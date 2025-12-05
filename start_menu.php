@@ -1,16 +1,21 @@
 <?php
 session_start();
 
-// Check if user is logged in
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header("Location: login.php");
-    exit();
-}
+// TEMPORARY: Comment out login check for testing
+// if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+//     header("Location: login.php");
+//     exit();
+// }
 
-// Get user information from session
-$username = $_SESSION['username'];
-$displayname = $_SESSION['displayname'];
-$email = $_SESSION['email'];
+// TEMPORARY: Dummy values for testing
+$username = "TestUser";
+$displayname = "Test Player";
+$email = "test@example.com";
+
+// Uncomment below and remove dummy values when database is ready:
+// $username = $_SESSION['username'];
+// $displayname = $_SESSION['displayname'];
+// $email = $_SESSION['email'];
 ?>
 
 <!DOCTYPE html>
@@ -18,219 +23,144 @@ $email = $_SESSION['email'];
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Laro ng Lahi</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .navbar {
-            background: white;
-            border-radius: 10px;
-            padding: 20px 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .navbar h1 {
-            color: #667eea;
-            font-size: 24px;
-        }
-        
-        .navbar .user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-        
-        .navbar .user-name {
-            color: #333;
-            font-weight: 600;
-        }
-        
-        .navbar .logout-btn {
-            padding: 8px 20px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            text-decoration: none;
-            font-weight: 600;
-        }
-        
-        .navbar .logout-btn:hover {
-            background: #5568d3;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-        
-        .welcome-card {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            margin-bottom: 30px;
-            text-align: center;
-        }
-        
-        .welcome-card h2 {
-            color: #333;
-            margin-bottom: 10px;
-            font-size: 32px;
-        }
-        
-        .welcome-card p {
-            color: #666;
-            font-size: 18px;
-        }
-        
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .info-card {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .info-card h3 {
-            color: #667eea;
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        
-        .info-card .info-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #f0f0f0;
-        }
-        
-        .info-card .info-row:last-child {
-            border-bottom: none;
-        }
-        
-        .info-card .label {
-            color: #666;
-            font-weight: 500;
-        }
-        
-        .info-card .value {
-            color: #333;
-            font-weight: 600;
-        }
-        
-        .game-section {
-            background: white;
-            border-radius: 15px;
-            padding: 40px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-        
-        .game-section h2 {
-            color: #333;
-            margin-bottom: 20px;
-        }
-        
-        .game-btn {
-            padding: 15px 40px;
-            background: #667eea;
-            color: white;
-            border: none;
-            border-radius: 10px;
-            font-size: 18px;
-            font-weight: 600;
-            cursor: pointer;
-            margin: 10px;
-            transition: all 0.3s;
-        }
-        
-        .game-btn:hover {
-            background: #5568d3;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
-        }
-    </style>
+    <title>Laro ng Lahi - Main Menu</title>
+    <link rel="stylesheet" href="assets/css/start_menu.css">
 </head>
 <body>
-    <div class="navbar">
-        <h1>🎮 Laro ng Lahi</h1>
-        <div class="user-info">
-            <span class="user-name">Welcome, <?php echo htmlspecialchars($displayname); ?>!</span>
-            <a href="logout.php" class="logout-btn">Logout</a>
+    <!-- Click to Enter Overlay -->
+    <div id="enterOverlay" class="enter-overlay">
+        <div class="enter-content">
+            <img src="assets/startmenu/screen_title.png" alt="Laro ng Lahi" class="enter-title">
+            <div class="enter-text">Click anywhere to enter</div>
         </div>
     </div>
     
-    <div class="container">
-        <div class="welcome-card">
-            <h2>Mabuhay, <?php echo htmlspecialchars($displayname); ?>! 🎉</h2>
-            <p>Ready to play traditional Filipino games?</p>
+    <div class="game-container">
+        <!-- Decorative glow -->
+        <div class="glow-effect"></div>
+        
+        <!-- Floating particles -->
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
         </div>
         
-        <div class="info-grid">
-            <div class="info-card">
-                <h3>Account Information</h3>
-                <div class="info-row">
-                    <span class="label">Username:</span>
-                    <span class="value"><?php echo htmlspecialchars($username); ?></span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Display Name:</span>
-                    <span class="value"><?php echo htmlspecialchars($displayname); ?></span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Email:</span>
-                    <span class="value"><?php echo htmlspecialchars($email); ?></span>
-                </div>
-            </div>
+        <!-- User info bar -->
+        <div class="user-bar">
+            <div class="user-avatar"><?php echo strtoupper(substr($displayname, 0, 1)); ?></div>
+            <span class="user-name"><?php echo htmlspecialchars($displayname); ?></span>
+            <a href="logout.php" class="logout-btn">Logout</a>
+        </div>
+        
+        <!-- Game Title -->
+        <div class="game-title">
+            <img src="assets/startmenu/screen_title.png" alt="Laro ng Lahi">
+        </div>
+        
+        <!-- Menu Buttons -->
+        <div class="menu-container">
+            <!-- Start Button - Centered and prominent -->
+            <a href="game_select.php" class="start-btn" title="Start Game">
+                <img src="assets/startmenu/start_button.png" alt="Start">
+            </a>
             
-            <div class="info-card">
-                <h3>Game Stats</h3>
-                <div class="info-row">
-                    <span class="label">Games Played:</span>
-                    <span class="value">0</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Total Score:</span>
-                    <span class="value">0</span>
-                </div>
-                <div class="info-row">
-                    <span class="label">Rank:</span>
-                    <span class="value">Beginner</span>
-                </div>
+            <!-- Secondary buttons - Horizontal layout -->
+            <div class="secondary-buttons">
+                <a href="settings.php" class="menu-btn" title="Settings">
+                    <img src="assets/startmenu/settings_button.png" alt="Settings">
+                </a>
+                <a href="facts.php" class="menu-btn" title="Laro Fact Cards">
+                    <img src="assets/startmenu/fact_button.png" alt="Facts">
+                </a>
+                <a href="achievements.php" class="menu-btn achievements-btn" title="Achievements">
+                    <img src="assets/startmenu/achievements_button.png" alt="Achievements">
+                </a>
             </div>
         </div>
         
-        <div class="game-section">
-            <h2>Start Playing!</h2>
-            <p style="color: #666; margin-bottom: 30px;">Choose your favorite Filipino traditional game</p>
-            <button class="game-btn">🎯 Patintero</button>
-            <button class="game-btn">🏃 Tumbang Preso</button>
-            <button class="game-btn">🎭 Langit Lupa</button>
-            <button class="game-btn">🎪 Luksong Tinik</button>
-        </div>
+        <!-- Version text -->
+        <div class="version-text">Version 1.0.0 | © 2024 Laro ng Lahi</div>
+        
+        <!-- Background Music -->
+        <audio id="bgMusic" loop autoplay>
+            <source src="assets/bgmusic/startmenuMusic.mp3" type="audio/mpeg">
+        </audio>
+        
+        <!-- Music Toggle Button -->
+        <button id="musicToggle" class="music-toggle" title="Toggle Music">
+            🔊
+        </button>
     </div>
+    
+    <script>
+        // Elements
+        const bgMusic = document.getElementById('bgMusic');
+        const musicToggle = document.getElementById('musicToggle');
+        const enterOverlay = document.getElementById('enterOverlay');
+        let isMuted = false;
+        
+        // Set volume and ensure loop
+        bgMusic.volume = 0.5;
+        bgMusic.loop = true;
+        
+        // Handle "Click to Enter" overlay
+        enterOverlay.addEventListener('click', () => {
+            // Start the music
+            bgMusic.play();
+            // Hide the overlay with fade
+            enterOverlay.classList.add('hidden');
+        });
+        
+        // Fallback: ensure music restarts if it ends (extra safety for looping)
+        bgMusic.addEventListener('ended', () => {
+            bgMusic.currentTime = 0;
+            bgMusic.play();
+        });
+        
+        musicToggle.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if (isMuted) {
+                bgMusic.muted = false;
+                bgMusic.play();
+                musicToggle.textContent = '🔊';
+                isMuted = false;
+            } else {
+                bgMusic.muted = true;
+                musicToggle.textContent = '🔇';
+                isMuted = true;
+            }
+        });
+        
+        // Add subtle parallax effect on mouse move
+        document.addEventListener('mousemove', (e) => {
+            const title = document.querySelector('.game-title');
+            const glow = document.querySelector('.glow-effect');
+            
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
+            
+            const moveX = (e.clientX - centerX) / 50;
+            const moveY = (e.clientY - centerY) / 50;
+            
+            title.style.transform = `translate(${moveX}px, ${moveY}px)`;
+            glow.style.transform = `translate(calc(-50% + ${moveX * 2}px), ${moveY * 2}px)`;
+        });
+        
+        // Button click animation
+        const allButtons = document.querySelectorAll('.menu-btn, .start-btn');
+        allButtons.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                btn.style.transform = 'scale(0.9)';
+                setTimeout(() => {
+                    btn.style.transform = '';
+                }, 100);
+            });
+        });
+    </script>
 </body>
 </html>
