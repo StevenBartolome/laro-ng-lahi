@@ -116,10 +116,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 $conn->close();
 
-// Calculate remaining time for OTP
-$remaining_time = 300 - (time() - $_SESSION['otp_time']);
-$minutes = floor($remaining_time / 60);
-$seconds = $remaining_time % 60;
 ?>
 
 <!DOCTYPE html>
@@ -360,16 +356,6 @@ $seconds = $remaining_time % 60;
             <strong><?php echo $_SESSION['temp_email']; ?></strong>
         </div>
         
-        <?php if ($remaining_time > 0): ?>
-            <div class="timer" id="timer">
-                ⏱️ Code expires in: <strong><?php echo sprintf("%d:%02d", $minutes, $seconds); ?></strong>
-            </div>
-        <?php else: ?>
-            <div class="timer expired">
-                ⚠️ Your code has expired. Please request a new one.
-            </div>
-        <?php endif; ?>
-        
         <form method="POST" action="">
             <div class="form-group">
                 <label for="otp">Enter 6-Digit Code *</label>
@@ -389,31 +375,7 @@ $seconds = $remaining_time % 60;
         </form>
     </div>
     
-    <script>
-        // Countdown timer
-        let timeLeft = <?php echo $remaining_time; ?>;
-        const timerElement = document.getElementById('timer');
-        const resendBtn = document.getElementById('resendBtn');
-        
-        if (timeLeft > 0) {
-            const countdown = setInterval(function() {
-                timeLeft--;
-                
-                if (timeLeft <= 0) {
-                    clearInterval(countdown);
-                    timerElement.innerHTML = '⚠️ Your code has expired. Please request a new one.';
-                    timerElement.classList.add('expired');
-                    resendBtn.disabled = false;
-                } else {
-                    const minutes = Math.floor(timeLeft / 60);
-                    const seconds = timeLeft % 60;
-                    timerElement.innerHTML = `⏱️ Code expires in: <strong>${minutes}:${seconds.toString().padStart(2, '0')}</strong>`;
-                }
-            }, 1000);
-        } else {
-            resendBtn.disabled = false;
-        }
-        
+    <script>        
         // Auto-focus on OTP input
         document.getElementById('otp').focus();
         

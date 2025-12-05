@@ -1,6 +1,19 @@
 <?php
 session_start();
 
+// Handle reset FIRST - before any output
+if (isset($_GET['reset'])) {
+    unset($_SESSION['reg_step']);
+    unset($_SESSION['temp_username']);
+    unset($_SESSION['temp_email']);
+    unset($_SESSION['temp_password']);
+    unset($_SESSION['temp_displayname']);
+    unset($_SESSION['otp']);
+    unset($_SESSION['otp_time']);
+    header("Location: register.php");
+    exit();
+}
+
 // Database configuration
 $servername = "localhost";
 $db_username = "root";
@@ -19,7 +32,12 @@ use PHPMailer\PHPMailer\Exception;
 require 'vendor/autoload.php';
 
 $message = "";
-$step = isset($_SESSION['reg_step']) ? $_SESSION['reg_step'] : 1;
+
+// Initialize step - ensure it defaults to 1 if not set
+if (!isset($_SESSION['reg_step'])) {
+    $_SESSION['reg_step'] = 1;
+}
+$step = $_SESSION['reg_step'];
 
 // Handle form submissions
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
@@ -311,6 +329,7 @@ $conn->close();
             margin-bottom: 15px;
             display: flex;
             align-items: center;
+            padding: 0;
         }
         
         .back-btn:hover {
@@ -330,7 +349,7 @@ $conn->close();
             <div class="progress-step <?php echo $step >= 2 ? 'active' : ''; ?>">2</div>
         </div>
         
-        <?php echo $message; ?>
+        <?php if (!empty($message)) echo $message; ?>
         
         <?php if ($step == 1): ?>
             <h2 class="step-title">Basic Account Information</h2>
@@ -339,12 +358,14 @@ $conn->close();
                     <label for="username">Username *</label>
                     <input type="text" id="username" name="username" required 
                            pattern="[a-zA-Z0-9_]{3,20}" 
-                           title="3-20 characters, letters, numbers and underscore only">
+                           title="3-20 characters, letters, numbers and underscore only"
+                           value="<?php echo isset($_SESSION['temp_username']) ? htmlspecialchars($_SESSION['temp_username']) : ''; ?>">
                 </div>
                 
                 <div class="form-group">
                     <label for="email">Email Address *</label>
-                    <input type="email" id="email" name="email" required>
+                    <input type="email" id="email" name="email" required
+                           value="<?php echo isset($_SESSION['temp_email']) ? htmlspecialchars($_SESSION['temp_email']) : ''; ?>">
                 </div>
                 
                 <div class="form-group">
@@ -368,25 +389,20 @@ $conn->close();
                     <label for="displayname">Display Name / Nickname *</label>
                     <input type="text" id="displayname" name="displayname" required 
                            maxlength="50" 
-                           placeholder="How should we call you in-game?">
+                           placeholder="How should we call you in-game?"
+                           value="<?php echo isset($_SESSION['temp_displayname']) ? htmlspecialchars($_SESSION['temp_displayname']) : ''; ?>">
                 </div>
                 
                 <button type="submit" name="step2" class="btn btn-primary">Send Verification Code</button>
             </form>
+        <?php else: ?>
+            <div class="error">Invalid registration step. Please start over.</div>
+            <button class="btn btn-primary" onclick="window.location.href='register.php?reset=1'">Start Registration</button>
         <?php endif; ?>
         
         <div class="login-link">
             Already have an account? <a href="login.php">Login here</a>
         </div>
     </div>
-    
-    <?php
-    // Handle reset
-    if (isset($_GET['reset'])) {
-        $_SESSION['reg_step'] = 1;
-        header("Location: register.php");
-        exit();
-    }
-    ?>
 </body>
 </html>

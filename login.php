@@ -43,7 +43,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION['displayname'] = $user['displayname'];
                 $_SESSION['logged_in'] = true;
                 
-                header("Location: dashboard.php"); // Redirect to game dashboard
+                header("Location: start_menu.php"); // Redirect to game dashboard
                 exit();
             } else {
                 $message = "<div class='error'>Invalid username/email or password.</div>";
