@@ -1,0 +1,237 @@
+/* Game Select Screen Styles */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #1a1a2e;
+}
+
+/* Full screen game background */
+.game-select-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: url('../startmenu/game_background_pixelated.png') center center / cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dark overlay */
+.game-select-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    pointer-events: none;
+}
+
+/* Back Button */
+.back-btn {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+}
+
+.back-btn img {
+    width: 200px;
+    height: auto;
+}
+
+.back-btn:hover {
+    transform: scale(1.1) translateX(-5px);
+    filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.5));
+}
+
+/* Select Game Title */
+.select-title {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 60px;
+    margin-top: -50px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.select-title img {
+    max-width: 500px;
+    width: 90vw;
+    height: auto;
+    filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Game Cards Container */
+.game-cards-container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 40px;
+}
+
+/* Individual Game Card */
+.game-card {
+    display: block;
+    cursor: pointer;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5));
+    text-decoration: none;
+}
+
+.game-card img {
+    width: 220px;
+    height: auto;
+    display: block;
+    border-radius: 15px;
+}
+
+.game-card:hover {
+    transform: scale(1.1) translateY(-15px);
+    filter: drop-shadow(0 20px 40px rgba(0, 0, 0, 0.6));
+}
+
+.game-card:active {
+    transform: scale(0.95);
+}
+
+/* Staggered animation for cards */
+.game-card:nth-child(1) { animation: cardSlideIn 0.6s ease-out 0.2s both; }
+.game-card:nth-child(2) { animation: cardSlideIn 0.6s ease-out 0.4s both; }
+.game-card:nth-child(3) { animation: cardSlideIn 0.6s ease-out 0.6s both; }
+
+@keyframes cardSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(80px) scale(0.8) rotateY(20deg);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1) rotateY(0deg);
+    }
+}
+
+/* Card glow effect on hover */
+.game-card::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 15px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    box-shadow: 0 0 30px rgba(255, 200, 50, 0.6);
+    pointer-events: none;
+}
+
+.game-card:hover::after {
+    opacity: 1;
+}
+
+/* Decorative particles */
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 5;
+}
+
+.particle {
+    position: absolute;
+    width: 8px;
+    height: 8px;
+    background: rgba(255, 215, 0, 0.5);
+    border-radius: 50%;
+    animation: sparkle 5s linear infinite;
+}
+
+.particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.particle:nth-child(2) { left: 25%; animation-delay: 0.7s; }
+.particle:nth-child(3) { left: 40%; animation-delay: 1.4s; }
+.particle:nth-child(4) { left: 55%; animation-delay: 2.1s; }
+.particle:nth-child(5) { left: 70%; animation-delay: 2.8s; }
+.particle:nth-child(6) { left: 85%; animation-delay: 3.5s; }
+
+@keyframes sparkle {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% { opacity: 1; }
+    90% { opacity: 1; }
+    100% {
+        transform: translateY(-20vh) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Responsive adjustments */
+@media (max-width: 900px) {
+    .game-cards-container {
+        gap: 25px;
+    }
+    
+    .game-card img {
+        width: 180px;
+    }
+    
+    .select-title img {
+        max-width: 400px;
+    }
+}
+
+@media (max-width: 700px) {
+    .game-cards-container {
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .game-card img {
+        width: 200px;
+    }
+    
+    .select-title {
+        margin-bottom: 30px;
+    }
+    
+    .select-title img {
+        max-width: 300px;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-card img {
+        width: 160px;
+    }
+    
+    .back-btn img {
+        width: 45px;
+    }
+}
