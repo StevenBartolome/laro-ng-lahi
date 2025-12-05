@@ -1,0 +1,428 @@
+/* Start Menu Styles - Laro ng Lahi */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Nunito', sans-serif;
+    min-height: 100vh;
+    overflow: hidden;
+    background: #1a1a2e;
+}
+
+/* Click to Enter Overlay */
+.enter-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    cursor: pointer;
+    transition: opacity 0.8s ease, visibility 0.8s ease;
+}
+
+.enter-overlay.hidden {
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.enter-content {
+    text-align: center;
+    animation: pulse-glow 2s ease-in-out infinite;
+}
+
+.enter-title {
+    max-width: 500px;
+    width: 80vw;
+    margin-bottom: 40px;
+    filter: drop-shadow(0 0 30px rgba(255, 200, 50, 0.5));
+}
+
+.enter-text {
+    color: white;
+    font-size: 24px;
+    font-weight: 700;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+    animation: blink 1.5s ease-in-out infinite;
+}
+
+@keyframes blink {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+}
+
+@keyframes pulse-glow {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.02); }
+}
+
+/* Full screen game background */
+.game-container {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: url('../startmenu/game_background_pixelated.png') center center / cover no-repeat;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Dark overlay for better text/button visibility */
+.game-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.2) 0%,
+        rgba(0, 0, 0, 0.05) 30%,
+        rgba(0, 0, 0, 0.05) 70%,
+        rgba(0, 0, 0, 0.3) 100%
+    );
+    pointer-events: none;
+}
+
+/* User info bar at top */
+.user-bar {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(255, 255, 255, 0.15);
+    backdrop-filter: blur(10px);
+    padding: 10px 20px;
+    border-radius: 50px;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #ffd700 0%, #ff8c00 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    color: white;
+    font-size: 18px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+    border: 2px solid white;
+}
+
+.user-name {
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+.logout-btn {
+    background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    box-shadow: 0 3px 10px rgba(231, 76, 60, 0.4);
+}
+
+.logout-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 5px 15px rgba(231, 76, 60, 0.6);
+}
+
+/* Game Title - Made bigger */
+.game-title {
+    position: relative;
+    z-index: 10;
+    margin-bottom: 200px;
+    margin-top: -300px;
+    animation: float 3s ease-in-out infinite;
+}
+
+.game-title img {
+    max-width: 900px;
+    width: 95vw;
+    height: auto;
+    filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
+}
+
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-15px); }
+}
+
+/* Menu layout container */
+.menu-container {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 30px;
+}
+
+/* Start button - centered and prominent */
+.start-btn {
+    display: block;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 8px 20px rgba(0, 0, 0, 0.5));
+    animation: slideIn 0.6s ease-out 0.2s both;
+}
+
+.start-btn img {
+    width: 280px;
+    height: auto;
+    display: block;
+}
+
+.start-btn:hover {
+    transform: scale(1.15) translateY(-8px);
+    filter: drop-shadow(0 15px 35px rgba(0, 0, 0, 0.6)) brightness(1.1);
+}
+
+.start-btn:active {
+    transform: scale(0.95);
+}
+
+/* Secondary buttons container - horizontal layout */
+.secondary-buttons {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 50px;
+    margin-top: 100px;
+}
+
+/* Secondary menu button styles */
+.menu-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.4));
+    text-decoration: none;
+}
+
+.menu-btn img {
+    width: 120px;
+    height: 120px;
+    min-width: 120px;
+    min-height: 120px;
+    object-fit: contain;
+    display: block;
+    transform: scale(1);
+}
+
+.menu-btn:hover {
+    transform: scale(1.15) translateY(-8px);
+    filter: drop-shadow(0 10px 25px rgba(0, 0, 0, 0.5)) brightness(1.1);
+}
+
+.menu-btn:active {
+    transform: scale(0.95);
+}
+
+/* Staggered animation for secondary buttons */
+.menu-btn:nth-child(1) { animation: slideIn 0.6s ease-out 0.4s both; }
+.menu-btn:nth-child(2) { animation: slideIn 0.6s ease-out 0.5s both; }
+.menu-btn:nth-child(3) { animation: slideIn 0.6s ease-out 0.6s both; }
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(50px) scale(0.8);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Decorative particles */
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 5;
+}
+
+.particle {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    background: rgba(255, 215, 0, 0.6);
+    border-radius: 50%;
+    animation: sparkle 4s linear infinite;
+}
+
+.particle:nth-child(1) { left: 10%; animation-delay: 0s; }
+.particle:nth-child(2) { left: 20%; animation-delay: 0.5s; }
+.particle:nth-child(3) { left: 35%; animation-delay: 1s; }
+.particle:nth-child(4) { left: 50%; animation-delay: 1.5s; }
+.particle:nth-child(5) { left: 65%; animation-delay: 2s; }
+.particle:nth-child(6) { left: 80%; animation-delay: 2.5s; }
+.particle:nth-child(7) { left: 90%; animation-delay: 3s; }
+
+@keyframes sparkle {
+    0% {
+        transform: translateY(100vh) scale(0);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-20vh) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Glowing effect behind title */
+.glow-effect {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 250px;
+    background: radial-gradient(ellipse, rgba(255, 200, 50, 0.3) 0%, transparent 70%);
+    filter: blur(30px);
+    z-index: 1;
+    animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 0.5; transform: translateX(-50%) scale(1); }
+    50% { opacity: 0.8; transform: translateX(-50%) scale(1.1); }
+}
+
+/* Footer version */
+.version-text {
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    color: rgba(255, 255, 255, 0.5);
+    font-size: 12px;
+    z-index: 10;
+    text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
+}
+
+/* Scale up achievements button since its source image is smaller */
+.achievements-btn img {
+    transform: scale(1.15);
+}
+
+/* Music Toggle Button */
+.music-toggle {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    color: white;
+    font-size: 24px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.music-toggle:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .game-title img {
+        max-width: 400px;
+    }
+    
+    .start-btn img {
+        width: 220px;
+    }
+    
+    .menu-btn img {
+        width: 90px;
+        height: 90px;
+    }
+    
+    .secondary-buttons {
+        gap: 15px;
+    }
+    
+    .user-bar {
+        top: 10px;
+        right: 10px;
+        padding: 8px 15px;
+    }
+    
+    .user-name {
+        display: none;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-title img {
+        max-width: 300px;
+    }
+    
+    .start-btn img {
+        width: 180px;
+    }
+    
+    .menu-btn img {
+        width: 75px;
+        height: 75px;
+    }
+    
+    .secondary-buttons {
+        gap: 10px;
+    }
+    
+    .menu-container {
+        gap: 20px;
+    }
+}
