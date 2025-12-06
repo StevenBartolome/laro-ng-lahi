@@ -11,10 +11,27 @@
 </head>
 
 <body>
-    <!-- Back Button -->
-    <a href="../game_select.php" class="back-btn" title="Back to Game Select">
-        <img src="../assets/startmenu/back_button.png" alt="Back">
-    </a>
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="../assets/luksong_baka_assets/luksong_baka_bgm.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="jumpSound">
+        <source src="../assets/luksong_baka_assets/jump_sound.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Sound Controls (Top Left) -->
+    <div class="sound-controls">
+        <div class="volume-control">
+            <span class="volume-label">🎵 BGM</span>
+            <input type="range" id="bgmVolume" class="volume-slider" min="0" max="100" value="50"
+                title="Background Music Volume">
+        </div>
+        <div class="volume-control">
+            <span class="volume-label">🔊 SFX</span>
+            <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="70"
+                title="Sound Effects Volume">
+        </div>
+    </div>
 
     <!-- Difficulty Selection Screen -->
     <div id="difficultyScreen" class="overlay">
@@ -31,18 +48,30 @@
                 <p>1. Press <strong>SPACE</strong> or <strong>CLICK</strong> to start running</p>
                 <p>2. Hold to charge your jump angle</p>
                 <p>3. Release to jump over the baka!</p>
-                <p>4. Clear all 4 levels to advance!</p>
+                <p>4. Clear all 5 levels to win!</p>
             </div>
         </div>
     </div>
 
-    <!-- Game Canvas -->
-    <canvas id="gameCanvas"></canvas>
+    <!-- Game Container -->
+    <div class="game-container">
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Back Button (Below Game) -->
+        <a href="../game_select.php" class="back-btn" title="Back to Game Select">
+            <img src="../assets/startmenu/back_button.png" alt="Back">
+        </a>
+    </div>
 
     <!-- Game UI Overlay -->
     <div id="gameUI">
+        <div class="lives-display" id="livesDisplay">
+            <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart1">
+            <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart2">
+            <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart3">
+        </div>
         <div class="level-display">Baka Level: <span id="levelText">1</span></div>
-        <div class="round-display">Round: <span id="roundText">1</span></div>
     </div>
 
     <!-- Message Overlay -->
@@ -50,7 +79,16 @@
         <div id="messageText"></div>
     </div>
 
-    <script src="script.js"></script>
+    <!-- Modular JS Files (load order matters!) -->
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/assets.js"></script>
+    <script src="js/sound.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/logic.js"></script>
+    <script src="js/rendering.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/main.js"></script>
 </body>
 
 </html>

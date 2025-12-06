@@ -44,6 +44,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let angleSpeed = 4;
     let difficultyMultiplier = 1;
     let totalJumps = 0;  // Track total successful jumps for score
+    let lives = 3;       // Player has 3 lives
     
     // ===== SPRITE ASSETS =====
     const assets = {
@@ -252,6 +253,34 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1500);
     }
     
+    /**
+     * Update the visual hearts display
+     */
+    function updateLivesDisplay() {
+        for (let i = 1; i <= 3; i++) {
+            const heart = document.getElementById('heart' + i);
+            if (i <= lives) {
+                heart.classList.remove('lost');
+            } else {
+                heart.classList.add('lost');
+            }
+        }
+    }
+    
+    /**
+     * Handle losing a life
+     * @returns {boolean} - True if game over (all lives lost)
+     */
+    function loseLife() {
+        lives--;
+        updateLivesDisplay();
+        
+        if (lives <= 0) {
+            return true;  // Game over
+        }
+        return false;  // Still has lives
+    }
+    
     function resetPlayer() {
         player.x = CONFIG.playerStartX;
         player.y = CONFIG.groundY;
@@ -263,8 +292,9 @@ document.addEventListener('DOMContentLoaded', () => {
     function resetGame() {
         setBakaLevel(1);
         currentRound = 1;
-        roundText.textContent = 1;
         difficultyMultiplier = 1;
+        lives = 3;
+        updateLivesDisplay();
         resetPlayer();
         gameState = 'idle';
     }
@@ -471,11 +501,20 @@ document.addEventListener('DOMContentLoaded', () => {
                 
                 if (canFail && collision === 'hit') {
                     gameState = 'fail';
-                    showMessage('💥 Hit the baka!', 'fail');
-                    setTimeout(() => {
-                        resetGame();
-                        gameState = 'idle';
-                    }, 2000);
+                    const isGameOver = loseLife();
+                    if (isGameOver) {
+                        showMessage('� Game Over!', 'fail');
+                        setTimeout(() => {
+                            resetGame();
+                            gameState = 'idle';
+                        }, 2000);
+                    } else {
+                        showMessage('💥 Hit! ' + lives + ' ❤️ left', 'fail');
+                        setTimeout(() => {
+                            resetPlayer();
+                            gameState = 'idle';
+                        }, 1500);
+                    }
                 } else if (landed) {
                     // Levels 1-3 always succeed, levels 4-5 check if cleared
                     if (!canFail || collision === 'clear' || player.x > baka.x + baka.width) {
@@ -487,11 +526,20 @@ document.addEventListener('DOMContentLoaded', () => {
                         }, 500);
                     } else {
                         gameState = 'fail';
-                        showMessage('❌ Too short!', 'fail');
-                        setTimeout(() => {
-                            resetGame();
-                            gameState = 'idle';
-                        }, 2000);
+                        const isGameOver = loseLife();
+                        if (isGameOver) {
+                            showMessage('💔 Game Over!', 'fail');
+                            setTimeout(() => {
+                                resetGame();
+                                gameState = 'idle';
+                            }, 2000);
+                        } else {
+                            showMessage('❌ Too short! ' + lives + ' ❤️ left', 'fail');
+                            setTimeout(() => {
+                                resetPlayer();
+                                gameState = 'idle';
+                            }, 1500);
+                        }
                     }
                 }
                 break;
@@ -526,6 +574,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
     function handleInputDown() {
         if (isInputDown) return;
+        if (gameState === 'gameover') return;  // Block input after game complete
         isInputDown = true;
         
         if (gameState === 'idle') {

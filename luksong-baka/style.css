@@ -17,24 +17,105 @@ body {
     overflow: hidden;
 }
 
-/* Back Button */
-.back-btn {
+/* Sound Controls (Top Left) */
+.sound-controls {
     position: fixed;
     top: 20px;
     left: 20px;
     z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 10px 15px;
+    border-radius: 30px;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+}
+
+/* Music Mute Button */
+.mute-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.mute-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.3);
+}
+
+.mute-btn.muted {
+    opacity: 0.5;
+}
+
+/* Volume Control */
+.volume-control {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.volume-label {
+    font-size: 12px;
+    font-weight: 600;
+    color: white;
+    white-space: nowrap;
+}
+
+.volume-slider {
+    width: 80px;
+    height: 6px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: rgba(255, 255, 255, 0.3);
+    border-radius: 3px;
+    outline: none;
+    cursor: pointer;
+}
+
+.volume-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #D2691E;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.volume-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    background: #ff8c00;
+}
+
+/* Game Container */
+.game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+}
+
+/* Back Button (Below Game) */
+.back-btn {
     cursor: pointer;
     transition: all 0.3s ease;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
 }
 
 .back-btn img {
-    width: 80px;
+    width: 120px;
     height: auto;
 }
 
 .back-btn:hover {
-    transform: scale(1.1) translateX(-5px);
+    transform: scale(1.1);
 }
 
 /* Game Canvas */
@@ -161,6 +242,28 @@ body {
     font-family: 'Fredoka One', cursive;
 }
 
+/* Lives/Hearts Display */
+.lives-display {
+    display: flex;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 15px;
+    border-radius: 25px;
+}
+
+.heart {
+    width: 35px;
+    height: auto;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.heart.lost {
+    opacity: 0.3;
+    filter: grayscale(100%);
+    transform: scale(0.9);
+}
+
 /* Message Overlay */
 #messageOverlay {
     position: fixed;
@@ -200,4 +303,78 @@ body {
 #messageText.levelup {
     color: #D2691E;
     border: 3px solid #D2691E;
+}
+
+/* Game Complete Backdrop */
+#messageOverlay.game-complete-backdrop {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: none;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.game-complete-box {
+    background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%) !important;
+    padding: 50px 80px !important;
+    border: 4px solid #D2691E !important;
+    box-shadow: 0 0 50px rgba(210, 105, 30, 0.3);
+}
+
+.game-complete-content {
+    text-align: center;
+}
+
+/* Restart Button */
+.restart-btn {
+    padding: 15px 40px;
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Fredoka One', cursive;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #D2691E, #ff8c00);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(210, 105, 30, 0.4);
+}
+
+.restart-btn:hover {
+    transform: scale(1.1) translateY(-3px);
+    box-shadow: 0 10px 30px rgba(210, 105, 30, 0.6);
+}
+
+/* Button container */
+.complete-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+/* Back to Menu Button */
+.back-menu-btn {
+    padding: 15px 40px;
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'Fredoka One', cursive;
+    border: none;
+    border-radius: 50px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+    text-decoration: none;
+    display: inline-block;
+}
+
+.back-menu-btn:hover {
+    transform: scale(1.1) translateY(-3px);
+    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.6);
 }
