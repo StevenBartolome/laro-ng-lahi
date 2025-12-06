@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jolen - Filipino Marble Game</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Game Mode Selection Screen -->
+    <div id="mode-screen">
+        <div class="mode-container">
+            <h1>JOLEN</h1>
+            <p class="game-description">Traditional Filipino Marble Game</p>
+            <p class="instruction">Select Game Mode</p>
+            <div class="mode-buttons">
+                <button id="target-mode-btn" class="mode-btn">
+                    <span class="mode-title">🎯 Target Shooting</span>
+                    <span class="mode-desc">Hit all opponent marbles</span>
+                </button>
+                <button id="circle-mode-btn" class="mode-btn">
+                    <span class="mode-title">⭕ Circle Game</span>
+                    <span class="mode-desc">Knock marbles out of the circle</span>
+                </button>
+                <button id="hole-mode-btn" class="mode-btn">
+                    <span class="mode-title">🕳️ Hole Game</span>
+                    <span class="mode-desc">Roll marbles into holes</span>
+                </button>
+                <button id="tumbang-mode-btn" class="mode-btn">
+                    <span class="mode-title">🎪 Tumbang Preso</span>
+                    <span class="mode-desc">Knock down the target</span>
+                </button>
+                <button id="line-mode-btn" class="mode-btn">
+                    <span class="mode-title">📏 Line Game</span>
+                    <span class="mode-desc">Hit marbles in sequence</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Difficulty Selection Screen -->
+    <div id="difficulty-screen" style="display: none;">
+        <div class="difficulty-container">
+            <h1 id="mode-title-display">JOLEN</h1>
+            <p class="instruction">Select Your Difficulty</p>
+            <div class="difficulty-buttons">
+                <button id="easy-btn" class="diff-btn">EASY</button>
+                <button id="normal-btn" class="diff-btn">NORMAL</button>
+                <button id="hard-btn" class="diff-btn">HARD</button>
+            </div>
+            <button id="back-to-modes-btn" class="back-mode-btn">← Back to Modes</button>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container" style="display: none;">
+        <!-- Help Button -->
+        <button id="help-btn" class="help-button">?</button>
+
+        <!-- Help Modal -->
+        <div id="help-modal" class="modal">
+            <div class="modal-content">
+                <span class="close">&times;</span>
+                <h2>How to Play Jolen</h2>
+                <div class="help-sections">
+                    <div class="help-section">
+                        <h3>🎯 Objective</h3>
+                        <p>Hit all opponent marbles to win each round. Progress through levels as more marbles appear!</p>
+                    </div>
+                    <div class="help-section">
+                        <h3>🎮 Controls</h3>
+                        <p><strong>CLICK & HOLD</strong> - Click on your marble and hold</p>
+                        <p><strong>DRAG</strong> - Pull back in the opposite direction you want to shoot</p>
+                        <p><strong>RELEASE</strong> - Let go to launch your marble!</p>
+                    </div>
+                    <div class="help-section">
+                        <h3>📋 Game Flow</h3>
+                        <ol>
+                            <li><strong>Grab Marble:</strong> Click and hold your blue marble</li>
+                            <li><strong>Aim & Power:</strong> Drag to aim (opposite direction) - pull further for more power!</li>
+                            <li><strong>Release:</strong> Let go to shoot your marble</li>
+                            <li><strong>Win:</strong> Complete the objective to advance to next level</li>
+                        </ol>
+                    </div>
+                    <div class="help-section">
+                        <h3>💡 Tips</h3>
+                        <ul>
+                            <li>Drag OPPOSITE to where you want to shoot!</li>
+                            <li>Pull further back = stronger shot</li>
+                            <li>Plan your shots to hit multiple targets</li>
+                            <li>Your marble stays where it lands - shoot from there next time!</li>
+                            <li>Each level gets progressively harder</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Header -->
+        <div class="game-header">
+            <div class="header-item">
+                <span class="label">Level:</span>
+                <span id="level-number" class="value">1</span>
+            </div>
+            <div class="header-item">
+                <span class="label">Score:</span>
+                <span id="score-display" class="value">0</span>
+            </div>
+            <div class="header-item">
+                <span class="label">Targets Left:</span>
+                <span id="targets-left" class="value">0</span>
+            </div>
+        </div>
+
+        <!-- Instruction Prompt -->
+        <div id="instruction-prompt">
+            <p>CLICK & DRAG your marble to aim and shoot!</p>
+        </div>
+
+        <!-- Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Back Button -->
+        <a href="../game_select.php" class="back-button">← Back to Menu</a>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
