@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Patintero Game - Single Player</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="patintero.css">
 </head>
 
 <body>
@@ -36,8 +36,42 @@
             <button class="btn" onclick="startGame('medium')">Start (Medium)</button>
         </div>
 
+        <!-- Coin Flip Screen -->
+        <div class="selection-screen" id="coinFlipScreen" style="display: none;">
+            <h2>Determining Your Starting Role...</h2>
+            <div class="coin-container">
+                <div class="coin" id="coin">
+                    <div class="coin-side coin-heads">RUNNER</div>
+                    <div class="coin-side coin-tails">TAGGER</div>
+                </div>
+            </div>
+            <p id="coinResult" style="font-size: 24px; font-weight: bold; margin-top: 20px;"></p>
+        </div>
+
         <!-- Game Area -->
         <div class="game-area" id="gameArea">
+            <div class="game-header">
+                <div class="timer-display" id="timerDisplay">
+                    <span class="timer-label">Time:</span>
+                    <span class="timer-value" id="timerValue">2:00</span>
+                </div>
+                <div class="score-display" id="scoreDisplay">
+                    <div style="display: flex; gap: 20px;">
+                        <div>
+                            <span class="score-label">My Team:</span>
+                            <span class="score-value" id="myTeamScore">0</span>
+                        </div>
+                        <div>
+                            <span class="score-label">Enemy Team:</span>
+                            <span class="score-value" id="enemyTeamScore">0</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="role-display" id="roleDisplay">
+                    <span class="role-label">Role:</span>
+                    <span class="role-value" id="roleValue">RUNNER</span>
+                </div>
+            </div>
             <div class="controls-info">
                 Use <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span>
                 <span class="key-badge">D</span>
@@ -60,6 +94,14 @@
                 <div class="boost-fill" id="boostFill"></div>
                 <span class="boost-text">Boost (Space)</span>
             </div>
+
+            <!-- Character Selection Panel -->
+            <div class="character-selection-panel" id="characterPanel">
+                <h3 id="characterPanelTitle">Select Character to Control</h3>
+                <div class="character-buttons" id="characterButtons">
+                    <!-- Buttons will be dynamically generated -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -70,7 +112,7 @@
         <button class="btn" onclick="resetGame()">Play Again</button>
     </div>
 
-    <script src="script.js"></script>
+    <script src="patintero.js"></script>
 </body>
 
 </html>
