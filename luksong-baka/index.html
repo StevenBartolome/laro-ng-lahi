@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luksong Baka</title>
+    <link rel="stylesheet" href="luksong-baka.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <!-- Difficulty Selection Screen -->
+    <div id="difficulty-screen">
+        <div class="difficulty-container">
+            <h1>🐄 Luksong Baka 🐄</h1>
+            <p class="subtitle">Choose Your Difficulty</p>
+            <div class="button-group">
+                <button id="easy-btn" class="difficulty-btn easy">
+                    <span class="btn-icon">🌱</span>
+                    <span class="btn-text">Easy</span>
+                </button>
+                <button id="normal-btn" class="difficulty-btn normal">
+                    <span class="btn-icon">⚡</span>
+                    <span class="btn-text">Normal</span>
+                </button>
+                <button id="hard-btn" class="difficulty-btn hard">
+                    <span class="btn-icon">🔥</span>
+                    <span class="btn-text">Hard</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div id="game-container">
+        <!-- Game Info Panel -->
+        <div id="game-info">
+            <div class="info-card">
+                <span class="info-label">Level</span>
+                <span id="level-display" class="info-value">1</span>
+            </div>
+            <div class="info-card">
+                <span class="info-label">Score</span>
+                <span id="score-display" class="info-value">0</span>
+            </div>
+            <div class="info-card instructions">
+                <span class="info-label">Instructions</span>
+                <span class="info-text">Press & Hold SPACE to charge, Release to jump!</span>
+            </div>
+        </div>
+
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Timing Bar Container -->
+        <div id="timing-bar-container">
+            <div class="timing-bar-label">POWER GAUGE</div>
+            <div id="timing-bar-track">
+                <div class="power-zone weak"></div>
+                <div class="power-zone good"></div>
+                <div class="power-zone perfect"></div>
+                <div id="timing-bar-fill"></div>
+                <div id="timing-bar-indicator"></div>
+            </div>
+            <div class="zone-labels">
+                <span class="zone-label">Weak</span>
+                <span class="zone-label">Good</span>
+                <span class="zone-label">Perfect</span>
+            </div>
+        </div>
+    </div>
+
+    <script src="luksong-baka.js"></script>
+</body>
+
+</html>
