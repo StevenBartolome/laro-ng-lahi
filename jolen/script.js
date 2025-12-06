@@ -26,6 +26,37 @@ document.addEventListener('DOMContentLoaded', () => {
     canvas.width = 1280;
     canvas.height = 720;
 
+    // --- Image Assets ---
+    const images = {
+        background: new Image(),
+        playerMarble: new Image(),
+        targetMarbleRed: new Image(),
+        targetMarbleGreen: new Image(),
+        targetMarbleYellow: new Image()
+    };
+
+    images.background.src = '../assets/jolen_assets/game_background.png';
+    images.playerMarble.src = '../assets/jolen_assets/player_marble.png';
+    images.targetMarbleRed.src = '../assets/jolen_assets/target_marble_red.png';
+    images.targetMarbleGreen.src = '../assets/jolen_assets/target_marble_green.png';
+    images.targetMarbleYellow.src = '../assets/jolen_assets/target_marble_yellow.png';
+
+    let assetsLoaded = 0;
+    const totalAssets = 5;
+
+    function onAssetLoad() {
+        assetsLoaded++;
+        if (assetsLoaded === totalAssets) {
+            console.log('All jolen assets loaded!');
+        }
+    }
+
+    images.background.onload = onAssetLoad;
+    images.playerMarble.onload = onAssetLoad;
+    images.targetMarbleRed.onload = onAssetLoad;
+    images.targetMarbleGreen.onload = onAssetLoad;
+    images.targetMarbleYellow.onload = onAssetLoad;
+
     // --- Game Mode ---
     let gameMode = 'target'; // target, circle, hole, tumbang, line
 
@@ -124,6 +155,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     vx: 0,
                     vy: 0,
                     color: TARGET_COLOR,
+                    colorIndex: i % 3,
                     hit: false
                 });
             }
@@ -145,6 +177,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     vx: 0,
                     vy: 0,
                     color: TARGET_COLOR,
+                    colorIndex: i % 3,
                     hit: false,
                     outOfCircle: false
                 });
@@ -181,6 +214,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     vx: 0,
                     vy: 0,
                     color: TARGET_COLOR,
+                    colorIndex: i % 3,
                     hit: false,
                     hitOrder: i
                 });
@@ -350,45 +384,69 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // --- Drawing Functions ---
-    function drawMarble(marble, glow = false) {
+    function drawMarble(marble, glow = false, isPlayer = false) {
         ctx.save();
         
         // Draw glow effect
         if (glow) {
             ctx.shadowBlur = 20;
-            ctx.shadowColor = marble.color;
+            ctx.shadowColor = marble.color || PLAYER_COLOR;
         }
         
-        // Draw marble body
-        const gradient = ctx.createRadialGradient(
-            marble.x - marble.radius / 3, 
-            marble.y - marble.radius / 3, 
-            marble.radius / 4,
-            marble.x, 
-            marble.y, 
-            marble.radius
-        );
-        gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
-        gradient.addColorStop(0.4, marble.color);
-        gradient.addColorStop(1, 'rgba(0, 0, 0, 0.5)');
+        // Determine which image to use
+        let marbleImage = null;
+        if (isPlayer) {
+            marbleImage = images.playerMarble;
+        } else if (marble.colorIndex !== undefined) {
+            switch (marble.colorIndex) {
+                case 0:
+                    marbleImage = images.targetMarbleRed;
+                    break;
+                case 1:
+                    marbleImage = images.targetMarbleGreen;
+                    break;
+                case 2:
+                    marbleImage = images.targetMarbleYellow;
+                    break;
+            }
+        }
         
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(marble.x, marble.y, marble.radius, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw highlight
-        ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
-        ctx.beginPath();
-        ctx.arc(marble.x - marble.radius / 3, marble.y - marble.radius / 3, marble.radius / 3, 0, Math.PI * 2);
-        ctx.fill();
-        
-        // Draw outline
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.arc(marble.x, marble.y, marble.radius, 0, Math.PI * 2);
-        ctx.stroke();
+        // Draw marble with image if loaded, otherwise use gradient
+        if (marbleImage && marbleImage.complete && marbleImage.naturalWidth > 0) {
+            const size = marble.radius * 2;
+            ctx.drawImage(marbleImage, marble.x - marble.radius, marble.y - marble.radius, size, size);
+        } else {
+            // Fallback to gradient rendering
+            const gradient = ctx.createRadialGradient(
+                marble.x - marble.radius / 3, 
+                marble.y - marble.radius / 3, 
+                marble.radius / 4,
+                marble.x, 
+                marble.y, 
+                marble.radius
+            );
+            gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+            gradient.addColorStop(0.4, marble.color || PLAYER_COLOR);
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0.5)');
+            
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(marble.x, marble.y, marble.radius, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw highlight
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.beginPath();
+            ctx.arc(marble.x - marble.radius / 3, marble.y - marble.radius / 3, marble.radius / 3, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Draw outline
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(marble.x, marble.y, marble.radius, 0, Math.PI * 2);
+            ctx.stroke();
+        }
         
         ctx.restore();
     }
@@ -749,6 +807,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // --- Drawing ---
         ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        // Draw background
+        if (images.background.complete && images.background.naturalWidth > 0) {
+            ctx.drawImage(images.background, 0, 0, canvas.width, canvas.height);
+        }
+        
         // Draw game mode specific elements
         drawCircle();
         drawHoles();
@@ -757,11 +820,11 @@ document.addEventListener('DOMContentLoaded', () => {
         // Draw target marbles
         targetMarbles.forEach(target => {
             if (gameMode === 'target' && !target.hit) {
-                drawMarble(target);
+                drawMarble(target, false, false);
             } else if (gameMode === 'circle' && !target.outOfCircle) {
-                drawMarble(target);
+                drawMarble(target, false, false);
             } else if (gameMode === 'line' && !target.hit) {
-                drawMarble(target);
+                drawMarble(target, false, false);
             }
         });
         
@@ -769,7 +832,7 @@ document.addEventListener('DOMContentLoaded', () => {
         drawLineNumbers();
         
         // Draw player marble
-        drawMarble(playerMarble, gameState === 'idle' || gameState === 'dragging');
+        drawMarble(playerMarble, gameState === 'idle' || gameState === 'dragging', true);
         
         // Draw drag line
         drawDragLine();
