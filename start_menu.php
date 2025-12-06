@@ -27,14 +27,6 @@ $email = "test@example.com";
     <link rel="stylesheet" href="assets/css/start_menu.css">
 </head>
 <body>
-    <!-- Click to Enter Overlay -->
-    <div id="enterOverlay" class="enter-overlay">
-        <div class="enter-content">
-            <img src="assets/startmenu/screen_title.png" alt="Laro ng Lahi" class="enter-title">
-            <div class="enter-text">Click anywhere to enter</div>
-        </div>
-    </div>
-    
     <div class="game-container">
         <!-- Decorative glow -->
         <div class="glow-effect"></div>
@@ -101,27 +93,60 @@ $email = "test@example.com";
         // Elements
         const bgMusic = document.getElementById('bgMusic');
         const musicToggle = document.getElementById('musicToggle');
-        const enterOverlay = document.getElementById('enterOverlay');
-        let isMuted = false;
+        let isMuted = localStorage.getItem('musicMuted') === 'true';
         
         // Set volume and ensure loop
         bgMusic.volume = 0.5;
         bgMusic.loop = true;
         
-        // Handle "Click to Enter" overlay
-        enterOverlay.addEventListener('click', () => {
-            // Start the music
-            bgMusic.play();
-            // Hide the overlay with fade
-            enterOverlay.classList.add('hidden');
+        // Restore mute state
+        if (isMuted) {
+            bgMusic.muted = true;
+            musicToggle.textContent = '🔇';
+        }
+        
+        // Resume music from saved position
+        const savedTime = localStorage.getItem('musicTime');
+        if (savedTime) {
+            bgMusic.currentTime = parseFloat(savedTime);
+        }
+        
+        // Try to autoplay (will work if user interacted before)
+        bgMusic.play().catch(() => {
+            // If blocked, play on first interaction
+            document.addEventListener('click', function initAudio() {
+                bgMusic.play().catch(() => {});
+            }, { once: true });
         });
         
-        // Fallback: ensure music restarts if it ends (extra safety for looping)
+        // Save music position periodically
+        setInterval(() => {
+            if (!bgMusic.paused) {
+                localStorage.setItem('musicTime', bgMusic.currentTime);
+            }
+        }, 500);
+        
+        // Save position before leaving page
+        window.addEventListener('beforeunload', () => {
+            localStorage.setItem('musicTime', bgMusic.currentTime);
+            localStorage.setItem('musicMuted', isMuted);
+        });
+        
+        // Also save when clicking any link
+        document.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                localStorage.setItem('musicTime', bgMusic.currentTime);
+                localStorage.setItem('musicMuted', isMuted);
+            });
+        });
+        
+        // Fallback: ensure music restarts if it ends
         bgMusic.addEventListener('ended', () => {
             bgMusic.currentTime = 0;
             bgMusic.play();
         });
         
+        // Music toggle button
         musicToggle.addEventListener('click', (e) => {
             e.stopPropagation();
             if (isMuted) {
@@ -134,6 +159,7 @@ $email = "test@example.com";
                 musicToggle.textContent = '🔇';
                 isMuted = true;
             }
+            localStorage.setItem('musicMuted', isMuted);
         });
         
         // Add subtle parallax effect on mouse move
