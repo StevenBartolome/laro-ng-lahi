@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luksong Baka - Laro ng Lahi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Back Button -->
+    <a href="../game_select.php" class="back-btn" title="Back to Game Select">
+        <img src="../assets/startmenu/back_button.png" alt="Back">
+    </a>
+
+    <!-- Difficulty Selection Screen -->
+    <div id="difficultyScreen" class="overlay">
+        <div class="overlay-content">
+            <h1>🐃 Luksong Baka</h1>
+            <p>Choose Difficulty</p>
+            <div class="difficulty-buttons">
+                <button id="easyBtn" class="diff-btn easy">Easy</button>
+                <button id="normalBtn" class="diff-btn normal">Normal</button>
+                <button id="hardBtn" class="diff-btn hard">Hard</button>
+            </div>
+            <div class="instructions">
+                <h3>How to Play:</h3>
+                <p>1. Press <strong>SPACE</strong> or <strong>CLICK</strong> to start running</p>
+                <p>2. Hold to charge your jump angle</p>
+                <p>3. Release to jump over the baka!</p>
+                <p>4. Clear all 4 levels to advance!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Canvas -->
+    <canvas id="gameCanvas"></canvas>
+
+    <!-- Game UI Overlay -->
+    <div id="gameUI">
+        <div class="level-display">Baka Level: <span id="levelText">1</span></div>
+        <div class="round-display">Round: <span id="roundText">1</span></div>
+    </div>
+
+    <!-- Message Overlay -->
+    <div id="messageOverlay" class="hidden">
+        <div id="messageText"></div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
