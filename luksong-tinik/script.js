@@ -8,16 +8,57 @@ document.addEventListener('DOMContentLoaded', () => {
     const gaugesContainer = document.getElementById('gauges-container');
     const runSpeedBar = document.getElementById('run-speed-bar');
     const jumpPowerBar = document.getElementById('jump-power-bar');
+    const levelDisplay = document.getElementById('level-number');
+    const instructionPrompt = document.getElementById('instruction-prompt');
 
-    canvas.width = 800;
-    canvas.height = 400;
+    canvas.width = 1280;
+    canvas.height = 720;
+
+    // --- Image Assets ---
+    const images = {
+        playerRunning: [],
+        playerJumpCharge: [],
+        platformMidground: []
+    };
+    
+    for (let i = 1; i <= 4; i++) {
+        const img = new Image();
+        img.src = `../assets/luksong_tinik_assets/player_running_sprite_${i}.png`;
+        images.playerRunning.push(img);
+    }
+    
+    for (let i = 1; i <= 4; i++) {
+        const img = new Image();
+        img.src = `../assets/luksong_tinik_assets/player_jump_charge_${i}.png`;
+        images.playerJumpCharge.push(img);
+    }
+    
+    for (let i = 1; i <= 2; i++) {
+        const img = new Image();
+        img.src = `../assets/luksong_tinik_assets/player_platform_midground_variation_${i}.png`;
+        images.platformMidground.push(img);
+    }
+
+    let assetsLoaded = 0;
+    const totalAssets = 4 + 4 + 2; // running sprites + jump charge sprites + platforms
+
+    function onAssetLoad() {
+        assetsLoaded++;
+        if (assetsLoaded === totalAssets) {
+            console.log('All assets loaded!');
+        }
+    }
+
+    images.playerRunning.forEach(img => img.onload = onAssetLoad);
+    images.playerJumpCharge.forEach(img => img.onload = onAssetLoad);
+    images.platformMidground.forEach(img => img.onload = onAssetLoad);
 
     // --- Game Constants ---
     const GRAVITY = 0.5;
     const BASE_RUN_SPEED = 2;
     const BASE_JUMP_VELOCITY = 10;
-    const PLAYER_SIZE = 30;
-    const GROUND_Y = canvas.height - 50;
+    const PLAYER_SIZE = 60;
+    const GROUND_Y = canvas.height - 90;
 
     // --- Game State ---
     let gameState = 'idle'; // idle, poweringRun, running, poweringJump, chargingAngle, jumping, success, fault
@@ -32,6 +73,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let gaugeValue = 0;
     let gaugeSpeed = 5;
     let gaugeDirection = 1;
+    let animationFrame = 0;
+    let spriteIndex = 0;
 
     // --- Game Objects ---
     const player = {
@@ -66,18 +109,37 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
     // --- Drawing Functions ---
-    function drawGround() {
-        ctx.beginPath();
-        ctx.moveTo(0, GROUND_Y);
-        ctx.lineTo(canvas.width, GROUND_Y);
-        ctx.strokeStyle = 'green';
-        ctx.lineWidth = 4;
-        ctx.stroke();
-    }
-
     function drawPlayer() {
-        ctx.fillStyle = player.color;
-        ctx.fillRect(player.x, player.y, player.width, player.height);
+        let currentImage = null;
+        
+        // Update sprite animation
+        if (gameState === 'running' || gameState === 'poweringRun') {
+            animationFrame++;
+            if (animationFrame % 10 === 0) {
+                spriteIndex = (spriteIndex + 1) % images.playerRunning.length;
+            }
+            currentImage = images.playerRunning[spriteIndex];
+        } else if (gameState === 'chargingAngle' || gameState === 'poweringJump') {
+            animationFrame++;
+            if (animationFrame % 8 === 0) {
+                spriteIndex = (spriteIndex + 1) % images.playerJumpCharge.length;
+            }
+            currentImage = images.playerJumpCharge[spriteIndex];
+        } else if (gameState === 'jumping') {
+            // Use last jump charge frame for jumping
+            currentImage = images.playerJumpCharge[images.playerJumpCharge.length - 1];
+        } else {
+            // Idle state - use first running sprite
+            currentImage = images.playerRunning[0];
+        }
+
+        if (currentImage && currentImage.complete) {
+            ctx.drawImage(currentImage, player.x, player.y, player.width, player.height);
+        } else {
+            // Fallback
+            ctx.fillStyle = player.color;
+            ctx.fillRect(player.x, player.y, player.width, player.height);
+        }
     }
 
     function drawObstacle() {
@@ -91,21 +153,39 @@ document.addEventListener('DOMContentLoaded', () => {
         ctx.save();
         ctx.translate(player.x + player.width / 2, player.y + player.height / 2);
 
-        // Draw protractor
+        // Draw protractor arc (larger)
         ctx.beginPath();
-        ctx.arc(0, 0, 40, -Math.PI * (85 / 180), -Math.PI * (20 / 180));
-        ctx.strokeStyle = 'rgba(0, 0, 0, 0.5)';
-        ctx.lineWidth = 2;
+        ctx.arc(0, 0, 80, -Math.PI * (85 / 180), -Math.PI * (20 / 180));
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.8)';
+        ctx.lineWidth = 6;
         ctx.stroke();
 
-        // Draw angle line
+        // Draw angle line (much thicker and more visible)
         const angleRad = -chargeAngle * (Math.PI / 180);
         ctx.beginPath();
         ctx.moveTo(0, 0);
-        ctx.lineTo(Math.cos(angleRad) * 40, Math.sin(angleRad) * 40);
+        ctx.lineTo(Math.cos(angleRad) * 80, Math.sin(angleRad) * 80);
+        ctx.strokeStyle = '#ffeb3b';
+        ctx.lineWidth = 8;
+        ctx.stroke();
+
+        // Draw angle pointer at end
+        ctx.beginPath();
+        ctx.arc(Math.cos(angleRad) * 80, Math.sin(angleRad) * 80, 8, 0, Math.PI * 2);
+        ctx.fillStyle = '#ffeb3b';
+        ctx.fill();
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Draw angle text
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 20px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(`${Math.round(chargeAngle)}°`, 0, -90);
         ctx.strokeStyle = 'black';
         ctx.lineWidth = 3;
-        ctx.stroke();
+        ctx.strokeText(`${Math.round(chargeAngle)}°`, 0, -90);
 
         ctx.restore();
     }
@@ -140,6 +220,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // on fail, reset to level 1
             level = 1;
         }
+        levelDisplay.textContent = level;
         player.x = 50;
         player.y = GROUND_Y - PLAYER_SIZE;
         player.vx = 0;
@@ -152,6 +233,7 @@ document.addEventListener('DOMContentLoaded', () => {
         gaugeValue = 0;
         runSpeedPower = 0;
         jumpPower = 0;
+        instructionPrompt.style.display = 'block';
         buildObstacle();
     }
 
@@ -246,7 +328,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
         // --- Drawing ---
         ctx.clearRect(0, 0, canvas.width, canvas.height);
-        drawGround();
         drawObstacle();
         drawPlayer();
 
@@ -269,6 +350,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 gaugesContainer.style.display = 'flex';
                 runSpeedBar.style.left = '0%';
                 jumpPowerBar.style.left = '0%';
+                instructionPrompt.style.display = 'none';
                 break;
             case 'poweringRun':
                 runSpeedPower = gaugeValue;
@@ -303,20 +385,20 @@ document.addEventListener('DOMContentLoaded', () => {
     function startGame(difficulty) {
         switch (difficulty) {
             case 'easy':
-                angleSpeed = 3;
-                gaugeSpeed = 3;
+                angleSpeed = 1.5;
+                gaugeSpeed = 1.5;
                 break;
             case 'normal':
-                angleSpeed = 5;
-                gaugeSpeed = 5;
+                angleSpeed = 2.5;
+                gaugeSpeed = 2.5;
                 break;
             case 'hard':
-                angleSpeed = 8;
-                gaugeSpeed = 7;
+                angleSpeed = 4;
+                gaugeSpeed = 3.5;
                 break;
         }
         difficultyScreen.style.display = 'none';
-        canvas.style.display = 'block';
+        document.getElementById('game-container').style.display = 'block';
 
         // A single event listener for all game inputs
         let inputHandled = false;
