@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Patintero Game - Single Player</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <h1>🏃 Patintero Single Player 🏃</h1>
+
+        <!-- Difficulty Selection Screen -->
+        <div class="selection-screen" id="difficultyScreen">
+            <h2>Select Difficulty</h2>
+            <div class="runner-cards">
+                <div class="runner-card" onclick="startGame('easy')" id="diff-easy">
+                    <div class="runner-icon">E</div>
+                    <h3>Easy</h3>
+                    <p>Slow, more forgiving Taya</p>
+                </div>
+                <div class="runner-card" onclick="startGame('medium')" id="diff-medium">
+                    <div class="runner-icon">M</div>
+                    <h3>Medium</h3>
+                    <p>Balanced</p>
+                </div>
+                <div class="runner-card" onclick="startGame('hard')" id="diff-hard">
+                    <div class="runner-icon">H</div>
+                    <h3>Hard</h3>
+                    <p>Fast, reactive Taya</p>
+                </div>
+            </div>
+            <br>
+            <button class="btn" onclick="startGame('medium')">Start (Medium)</button>
+        </div>
+
+        <!-- Game Area -->
+        <div class="game-area" id="gameArea">
+            <div class="controls-info">
+                Use <span class="key-badge">W</span> <span class="key-badge">A</span> <span class="key-badge">S</span>
+                <span class="key-badge">D</span>
+                or <span class="key-badge">Arrow Keys</span> to move. Reach the <strong>END ZONE</strong> to win!
+            </div>
+
+            <div class="field" id="field">
+                <div class="start-zone">Start</div>
+                <div class="end-zone">Finish</div>
+
+                <!-- Grid Lines -->
+                <div class="line horizontal-line" style="top: 20%"></div>
+                <div class="line horizontal-line" style="top: 40%"></div>
+                <div class="line horizontal-line" style="top: 60%"></div>
+                <div class="line horizontal-line" style="top: 80%"></div>
+                <div class="line vertical-line"></div>
+            </div>
+
+            <div class="boost-meter-container" id="boostMeter">
+                <div class="boost-fill" id="boostFill"></div>
+                <span class="boost-text">Boost (Space)</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Modal -->
+    <div class="game-over-modal" id="gameOverModal">
+        <h2 id="modalTitle">Game Over!</h2>
+        <p id="modalMessage">You were tagged!</p>
+        <button class="btn" onclick="resetGame()">Play Again</button>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
