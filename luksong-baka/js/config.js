@@ -15,7 +15,7 @@ const CONFIG = {
     
     // Jump angle range (extended for better control)
     minAngle: 0,
-    maxAngle: 140,
+    maxAngle: 100,
     
     // Baka hitbox heights per level (5 levels)
     bakaHeight: [50, 85, 125, 170, 220],

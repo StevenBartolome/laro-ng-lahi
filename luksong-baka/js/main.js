@@ -50,8 +50,24 @@ const Game = {
         switch (GameState.state) {
             case 'running':
                 Player.x += CONFIG.runSpeed * GameState.difficultyMultiplier;
-                if (Player.x >= Baka.x - 280) {
-                    Player.x = Baka.x - 280;
+                
+                // Check if player ran into the baka (didn't jump!)
+                if (Player.x + Player.width > Baka.x + 30) {
+                    GameState.state = 'fail';
+                    const isGameOver = GameLogic.loseLife();
+                    if (isGameOver) {
+                        UI.showMessage('💔 Game Over!', 'fail');
+                        setTimeout(() => {
+                            GameLogic.resetGame();
+                            GameState.state = 'idle';
+                        }, 2000);
+                    } else {
+                        UI.showMessage('💥 Ran into baka! ' + GameState.lives + ' ❤️ left', 'fail');
+                        setTimeout(() => {
+                            Player.reset();
+                            GameState.state = 'idle';
+                        }, 1500);
+                    }
                 }
                 break;
                 
