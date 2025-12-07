@@ -129,12 +129,21 @@ const Rendering = {
         if (GameState.state !== 'charging') return;
         
         ctx.save();
+        
+        // Warning shake and color
+        let indicatorColor = 'rgba(255, 255, 255, 0.4)';
+        if (GameState.chargeCycles >= 1) {
+             const shake = (Date.now() % 100 < 50) ? 3 : -3; 
+             ctx.translate(shake, 0);
+             indicatorColor = '#ff4444'; // Red warning
+        }
+        
         ctx.translate(Player.x + Player.width / 2, Player.y - Player.height / 2);
         
         // Extended arc (20° to 80°)
         ctx.beginPath();
         ctx.arc(0, 0, 65, -Math.PI * (CONFIG.maxAngle / 180), -Math.PI * (CONFIG.minAngle / 180));
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.strokeStyle = indicatorColor;
         ctx.lineWidth = 5;
         ctx.stroke();
         

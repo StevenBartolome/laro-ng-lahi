@@ -8,6 +8,7 @@ const Sound = {
     jumpSound: null,
     runSound: null,
     clickSound: null,
+    overchargeSound: null,
     bgmVolume: 0.5,
     sfxVolume: 0.7,
     
@@ -16,6 +17,7 @@ const Sound = {
         this.jumpSound = document.getElementById('jumpSound');
         this.runSound = document.getElementById('runSound');
         this.clickSound = document.getElementById('clickSound');
+        this.overchargeSound = document.getElementById('overchargeSound');
         
         // Apply initial volumes
         if (this.runSound) this.runSound.volume = this.sfxVolume * 0.6;
@@ -87,6 +89,13 @@ const Sound = {
         }
     },
     
+    playOvercharge() {
+        if (this.overchargeSound && this.sfxVolume > 0) {
+            this.overchargeSound.currentTime = 0;
+            this.overchargeSound.play().catch(() => {});
+        }
+    },
+    
     setBgmVolume(volume) {
         this.bgmVolume = Math.max(0, Math.min(1, volume));
         
@@ -116,6 +125,9 @@ const Sound = {
         }
         if (this.clickSound) {
             this.clickSound.volume = this.sfxVolume;
+        }
+        if (this.overchargeSound) {
+            this.overchargeSound.volume = this.sfxVolume;
         }
         
         // Save to localStorage

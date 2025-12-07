@@ -87,6 +87,30 @@ const Game = {
                 } else if (GameState.chargeAngle <= CONFIG.minAngle) {
                     GameState.chargeAngle = CONFIG.minAngle;
                     GameState.angleDirection = 1;
+                    
+                    // Increment cycle count
+                    GameState.chargeCycles++;
+                    
+                    // Warning sound when holding too long (1 full cycle)
+                    if (GameState.chargeCycles === 1) {
+                        Sound.playOvercharge();
+                    }
+                    
+                    // Penalize if held even longer (2 full cycles)
+                    if (GameState.chargeCycles >= 2) {
+                        GameState.state = 'fail';
+                        const isGameOver = GameLogic.loseLife();
+                        if (isGameOver) {
+                            GameState.state = 'gameover';
+                            UI.showGameOver();
+                        } else {
+                            UI.showMessage('⚠️ Lost Momentum! ⚠️', 'fail');
+                            setTimeout(() => {
+                                Player.reset();
+                                GameState.state = 'idle';
+                            }, 1500);
+                        }
+                    }
                 }
                 break;
                 
