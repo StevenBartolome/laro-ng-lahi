@@ -11,6 +11,12 @@ const Rendering = {
         ctx = canvas.getContext('2d');
         canvas.width = CONFIG.canvasWidth;
         canvas.height = CONFIG.canvasHeight;
+        
+        // Disable smoothing for pixel art look
+        ctx.imageSmoothingEnabled = false;
+        ctx.mozImageSmoothingEnabled = false;
+        ctx.webkitImageSmoothingEnabled = false;
+        ctx.msImageSmoothingEnabled = false;
     },
     
     clear() {
@@ -41,13 +47,18 @@ const Rendering = {
     
     drawPlatform() {
         if (Assets.platform.complete) {
-            ctx.drawImage(
-                Assets.platform,
-                0,
-                CONFIG.groundY - 62,
-                canvas.width,
-                200
-            );
+            // Use tiling/pattern instead of stretching to prevent distortion
+            const overflow = 20;
+            const y = CONFIG.groundY - 38;
+            const height = 300; // Enough to cover bottom
+            
+            const pattern = ctx.createPattern(Assets.platform, 'repeat');
+            ctx.fillStyle = pattern;
+            
+            ctx.save();
+            ctx.translate(-overflow, y); // Align pattern start
+            ctx.fillRect(0, 0, canvas.width + (overflow * 2), height);
+            ctx.restore();
         }
     },
     
@@ -118,12 +129,21 @@ const Rendering = {
         if (GameState.state !== 'charging') return;
         
         ctx.save();
+        
+        // Warning shake and color
+        let indicatorColor = 'rgba(255, 255, 255, 0.4)';
+        if (GameState.chargeCycles >= 1) {
+             const shake = (Date.now() % 100 < 50) ? 3 : -3; 
+             ctx.translate(shake, 0);
+             indicatorColor = '#ff4444'; // Red warning
+        }
+        
         ctx.translate(Player.x + Player.width / 2, Player.y - Player.height / 2);
         
         // Extended arc (20° to 80°)
         ctx.beginPath();
         ctx.arc(0, 0, 65, -Math.PI * (CONFIG.maxAngle / 180), -Math.PI * (CONFIG.minAngle / 180));
-        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.strokeStyle = indicatorColor;
         ctx.lineWidth = 5;
         ctx.stroke();
         

@@ -23,6 +23,75 @@ const Game = {
                 this.start(id.replace('Btn', ''));
             });
         });
+
+        // Setup in-game UI buttons
+        const diffBtn = document.getElementById('difficultyBtn');
+        if (diffBtn) {
+            diffBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.showDifficultyScreen('difficulty'); // Show difficulty only
+                GameState.state = 'menu'; // Pause game logic
+            });
+        }
+
+        const infoBtn = document.getElementById('infoBtn');
+        if (infoBtn) {
+            infoBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.showDifficultyScreen('instructions'); // Show instructions only
+                GameState.state = 'menu'; // Pause game logic
+            });
+        }
+        
+        const closeBtn = document.getElementById('closeOverlayBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.hideDifficultyScreen();
+                if (GameState.state === 'menu') {
+                     GameState.state = 'idle';
+                }
+            });
+        }
+        
+        // Facts Feature listeners
+        const factsBtn = document.getElementById('factsBtn');
+        if (factsBtn) {
+            factsBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.showFacts();
+                GameState.state = 'menu';
+            });
+        }
+        
+        const closeFactsBtn = document.getElementById('closeFactsBtn');
+        if (closeFactsBtn) {
+            closeFactsBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.hideFacts();
+                if (GameState.state === 'menu') {
+                    GameState.state = 'idle';
+                }
+            });
+        }
+        
+        const factsBoard = document.getElementById('factsBoard');
+        if (factsBoard) {
+            factsBoard.addEventListener('click', () => {
+                UI.nextFact();
+            });
+        }
+        
+        document.querySelectorAll('.dot').forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                UI.setFact(index);
+            });
+        });
+        
+        // Hide close button initially (must select difficulty to start)
+        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+        if (closeOverlayBtn) closeOverlayBtn.style.display = 'none';
         
         // Setup generic button sounds (back buttons, etc)
         document.querySelectorAll('a, button').forEach(el => {
@@ -31,6 +100,15 @@ const Game = {
     },
     
     start(difficulty) {
+        // Show close button for future menu pauses
+        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+        if (closeOverlayBtn) closeOverlayBtn.style.display = 'block';
+        
+        // Stop previous loop if running
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+        
         // Set angle speed based on difficulty
         switch (difficulty) {
             case 'easy':
@@ -44,8 +122,10 @@ const Game = {
                 break;
         }
         
-        // Hide difficulty screen and setup game
+        // Hide overlay/menu logic handled by UI
         UI.hideDifficultyScreen();
+        // Reset panels visibility for next time (handled in UI)
+        
         GameLogic.resetGame();
         Input.init(this.canvas);
         Sound.startMusic();
@@ -53,6 +133,8 @@ const Game = {
         // Start game loop
         this.loop();
     },
+    
+    animationFrameId: null,
     
     update() {
         switch (GameState.state) {
@@ -87,6 +169,30 @@ const Game = {
                 } else if (GameState.chargeAngle <= CONFIG.minAngle) {
                     GameState.chargeAngle = CONFIG.minAngle;
                     GameState.angleDirection = 1;
+                    
+                    // Increment cycle count
+                    GameState.chargeCycles++;
+                    
+                    // Warning sound when holding too long (1 full cycle)
+                    if (GameState.chargeCycles === 1) {
+                        Sound.playOvercharge();
+                    }
+                    
+                    // Penalize if held even longer (2 full cycles)
+                    if (GameState.chargeCycles >= 2) {
+                        GameState.state = 'fail';
+                        const isGameOver = GameLogic.loseLife();
+                        if (isGameOver) {
+                            GameState.state = 'gameover';
+                            UI.showGameOver();
+                        } else {
+                            UI.showMessage('⚠️ Lost Momentum! ⚠️', 'fail');
+                            setTimeout(() => {
+                                Player.reset();
+                                GameState.state = 'idle';
+                            }, 1500);
+                        }
+                    }
                 }
                 break;
                 
@@ -177,7 +283,7 @@ const Game = {
     loop() {
         this.update();
         Rendering.render();
-        requestAnimationFrame(() => this.loop());
+        this.animationFrameId = requestAnimationFrame(() => this.loop());
     }
 };
 

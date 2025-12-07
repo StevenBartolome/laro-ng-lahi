@@ -70,8 +70,10 @@ body {
 
 .select-title img {
     max-width: 500px;
-    width: 90vw;
+    width: 90%; /* Changed from 90vw to 90% of container/screen width */
     height: auto;
+    max-height: 25vh; /* Limit vertical height */
+    object-fit: contain;
     filter: drop-shadow(0 8px 25px rgba(0, 0, 0, 0.5));
 }
 

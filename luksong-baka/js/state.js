@@ -24,6 +24,8 @@ const GameState = {
     // Input
     isInputDown: false,
     bounceInputTime: 0,
+    chargeStartTime: 0,
+    chargeCycles: 0,
     
     // Reset to initial state
     reset() {
