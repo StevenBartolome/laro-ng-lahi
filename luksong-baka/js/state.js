@@ -6,25 +6,25 @@
 const GameState = {
     // Current state
     state: 'menu',  // menu, idle, running, charging, jumping, success, fail, gameover
-    
+
     // Level tracking
     currentLevel: 1,
     currentRound: 1,
-    
+
     // Jump mechanics
     chargeAngle: 35,
     angleDirection: 1,
     angleSpeed: 4,
     difficultyMultiplier: 1,
-    
+
     // Score
     totalJumps: 0,
     lives: 3,
-    
+
     // Input
     isInputDown: false,
     bounceInputTime: 0,
-    
+
     // Reset to initial state
     reset() {
         this.state = 'idle';
@@ -50,7 +50,7 @@ const Player = {
     frameIndex: 0,
     frameTimer: 0,
     frameDelay: 7,
-    
+
     reset() {
         this.x = CONFIG.playerStartX;
         this.y = CONFIG.groundY;
@@ -67,12 +67,12 @@ const Baka = {
     width: CONFIG.bakaWidth,
     height: CONFIG.bakaHeight[0],
     level: 1,
-    
+
     setLevel(level) {
         this.level = Math.min(Math.max(level, 1), 5);
         this.height = CONFIG.bakaHeight[this.level - 1];
         GameState.currentLevel = this.level;
-        
+
         // Update UI
         const levelText = document.getElementById('levelText');
         if (levelText) levelText.textContent = this.level;

@@ -1,24 +1,21 @@
-// Import Firebase SDK functions
-import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
-import { getDatabase } from "firebase/database"; // for Realtime Database
-// import { getFirestore } from "firebase/firestore"; // optional if using Firestore
+// firebase-config.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getDatabase } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
-// Your Firebase config object
 const firebaseConfig = {
-  apiKey: "AIzaSyDgQK-SQh7nNCAM0DfTAA-_N95ReMaPZZ0",
-  authDomain: "laro-ng-lahi.firebaseapp.com",
-  projectId: "laro-ng-lahi",
-  storageBucket: "laro-ng-lahi.firebasestorage.app",
-  messagingSenderId: "859396070006",
-  appId: "1:859396070006:web:84191c52a04601c27cdd57"
+    apiKey: "AIzaSyDV0vlEe1R4gXLeQ2jq6aCetMsYIcRSsVE",
+    authDomain: "laro-ng-lahi-409b8.firebaseapp.com",
+    databaseURL: "https://laro-ng-lahi-409b8-default-rtdb.asia-southeast1.firebasedatabase.app/", // Add this!
+    projectId: "laro-ng-lahi-409b8",
+    storageBucket: "laro-ng-lahi-409b8.firebasestorage.app",
+    messagingSenderId: "940109405312",
+    appId: "1:940109405312:web:f2de27f0f9017c1caeda65"
 };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+const auth = getAuth(app);
 
-// Export Firebase services to use in your app
-export const auth = getAuth(app);
-export const database = getDatabase(app);
-// export const firestore = getFirestore(app); // if using Firestore
-export default app;
+export { app, database, auth, signInAnonymously };

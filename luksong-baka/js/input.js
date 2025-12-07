@@ -12,18 +12,18 @@ const Input = {
                 this.handleDown();
             }
         });
-        
+
         window.addEventListener('keyup', (e) => {
             if (e.code === 'Space') {
                 e.preventDefault();
                 this.handleUp();
             }
         });
-        
+
         // Mouse
         canvas.addEventListener('mousedown', () => this.handleDown());
         canvas.addEventListener('mouseup', () => this.handleUp());
-        
+
         // Touch
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
@@ -34,13 +34,13 @@ const Input = {
             this.handleUp();
         });
     },
-    
+
     handleDown() {
         if (GameState.isInputDown) return;
         if (GameState.state === 'gameover') return;
-        
+
         GameState.isInputDown = true;
-        
+
         if (GameState.state === 'idle') {
             GameState.state = 'running';
             Sound.playRun(); // Start sound
@@ -54,11 +54,11 @@ const Input = {
             GameState.bounceInputTime = Date.now();
         }
     },
-    
+
     handleUp() {
         if (!GameState.isInputDown) return;
         GameState.isInputDown = false;
-        
+
         if (GameState.state === 'charging') {
             GameState.state = 'jumping';
             GameLogic.executeJump();

@@ -1,3 +1,15 @@
+<?php
+session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['logged_in']) || !$_SESSION['logged_in']) {
+    header("Location: login.php");
+    exit();
+}
+
+$user_id = $_SESSION['user_id'];
+$displayname = $_SESSION['displayname'] ?? $_SESSION['username'];
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -6,7 +18,7 @@
     <title>Multiplayer Menu</title>
     <link rel="stylesheet" href="assets/css/multiplayer-menu.css">
 </head>
-<body>
+<body data-userid="<?php echo htmlspecialchars($user_id); ?>" data-displayname="<?php echo htmlspecialchars($displayname); ?>">
     <div class="container">
         <!-- Header -->
         <div class="header">
@@ -26,11 +38,33 @@
             </button>
         </div>
 
+        <!-- Game Selection Screen -->
+        <div id="gameSelectScreen" class="screen">
+            <h2>Select a Game</h2>
+            <p class="subtitle">Choose which game to play</p>
+            
+            <select id="gameSelect" class="game-select">
+                <option value="">Loading games...</option>
+            </select>
+
+            <div id="gameInfo" class="game-info" style="display: none;"></div>
+
+            <button id="confirmGameBtn" class="btn btn-join" disabled>
+                Create Lobby
+            </button>
+            <button id="backFromGameSelect" class="btn btn-back">Back to Menu</button>
+        </div>
+
         <!-- Lobby Screen (After Creation) -->
         <div id="lobbyScreen" class="screen">
             <h2>Lobby Created!</h2>
             <p class="subtitle">Share this code with your friends</p>
             
+            <div class="game-header">
+                <p class="game-title" id="lobbyGameName">Game Name</p>
+                <p class="game-requirement" id="lobbyPlayerRequirement">2-4 players</p>
+            </div>
+
             <div class="code-display">
                 <p class="code-label">Your Lobby Code</p>
                 <p id="lobbyCode" class="code">------</p>
@@ -40,11 +74,16 @@
 
             <!-- Players List -->
             <div class="players-container">
-                <p class="players-label">Players in Lobby</p>
+                <div class="players-header">
+                    <p class="players-label">Players in Lobby</p>
+                    <p class="player-count" id="playerCount">0/4</p>
+                </div>
                 <div id="playersList" class="player-list">
                     <div class="empty-players">Waiting for players...</div>
                 </div>
             </div>
+
+            <p id="lobbyStatusMessage" class="status-message">Need at least 2 players to start</p>
 
             <button id="startGameBtn" class="btn btn-join" disabled>
                 <span class="icon">▶</span>
@@ -74,6 +113,11 @@
             <h2>In Lobby</h2>
             <p class="subtitle">Waiting for host to start...</p>
 
+            <div class="game-header">
+                <p class="game-title" id="joinedLobbyGameName">Game Name</p>
+                <p class="game-requirement" id="joinedLobbyPlayerRequirement">2-4 players</p>
+            </div>
+
             <div class="code-display">
                 <p class="code-label">Lobby Code</p>
                 <p id="joinedLobbyCode" class="code">------</p>
@@ -81,7 +125,10 @@
 
             <!-- Players List -->
             <div class="players-container">
-                <p class="players-label">Players in Lobby</p>
+                <div class="players-header">
+                    <p class="players-label">Players in Lobby</p>
+                    <p class="player-count" id="joinedPlayerCount">0/4</p>
+                </div>
                 <div id="joinedPlayersList" class="player-list">
                     <div class="empty-players">Loading players...</div>
                 </div>
@@ -91,6 +138,6 @@
         </div>
     </div>
 
-    <script src="assets/js/multiplayer-menu.js"></script>
+    <script type="module" src="assets/js/multiplayer-menu.js"></script>
 </body>
 </html>
