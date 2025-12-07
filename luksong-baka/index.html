@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luksong Baka - Laro ng Lahi</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="../assets/luksong_baka_assets/luksong_baka_bgm.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="jumpSound">
+        <source src="../assets/luksong_baka_assets/jump_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="runSound" loop>
+        <source src="../assets/luksong_baka_assets/running_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound">
+        <source src="../assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Sound Controls (Top Left) -->
+    <div class="sound-controls">
+        <div class="volume-control">
+            <span class="volume-label">🎵 BGM</span>
+            <input type="range" id="bgmVolume" class="volume-slider" min="0" max="100" value="50"
+                title="Background Music Volume">
+        </div>
+        <div class="volume-control">
+            <span class="volume-label">🔊 SFX</span>
+            <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="70"
+                title="Sound Effects Volume">
+        </div>
+    </div>
+
+    <!-- Difficulty Selection Screen -->
+    <div id="difficultyScreen" class="overlay">
+        <div class="overlay-content enhanced-overlay">
+            <h1 class="game-title">🐃 Luksong Baka</h1>
+
+            <div class="menu-grid">
+                <!-- Left Column: Instructions -->
+                <div class="instructions-panel">
+                    <h3>How to Play</h3>
+                    <div class="instruction-item">
+                        <span class="key-icon">␣</span>
+                        <span><strong>Press Space</strong> or <strong>Click</strong> to start running</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="icon">📐</span>
+                        <span><strong>Hold</strong> to aim your jump angle</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="icon">🚀</span>
+                        <span><strong>Release</strong> to jump over the baka</span>
+                    </div>
+                    <div class="instruction-item highlight">
+                        <span class="icon">✨</span>
+                        <span><strong>Press AGAIN</strong> on top to <strong>BOUNCE!</strong></span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Difficulty Selection -->
+                <div class="difficulty-panel">
+                    <h3>Select Difficulty</h3>
+
+                    <button id="easyBtn" class="diff-btn easy">
+                        <span class="diff-name">Easy</span>
+                        <span class="diff-desc">Slow aiming. Relaxed pace.</span>
+                    </button>
+
+                    <button id="normalBtn" class="diff-btn normal">
+                        <span class="diff-name">Normal</span>
+                        <span class="diff-desc">Standard speed. Balanced challenge.</span>
+                    </button>
+
+                    <button id="hardBtn" class="diff-btn hard">
+                        <span class="diff-name">Hard</span>
+                        <span class="diff-desc">Fast aiming! Precision required.</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div class="game-container">
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Back Button (Below Game) -->
+        <a href="../game_select.php" class="back-btn" title="Back to Game Select">
+            <img src="../assets/startmenu/back_button.png" alt="Back">
+        </a>
+    </div>
+
+    <!-- Game UI Overlay -->
+    <div id="gameUI">
+        <div class="lives-display" id="livesDisplay">
+            <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart1">
+            <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart2">
+            <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart3">
+        </div>
+        <div class="level-display">Baka Level: <span id="levelText">1</span></div>
+    </div>
+
+    <!-- Message Overlay -->
+    <div id="messageOverlay" class="hidden">
+        <div id="messageText"></div>
+    </div>
+
+    <!-- Modular JS Files (load order matters!) -->
+    <script src="js/config.js"></script>
+    <script src="js/state.js"></script>
+    <script src="js/assets.js"></script>
+    <script src="js/sound.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/logic.js"></script>
+    <script src="js/rendering.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/main.js"></script>
+</body>
+
+</html>

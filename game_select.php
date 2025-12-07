@@ -46,13 +46,13 @@ $email = "test@example.com";
         <!-- Game Cards -->
         <div class="game-cards-container">
             <a href="games/patintero.php" class="game-card" title="Play Patintero">
-                <img src="assets/startmenu/patintero_card.png" alt="Patintero">
+                <img src="assets/startmenu/patintero_gamecard.png" alt="Patintero">
             </a>
-            <a href="games/luksong_tinik.php" class="game-card" title="Play Luksong Tinik">
-                <img src="assets/startmenu/luksong_tinik_card.png" alt="Luksong Tinik">
+            <a href="luksong-tinik/index.html" class="game-card" title="Play Luksong Tinik">
+                <img src="assets/startmenu/holen_gamecard.png" alt="Luksong Tinik">
             </a>
-            <a href="games/luksong_baka.php" class="game-card" title="Play Luksong Baka">
-                <img src="assets/startmenu/luksong_baka_card.png" alt="Luksong Baka">
+            <a href="luksong-baka/index.html" class="game-card" title="Play Luksong Baka">
+                <img src="assets/startmenu/luksong_baka_gamecard.png" alt="Luksong Baka">
             </a>
         </div>
     </div>
@@ -60,6 +60,9 @@ $email = "test@example.com";
     <!-- Background Music (continues from main menu if playing) -->
     <audio id="bgMusic" loop>
         <source src="assets/bgmusic/startmenuMusic.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound">
+        <source src="assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
     </audio>
     
     <script>
@@ -112,14 +115,25 @@ $email = "test@example.com";
             bgMusic.play();
         });
         
-        // Card click animation
-        const gameCards = document.querySelectorAll('.game-card');
+        // Card click animation and sound
+        const gameCards = document.querySelectorAll('.game-card, .back-btn');
+        const clickSound = document.getElementById('clickSound');
+        
         gameCards.forEach(card => {
             card.addEventListener('click', (e) => {
-                card.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    card.style.transform = '';
-                }, 150);
+                // Play sound
+                if (clickSound) {
+                    clickSound.currentTime = 0;
+                    clickSound.play().catch(() => {});
+                }
+                
+                // Animation for cards
+                if (card.classList.contains('game-card')) {
+                    card.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        card.style.transform = '';
+                    }, 150);
+                }
             });
         });
     </script>
