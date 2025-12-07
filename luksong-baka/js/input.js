@@ -49,6 +49,8 @@ const Input = {
             Sound.stopRun(); // Stop sound
             GameState.chargeAngle = CONFIG.minAngle + 15;
             GameState.angleDirection = 1;
+            GameState.chargeStartTime = Date.now();
+            GameState.chargeCycles = 0;
         } else if (GameState.state === 'jumping') {
             // Player is trying to bounce!
             GameState.bounceInputTime = Date.now();
