@@ -1,7 +1,7 @@
 // firebase-config.js
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getDatabase } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
-import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
+import { getAuth, signInAnonymously, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-auth.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDV0vlEe1R4gXLeQ2jq6aCetMsYIcRSsVE",
@@ -17,5 +17,14 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const database = getDatabase(app);
 const auth = getAuth(app);
+
+// Set auth persistence to LOCAL (persists across browser sessions)
+setPersistence(auth, browserLocalPersistence)
+    .then(() => {
+        console.log('Firebase auth persistence enabled');
+    })
+    .catch((error) => {
+        console.error('Error setting persistence:', error);
+    });
 
 export { app, database, auth, signInAnonymously };

@@ -1,0 +1,431 @@
+/* Multiplayer-specific styles for Luksong Baka */
+
+.multiplayer-panel {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 280px;
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95));
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.panel-header h3 {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3em;
+    text-align: center;
+}
+
+.lobby-code {
+    text-align: center;
+    color: #ecf0f1;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.lobby-code span {
+    color: #3498db;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+.current-turn-display {
+    margin-bottom: 15px;
+}
+
+.turn-indicator {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.turn-label {
+    display: block;
+    color: #bdc3c7;
+    font-size: 0.85em;
+    margin-bottom: 5px;
+}
+
+.player-name-highlight {
+    display: block;
+    color: #3498db;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.your-turn-banner {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: scale(1);
+        box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    }
+
+    50% {
+        transform: scale(1.05);
+        box-shadow: 0 6px 20px rgba(46, 204, 113, 0.6);
+    }
+}
+
+.players-list h4 {
+    color: #ecf0f1;
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    font-family: 'Nunito', sans-serif;
+}
+
+.players-container {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.player-item {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.player-item.active-turn {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.3), rgba(41, 128, 185, 0.3));
+    border: 2px solid #3498db;
+}
+
+.player-item.eliminated {
+    opacity: 0.5;
+    background: rgba(231, 76, 60, 0.2);
+}
+
+.player-item-name {
+    color: #ecf0f1;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.player-item-stats {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.player-stat {
+    font-size: 0.85em;
+    color: #bdc3c7;
+}
+
+
+
+.player-stat.level {
+    color: #f39c12;
+}
+
+.player-badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+}
+
+.player-badge.you {
+    background: #2ecc71;
+}
+
+.player-badge.host {
+    background: #9b59b6;
+}
+
+.player-badge.taya {
+    background: #e74c3c;
+    /* Red color for Taya */
+}
+
+.btn-leave {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1em;
+}
+
+.btn-leave:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* Waiting Screen */
+.waiting-message {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.waiting-message p {
+    color: #ecf0f1;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.ready-players {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.ready-player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.ready-player-item.ready {
+    background: rgba(46, 204, 113, 0.2);
+    border-left: 4px solid #2ecc71;
+}
+
+.ready-status {
+    color: #95a5a6;
+    font-size: 0.9em;
+}
+
+.ready-status.ready {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.btn-ready {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-ready:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+}
+
+.btn-ready:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Spectator Overlay */
+.spectator-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 90;
+    backdrop-filter: blur(5px);
+    transition: all 0.5s ease;
+}
+
+.spectator-overlay.taya-mode {
+    background: rgba(0, 0, 0, 0.1);
+    /* Transparent for Taya */
+    backdrop-filter: none;
+    align-items: flex-end;
+    /* Move message to bottom */
+    padding-bottom: 50px;
+}
+
+.spectator-message.taya-view {
+    padding: 15px 30px;
+    background: rgba(44, 62, 80, 0.8);
+    transform: scale(0.9);
+}
+
+.spectator-message.taya-view h2 {
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.spectator-message.taya-view p {
+    font-size: 1em;
+    margin: 5px 0 0 0;
+}
+
+.spectator-message {
+    background: linear-gradient(135deg, rgba(52, 73, 94, 0.95), rgba(44, 62, 80, 0.95));
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.spectator-message p {
+    color: #ecf0f1;
+    font-size: 1.5em;
+    margin: 10px 0;
+    font-weight: 600;
+}
+
+.spectator-message span {
+    color: #3498db;
+    font-weight: bold;
+}
+
+.spectator-hint {
+    font-size: 1.1em !important;
+    color: #bdc3c7 !important;
+    font-style: italic;
+}
+
+/* Final Scores */
+.final-scores {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.score-item.winner {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.3), rgba(39, 174, 96, 0.3));
+    border: 2px solid #2ecc71;
+}
+
+.score-rank {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #f39c12;
+    margin-right: 15px;
+}
+
+.score-name {
+    flex: 1;
+    color: #ecf0f1;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.score-value {
+    color: #3498db;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.btn-back {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
+
+/* Utility classes */
+.hidden {
+    display: none !important;
+}
+
+/* Scrollbar styling */
+.players-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.players-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.players-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.players-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}

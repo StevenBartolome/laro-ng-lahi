@@ -28,6 +28,8 @@ class MultiplayerMenu {
     }
 
     async init() {
+        console.log('🔧 MULTIPLAYER MENU VERSION: 2024-12-08-v2 - onDisconnect REMOVED');
+
         // Get display name from PHP session
         this.displayName = document.body.dataset.displayname || 'Player';
         const phpUserId = document.body.dataset.userid || null;
@@ -38,11 +40,21 @@ class MultiplayerMenu {
             return;
         }
 
-        // Sign in anonymously to Firebase (for security rules)
+        // Wait for Firebase to be ready and check if already signed in
+        await new Promise(resolve => setTimeout(resolve, 500));
+
+        // Sign in anonymously to Firebase (for security rules) if not already signed in
         try {
-            const userCredential = await signInAnonymously(auth);
-            this.userId = userCredential.user.uid;
-            console.log('Firebase UID:', this.userId);
+            if (!auth.currentUser) {
+                console.log('Signing in anonymously...');
+                const userCredential = await signInAnonymously(auth);
+                this.userId = userCredential.user.uid;
+                console.log('New Firebase UID:', this.userId);
+            } else {
+                // Already signed in (persisted from previous session)
+                this.userId = auth.currentUser.uid;
+                console.log('Using existing Firebase UID:', this.userId);
+            }
         } catch (error) {
             console.error('Firebase auth error:', error);
             alert('Authentication failed. Please try again.');
@@ -145,8 +157,14 @@ class MultiplayerMenu {
     }
 
     setupBeforeUnload() {
+        // DISABLED: This listener was causing the lobby to be deleted when the host
+        // navigated to the game page. We will rely on manual "Leave Lobby" button
+        // or game-specific disconnect handlers.
+        /*
         window.addEventListener('beforeunload', () => {
             if (this.currentLobbyId) {
+                console.log('Leaving page, cleaning up lobby:', this.currentLobbyId);
+                // We use navigator.sendBeacon or fetch keepalive if possible, but Firebase remove() is sync-ish enough
                 if (this.isHost) {
                     remove(ref(database, `lobbies/${this.currentLobbyId}`));
                 } else {
@@ -154,6 +172,7 @@ class MultiplayerMenu {
                 }
             }
         });
+        */
     }
 
     showScreen(screenId) {
@@ -206,12 +225,31 @@ class MultiplayerMenu {
 
             await set(lobbyRef, lobbyData);
 
-            const lobbyDisconnectRef = ref(database, `lobbies/${lobbyId}`);
-            onDisconnect(lobbyDisconnectRef).remove();
+            // CRITICAL: Explicitly cancel any disconnect handler on this lobby
+            // to ensure it is NOT deleted when navigating to the game page.
+            await onDisconnect(lobbyRef).cancel();
+
+            // NOTE: Don't use onDisconnect().remove() here because navigating to the game
+            // page will trigger it and delete the lobby! The lobby should only be deleted
+            // when explicitly leaving or when the game ends.
+            // Individual players will have their own disconnect handlers in the game.
 
             this.currentLobbyId = lobbyId;
             this.currentLobbyCode = code;
             this.isHost = true;
+
+            console.log('✓ Lobby created in Firebase:', {
+                lobbyId: lobbyId,
+                code: code,
+                path: `lobbies/${lobbyId}`
+            });
+
+            // Verify lobby was created
+            const verifySnapshot = await get(lobbyRef);
+            console.log('Lobby exists after creation:', verifySnapshot.exists());
+            if (verifySnapshot.exists()) {
+                console.log('Lobby data:', verifySnapshot.val());
+            }
 
             document.getElementById('lobbyCode').textContent = code;
             document.getElementById('lobbyGameName').textContent = this.selectedGame.name;
@@ -377,14 +415,31 @@ class MultiplayerMenu {
                 get(lobbyRef).then((lobbySnapshot) => {
                     const lobby = lobbySnapshot.val();
 
+                    if (!lobby || !lobby.game) {
+                        console.error('Lobby data incomplete:', lobby);
+                        alert('Error: Lobby data is missing. Please try again.');
+                        return;
+                    }
+
+                    console.log('Navigating to game with lobby ID:', lobbyId);
+
+                    // CRITICAL: Cancel onDisconnect listener for this player so they aren't removed
+                    // when navigating to the game page.
+                    if (!this.isHost && this.userId) {
+                        const playerRef = ref(database, `lobbies/${lobbyId}/players/${this.userId}`);
+                        onDisconnect(playerRef).cancel();
+                    }
+
                     // Route to the correct game based on game_id
                     const gameRoutes = {
                         '1': 'jolen/index.html',
-                        '2': 'luksong-baka/index.html',
+                        '2': 'luksong-baka/multiplayer/index.html',  // Multiplayer version
                         '3': 'patintero/index.html'
                     };
 
-                    const gameUrl = gameRoutes[lobby.game?.id] || 'game.php';
+                    const gameUrl = gameRoutes[lobby.game.id] || 'game.php';
+                    // CRITICAL: Use the lobbyId parameter, not this.currentLobbyId
+                    // because this function is called with the actual lobby ID
                     window.location.href = `${gameUrl}?lobby=${lobbyId}`;
                 });
             } else if (!snapshot.exists()) {
@@ -402,12 +457,18 @@ class MultiplayerMenu {
 
             // Route to the correct game based on game_id
             const gameRoutes = {
-                '1': 'jolen/index.html',           // Assuming game_id 1 is jolen
-                '2': 'luksong-baka/index.html',    // Assuming game_id 2 is luksong-baka
-                '3': 'patintero/index.html'        // Assuming game_id 3 is patintero
+                '1': 'jolen/index.html',                      // Assuming game_id 1 is jolen
+                '2': 'luksong-baka/multiplayer/index.html',   // Multiplayer version for luksong-baka
+                '3': 'patintero/index.html'                   // Assuming game_id 3 is patintero
             };
 
             const gameUrl = gameRoutes[this.selectedGame.id] || 'game.php';
+
+
+            // Cancel any lobby disconnects just to be super safe (though we did it at creation)
+            const lobbyRef = ref(database, `lobbies/${this.currentLobbyId}`);
+            await onDisconnect(lobbyRef).cancel();
+
             window.location.href = `${gameUrl}?lobby=${this.currentLobbyId}`;
 
         } catch (error) {
