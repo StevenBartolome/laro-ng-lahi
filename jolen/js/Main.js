@@ -28,6 +28,11 @@ document.addEventListener("DOMContentLoaded", () => {
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
   
+  // Input Listeners (Global)
+  canvas.addEventListener("mousedown", handleMouseDown);
+  window.addEventListener("mousemove", handleMouseMove);
+  window.addEventListener("mouseup", handleMouseUp);
+  
   const instructionPrompt = document.getElementById("instruction-prompt");
   
   canvas.width = 1280;
@@ -349,9 +354,10 @@ document.addEventListener("DOMContentLoaded", () => {
     UI.hideMenu();
     document.getElementById("game-container").style.display = "block";
 
-    canvas.addEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mousemove", handleMouseMove);
-    canvas.addEventListener("mouseup", handleMouseUp);
+    UI.hideMenu();
+    document.getElementById("game-container").style.display = "block";
+
+    // Listeners are global now
     // Add touch if needed
 
     resetGame(false); // Reset to level 1

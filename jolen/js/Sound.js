@@ -18,6 +18,8 @@ const Sound = {
         // Set initial volumes
         if (this.bgMusic) this.bgMusic.volume = this.bgmVolume;
         if (this.clickSound) this.clickSound.volume = this.sfxVolume;
+        this.hitSound = document.getElementById('hitSound');
+        if (this.hitSound) this.hitSound.volume = this.sfxVolume;
         
         // Setup volume sliders
         this.setupVolumeControls();
@@ -41,6 +43,7 @@ const Sound = {
             sfxSlider.addEventListener('input', (e) => {
                 this.sfxVolume = e.target.value / 100;
                 if (this.clickSound) this.clickSound.volume = this.sfxVolume;
+                if (this.hitSound) this.hitSound.volume = this.sfxVolume;
             });
         }
     },
@@ -64,6 +67,13 @@ const Sound = {
         if (this.clickSound) {
             this.clickSound.currentTime = 0;
             this.clickSound.play().catch(e => {});
+        }
+    },
+
+    playHit() {
+        if (this.hitSound) {
+            this.hitSound.currentTime = 0;
+            this.hitSound.play().catch(e => {});
         }
     },
 

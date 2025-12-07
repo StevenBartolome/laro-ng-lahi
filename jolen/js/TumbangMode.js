@@ -1,3 +1,5 @@
+import Sound from "./Sound.js";
+
 export function setup(level, canvasWidth, canvasHeight) {
   return {
     x: canvasWidth / 2,
@@ -24,6 +26,7 @@ export function update(playerMarble, target, score, canvasWidth, canvasHeight) {
       target.knocked = true;
       target.angle = Math.PI / 2;
       scoreIncrease += 50;
+      Sound.playHit();
     }
   }
 

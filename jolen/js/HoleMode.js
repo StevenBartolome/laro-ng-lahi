@@ -1,4 +1,5 @@
 import { distance } from "./Common.js";
+import Sound from "./Sound.js";
 
 export function setup(level, canvasWidth, canvasHeight) {
   const holes = [];
@@ -49,7 +50,9 @@ export function update(playerMarble, holes, score, canvasWidth, canvasHeight) {
         playerMarble.vy = 0;
         playerMarble.x = hole.x;
         playerMarble.y = hole.y;
+        playerMarble.y = hole.y;
         scoreIncrease += 20;
+        Sound.playHit();
       }
     }
   });
