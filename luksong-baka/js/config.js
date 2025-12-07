@@ -9,8 +9,9 @@ const CONFIG = {
     canvasHeight: 600,
     
     // Physics
-    jumpForce: 18,
-    gravity: 0.55,
+    // Adjusted for slower, floatier jump (approx 50% slower motion)
+    jumpForce: 14.5,            // Reduced from 18 to match lower gravity
+    gravity: 0.35,              // Reduced from 0.55 for slower fall
     runSpeed: 3,
     
     // Jump angle range (extended for better control)

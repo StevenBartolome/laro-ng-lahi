@@ -17,9 +17,17 @@ const Game = {
         Sound.init();
         
         // Setup difficulty buttons
-        document.getElementById('easyBtn').addEventListener('click', () => this.start('easy'));
-        document.getElementById('normalBtn').addEventListener('click', () => this.start('normal'));
-        document.getElementById('hardBtn').addEventListener('click', () => this.start('hard'));
+        ['easyBtn', 'normalBtn', 'hardBtn'].forEach(id => {
+            document.getElementById(id).addEventListener('click', () => {
+                Sound.playClick();
+                this.start(id.replace('Btn', ''));
+            });
+        });
+        
+        // Setup generic button sounds (back buttons, etc)
+        document.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('click', () => Sound.playClick());
+        });
     },
     
     start(difficulty) {
@@ -52,15 +60,14 @@ const Game = {
                 Player.x += CONFIG.runSpeed * GameState.difficultyMultiplier;
                 
                 // Check if player ran into the baka (didn't jump!)
+                // Check if player ran into the baka (didn't jump!)
                 if (Player.x + Player.width > Baka.x + 30) {
+                    Sound.stopRun();
                     GameState.state = 'fail';
                     const isGameOver = GameLogic.loseLife();
                     if (isGameOver) {
-                        UI.showMessage('💔 Game Over!', 'fail');
-                        setTimeout(() => {
-                            GameLogic.resetGame();
-                            GameState.state = 'idle';
-                        }, 2000);
+                        GameState.state = 'gameover';
+                        UI.showGameOver();
                     } else {
                         UI.showMessage('💥 Ran into baka! ' + GameState.lives + ' ❤️ left', 'fail');
                         setTimeout(() => {
@@ -87,9 +94,33 @@ const Game = {
                 const landed = GameLogic.updateJumpArc();
                 const collision = GameLogic.checkBakaCollision();
                 
-                // Bounce off top
+                // Bounce off top - REQUIRES TIMING!
                 if (collision === 'bounce') {
-                    GameLogic.handleBounce();
+                    const timeSinceInput = Date.now() - GameState.bounceInputTime;
+                    
+                    // Check if player pressed space recently (within 250ms)
+                    if (timeSinceInput < 250) {
+                        // SUCCESSFUL BOUNCE
+                        GameLogic.handleBounce();
+                        Sound.playJump();
+                        UI.showMessage('✨ PERFECT! ✨', 'success');
+                        GameState.bounceInputTime = 0; // Reset to prevent double bounce
+                    } else {
+                        // FAILED TO TIME IT - CRASH!
+                        // FAILED TO TIME IT - CRASH!
+                        GameState.state = 'fail';
+                        const isGameOver = GameLogic.loseLife();
+                        if (isGameOver) {
+                            GameState.state = 'gameover';
+                            UI.showGameOver();
+                        } else {
+                            UI.showMessage('❌ Missed Timing! ' + GameState.lives + ' ❤️ left', 'fail');
+                            setTimeout(() => {
+                                Player.reset();
+                                GameState.state = 'idle';
+                            }, 1500);
+                        }
+                    }
                 }
                 
                 // Levels 1-3: Cannot hit the baka (collision disabled)
@@ -101,11 +132,8 @@ const Game = {
                     GameState.state = 'fail';
                     const isGameOver = GameLogic.loseLife();
                     if (isGameOver) {
-                        UI.showMessage('💔 Game Over!', 'fail');
-                        setTimeout(() => {
-                            GameLogic.resetGame();
-                            GameState.state = 'idle';
-                        }, 2000);
+                        GameState.state = 'gameover';
+                        UI.showGameOver();
                     } else {
                         UI.showMessage('💥 Hit! ' + GameState.lives + ' ❤️ left', 'fail');
                         setTimeout(() => {
@@ -120,19 +148,19 @@ const Game = {
                         GameState.state = 'success';
                         setTimeout(() => {
                             GameLogic.advanceLevel();
-                            Player.reset();
-                            GameState.state = 'idle';
+                            // Only reset if NOT gameover (cleared all levels)
+                            if (GameState.state !== 'gameover') {
+                                Player.reset();
+                                GameState.state = 'idle';
+                            }
                         }, 500);
                     } else {
                         // FAIL - landed short! Costs a life on ALL levels
                         GameState.state = 'fail';
                         const isGameOver = GameLogic.loseLife();
                         if (isGameOver) {
-                            UI.showMessage('💔 Game Over!', 'fail');
-                            setTimeout(() => {
-                                GameLogic.resetGame();
-                                GameState.state = 'idle';
-                            }, 2000);
+                            GameState.state = 'gameover';
+                            UI.showGameOver();
                         } else {
                             UI.showMessage('❌ Too short! ' + GameState.lives + ' ❤️ left', 'fail');
                             setTimeout(() => {

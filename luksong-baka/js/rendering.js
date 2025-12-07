@@ -145,6 +145,52 @@ const Rendering = {
         ctx.restore();
     },
     
+    drawBounceIndicator() {
+        // Show indicator when player is above baka
+        if (GameState.state === 'jumping' && 
+            Player.x > Baka.x - 50 && 
+            Player.x < Baka.x + Baka.width + 50) {
+            
+            const bakaCenterX = Baka.x + Baka.width / 2;
+            const bakaTopY = CONFIG.groundY - Baka.height;
+            const distY = Math.abs((Player.y + Player.height) - bakaTopY);
+            
+            // Draw target circle (static)
+            ctx.beginPath();
+            ctx.arc(bakaCenterX, bakaTopY, 50, 0, Math.PI * 2); // Larger target
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+            ctx.lineWidth = 4;
+            ctx.stroke();
+            
+            // Draw shrinking timing ring
+            if (distY < 200) { // Show earlier
+                const ringSize = Math.max(10, Math.min(80, distY / 2));
+                ctx.beginPath();
+                ctx.arc(bakaCenterX, bakaTopY, ringSize, 0, Math.PI * 2);
+                
+                // Color changes based on timing
+                if (ringSize <= 30) {
+                    ctx.strokeStyle = '#00ff00'; // Bright Green/Lime
+                    ctx.lineWidth = 6;
+                    ctx.shadowBlur = 10;
+                    ctx.shadowColor = '#00ff00';
+                    
+                    // Show "PRESS!" text when in zone
+                    ctx.fillStyle = '#00ff00';
+                    ctx.font = 'bold 24px Arial';
+                    ctx.textAlign = 'center';
+                    ctx.fillText('PRESS NOW!', bakaCenterX, bakaTopY - 60);
+                } else {
+                    ctx.strokeStyle = '#ffff00'; // Bright Yellow
+                    ctx.lineWidth = 4;
+                    ctx.shadowBlur = 0;
+                }
+                ctx.stroke();
+                ctx.shadowBlur = 0; // Reset shadow
+            }
+        }
+    },
+    
     drawInstructions() {
         if (GameState.state === 'idle') {
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
@@ -163,6 +209,7 @@ const Rendering = {
         this.drawPlatform();
         this.drawBaka();
         this.drawPlayer();
+        this.drawBounceIndicator();
         this.drawAngleIndicator();
         this.drawInstructions();
     }

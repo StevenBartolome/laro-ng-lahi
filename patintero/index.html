@@ -113,6 +113,23 @@
     </div>
 
     <script src="patintero.js"></script>
+
+    <!-- Click Sound -->
+    <audio id="clickSound">
+        <source src="../assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+    </audio>
+    <script>
+        // Global click sound for all interactive elements
+        document.addEventListener('click', (e) => {
+            if (e.target.closest('.btn') || e.target.closest('.runner-card') || e.target.tagName === 'BUTTON') {
+                const sound = document.getElementById('clickSound');
+                if (sound) {
+                    sound.currentTime = 0;
+                    sound.play().catch(() => { });
+                }
+            }
+        });
+    </script>
 </body>
 
 </html>

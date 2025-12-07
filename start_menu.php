@@ -82,6 +82,9 @@ $email = "test@example.com";
         <audio id="bgMusic" loop autoplay>
             <source src="assets/bgmusic/startmenuMusic.mp3" type="audio/mpeg">
         </audio>
+        <audio id="clickSound">
+            <source src="assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+        </audio>
         
         <!-- Music Toggle Button -->
         <button id="musicToggle" class="music-toggle" title="Toggle Music">
@@ -177,14 +180,25 @@ $email = "test@example.com";
             glow.style.transform = `translate(calc(-50% + ${moveX * 2}px), ${moveY * 2}px)`;
         });
         
-        // Button click animation
-        const allButtons = document.querySelectorAll('.menu-btn, .start-btn');
+        // Button click animation and sound
+        const allButtons = document.querySelectorAll('.menu-btn, .start-btn, button, a');
+        const clickSound = document.getElementById('clickSound');
+        
         allButtons.forEach(btn => {
             btn.addEventListener('click', (e) => {
-                btn.style.transform = 'scale(0.9)';
-                setTimeout(() => {
-                    btn.style.transform = '';
-                }, 100);
+                // Play sound
+                if (clickSound) {
+                    clickSound.currentTime = 0;
+                    clickSound.play().catch(() => {});
+                }
+
+                // Animation for specific classes
+                if (btn.classList.contains('menu-btn') || btn.classList.contains('start-btn')) {
+                    btn.style.transform = 'scale(0.9)';
+                    setTimeout(() => {
+                        btn.style.transform = '';
+                    }, 100);
+                }
             });
         });
     </script>

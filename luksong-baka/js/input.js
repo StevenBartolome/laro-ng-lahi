@@ -43,10 +43,15 @@ const Input = {
         
         if (GameState.state === 'idle') {
             GameState.state = 'running';
+            Sound.playRun(); // Start sound
         } else if (GameState.state === 'running') {
             GameState.state = 'charging';
+            Sound.stopRun(); // Stop sound
             GameState.chargeAngle = CONFIG.minAngle + 15;
             GameState.angleDirection = 1;
+        } else if (GameState.state === 'jumping') {
+            // Player is trying to bounce!
+            GameState.bounceInputTime = Date.now();
         }
     },
     

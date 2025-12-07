@@ -23,6 +23,7 @@ const GameState = {
     
     // Input
     isInputDown: false,
+    bounceInputTime: 0,
     
     // Reset to initial state
     reset() {
@@ -34,6 +35,7 @@ const GameState = {
         this.lives = CONFIG.maxLives;
         this.chargeAngle = CONFIG.minAngle + 15;
         this.angleDirection = 1;
+        this.bounceInputTime = 0;
     }
 };
 
