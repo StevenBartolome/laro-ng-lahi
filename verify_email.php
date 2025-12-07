@@ -7,17 +7,8 @@ if (!isset($_SESSION['temp_username']) || !isset($_SESSION['temp_email']) || !is
     exit();
 }
 
-// Database configuration
-$servername = "localhost";
-$db_username = "root";
-$db_password = "password";
-$dbname = "laro_ng_lahi";
-
-$conn = new mysqli($servername, $db_username, $db_password, $dbname);
-
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
-}
+// Include database configuration
+require_once 'config/db.php';
 
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
@@ -353,7 +344,7 @@ $conn->close();
         
         <div class="email-info">
             <p>Verification code sent to:</p>
-            <strong><?php echo $_SESSION['temp_email']; ?></strong>
+            <strong><?php echo htmlspecialchars($_SESSION['temp_email']); ?></strong>
         </div>
         
         <form method="POST" action="">
