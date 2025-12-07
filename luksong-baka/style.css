@@ -110,7 +110,8 @@ body {
 }
 
 .back-btn img {
-    width: 120px;
+    margin-top: 40px;
+    width: 220px;
     height: auto;
 }
 
@@ -147,6 +148,27 @@ body {
 .overlay-content {
     text-align: center;
     color: white;
+    position: relative;
+}
+
+.close-btn {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 36px;
+    cursor: pointer;
+    font-weight: 700;
+    line-height: 1;
+    transition: all 0.3s ease;
+    z-index: 10;
+}
+
+.close-btn:hover {
+    color: #ff4444;
+    transform: scale(1.1) rotate(90deg);
 }
 
 .overlay-content h1 {
@@ -180,6 +202,10 @@ body {
     grid-template-columns: 1fr 1fr;
     gap: 30px;
     text-align: left;
+}
+
+.menu-grid.single {
+    grid-template-columns: 1fr;
 }
 
 /* Panels */
@@ -314,8 +340,9 @@ body {
     top: 20px;
     right: 20px;
     display: flex;
-    gap: 20px;
+    gap: 15px; /* Increased gap */
     z-index: 50;
+    align-items: center;
 }
 
 .level-display, .round-display {
@@ -326,6 +353,59 @@ body {
     font-weight: 700;
     font-size: 18px;
     font-family: 'Fredoka One', cursive;
+    white-space: nowrap;
+}
+
+/* Difficulty/Settings Button */
+.ui-icon-btn {
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s;
+    padding: 8px;
+}
+
+.ui-icon-btn img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.ui-icon-btn:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.9);
+}
+
+/* Info FAB */
+.info-fab {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+    color: white;
+    border: 3px solid white;
+    border-radius: 50%;
+    font-size: 30px;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info-fab:hover {
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
 }
 
 /* Lives/Hearts Display */

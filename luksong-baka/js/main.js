@@ -23,6 +23,36 @@ const Game = {
                 this.start(id.replace('Btn', ''));
             });
         });
+
+        // Setup in-game UI buttons
+        const diffBtn = document.getElementById('difficultyBtn');
+        if (diffBtn) {
+            diffBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.showDifficultyScreen('difficulty'); // Show difficulty only
+                GameState.state = 'menu'; // Pause game logic
+            });
+        }
+
+        const infoBtn = document.getElementById('infoBtn');
+        if (infoBtn) {
+            infoBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.showDifficultyScreen('instructions'); // Show instructions only
+                GameState.state = 'menu'; // Pause game logic
+            });
+        }
+        
+        const closeBtn = document.getElementById('closeOverlayBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.hideDifficultyScreen();
+                if (GameState.state === 'menu') {
+                     GameState.state = 'idle';
+                }
+            });
+        }
         
         // Setup generic button sounds (back buttons, etc)
         document.querySelectorAll('a, button').forEach(el => {
@@ -31,6 +61,11 @@ const Game = {
     },
     
     start(difficulty) {
+        // Stop previous loop if running
+        if (this.animationFrameId) {
+            cancelAnimationFrame(this.animationFrameId);
+        }
+        
         // Set angle speed based on difficulty
         switch (difficulty) {
             case 'easy':
@@ -44,8 +79,10 @@ const Game = {
                 break;
         }
         
-        // Hide difficulty screen and setup game
+        // Hide overlay/menu logic handled by UI
         UI.hideDifficultyScreen();
+        // Reset panels visibility for next time (handled in UI)
+        
         GameLogic.resetGame();
         Input.init(this.canvas);
         Sound.startMusic();
@@ -53,6 +90,8 @@ const Game = {
         // Start game loop
         this.loop();
     },
+    
+    animationFrameId: null,
     
     update() {
         switch (GameState.state) {
@@ -201,7 +240,7 @@ const Game = {
     loop() {
         this.update();
         Rendering.render();
-        requestAnimationFrame(() => this.loop());
+        this.animationFrameId = requestAnimationFrame(() => this.loop());
     }
 };
 

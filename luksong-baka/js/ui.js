@@ -121,6 +121,34 @@ const UI = {
     
     hideDifficultyScreen() {
         this.elements.difficultyScreen.classList.add('hidden');
+    },
+    
+    showDifficultyScreen(mode = 'both') {
+        const difficultyScreen = this.elements.difficultyScreen;
+        const instructionsPanel = difficultyScreen.querySelector('.instructions-panel');
+        const difficultyPanel = difficultyScreen.querySelector('.difficulty-panel');
+        const overlayContent = difficultyScreen.querySelector('.overlay-content');
+        const menuGrid = difficultyScreen.querySelector('.menu-grid');
+        
+        // Reset layout based on mode
+        if (mode === 'both') {
+            overlayContent.style.maxWidth = '900px';
+            menuGrid.classList.remove('single');
+            instructionsPanel.style.display = 'block';
+            difficultyPanel.style.display = 'flex';
+        } else if (mode === 'instructions') {
+            overlayContent.style.maxWidth = '500px';
+            menuGrid.classList.add('single');
+            instructionsPanel.style.display = 'block';
+            difficultyPanel.style.display = 'none';
+        } else if (mode === 'difficulty') {
+            overlayContent.style.maxWidth = '500px';
+            menuGrid.classList.add('single');
+            instructionsPanel.style.display = 'none';
+            difficultyPanel.style.display = 'flex';
+        }
+        
+        difficultyScreen.classList.remove('hidden');
     }
 };
 
