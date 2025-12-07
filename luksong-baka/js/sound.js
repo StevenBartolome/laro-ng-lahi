@@ -6,12 +6,20 @@
 const Sound = {
     bgMusic: null,
     jumpSound: null,
+    runSound: null,
+    clickSound: null,
     bgmVolume: 0.5,
     sfxVolume: 0.7,
     
     init() {
         this.bgMusic = document.getElementById('bgMusic');
         this.jumpSound = document.getElementById('jumpSound');
+        this.runSound = document.getElementById('runSound');
+        this.clickSound = document.getElementById('clickSound');
+        
+        // Apply initial volumes
+        if (this.runSound) this.runSound.volume = this.sfxVolume * 0.6;
+        if (this.clickSound) this.clickSound.volume = this.sfxVolume; // Lower volume for running
         
         // Setup BGM volume slider
         const bgmSlider = document.getElementById('bgmVolume');
@@ -58,6 +66,26 @@ const Sound = {
             this.jumpSound.play().catch(() => {});
         }
     },
+
+    playRun() {
+        if (this.runSound && this.sfxVolume > 0 && this.runSound.paused) {
+            this.runSound.play().catch(() => {});
+        }
+    },
+
+    stopRun() {
+        if (this.runSound) {
+            this.runSound.pause();
+            this.runSound.currentTime = 0;
+        }
+    },
+    
+    playClick() {
+        if (this.clickSound && this.sfxVolume > 0) {
+            this.clickSound.currentTime = 0;
+            this.clickSound.play().catch(() => {});
+        }
+    },
     
     setBgmVolume(volume) {
         this.bgmVolume = Math.max(0, Math.min(1, volume));
@@ -82,6 +110,12 @@ const Sound = {
         
         if (this.jumpSound) {
             this.jumpSound.volume = this.sfxVolume;
+        }
+        if (this.runSound) {
+            this.runSound.volume = this.sfxVolume * 0.6;
+        }
+        if (this.clickSound) {
+            this.clickSound.volume = this.sfxVolume;
         }
         
         // Save to localStorage

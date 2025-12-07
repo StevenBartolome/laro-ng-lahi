@@ -61,12 +61,60 @@ const UI = {
             const restartBtn = document.getElementById('restartBtn');
             if (restartBtn) {
                 restartBtn.addEventListener('click', () => {
+                    Sound.playClick();
+                    UI.elements.messageOverlay.classList.add('hidden');
+                    UI.elements.messageOverlay.classList.remove('game-complete-backdrop');
+                    GameState.reset();
+                    Player.reset();
+                    Baka.setLevel(1);
+                    GameLogic.resetGame();
+                    GameState.state = 'idle';
+                });
+            }
+            
+            // Back to menu button
+            const backBtn = document.querySelector('.back-menu-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => Sound.playClick());
+            }
+        }, 100);
+    },
+
+    showGameOver() {
+        this.elements.messageOverlay.classList.add('game-complete-backdrop');
+        
+        this.elements.messageText.innerHTML = `
+            <div class="game-complete-content">
+                <div style="font-size: 42px; margin-bottom: 15px; color: #e74c3c;">💔 GAME OVER 💔</div>
+                <div style="font-size: 24px; margin-bottom: 10px;">You ran out of lives!</div>
+                <div style="font-size: 28px; color: #ffd700; margin-bottom: 25px;">Score: ${GameState.totalJumps * 100} points</div>
+                <div class="complete-buttons">
+                    <button id="retryBtn" class="restart-btn">🔄 Try Again</button>
+                    <a href="../game_select.php" class="back-menu-btn">🏠 Menu</a>
+                </div>
+            </div>
+        `;
+        this.elements.messageText.className = 'fail game-complete-box';
+        this.elements.messageOverlay.classList.remove('hidden');
+        
+        // Setup retry button
+        setTimeout(() => {
+            const retryBtn = document.getElementById('retryBtn');
+            if (retryBtn) {
+                retryBtn.addEventListener('click', () => {
+                    Sound.playClick();
                     UI.elements.messageOverlay.classList.add('hidden');
                     UI.elements.messageOverlay.classList.remove('game-complete-backdrop');
                     GameState.totalJumps = 0;
                     GameLogic.resetGame();
                     GameState.state = 'idle';
                 });
+            }
+            
+            // Back to menu button
+            const backBtn = document.querySelector('.back-menu-btn');
+            if (backBtn) {
+                backBtn.addEventListener('click', () => Sound.playClick());
             }
         }, 100);
     },

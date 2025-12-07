@@ -163,63 +163,149 @@ body {
     color: #ccc;
 }
 
-/* Difficulty Buttons */
-.difficulty-buttons {
+/* Enhanced Overlay Layout */
+.enhanced-overlay {
+    max-width: 900px !important;
+    width: 90%;
+    padding: 40px !important;
+}
+
+.game-title {
+    font-size: 56px !important;
+    margin-bottom: 30px !important;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    text-align: left;
+}
+
+/* Panels */
+.instructions-panel, .difficulty-panel {
+    background: rgba(0, 0, 0, 0.2);
+    padding: 25px;
+    border-radius: 20px;
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.instructions-panel h3, .difficulty-panel h3 {
+    color: #ffd700;
+    font-size: 24px;
+    margin-bottom: 20px;
+    font-family: 'Fredoka One', cursive;
+    text-shadow: 2px 2px 0 rgba(0,0,0,0.5);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 10px;
+}
+
+/* Instruction Items */
+.instruction-item {
     display: flex;
-    gap: 20px;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    font-size: 17px;
+    color: #fff;
+    line-height: 1.4;
+}
+
+.instruction-item.highlight {
+    background: rgba(255, 215, 0, 0.15);
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 215, 0, 0.3);
+}
+
+.key-icon {
+    display: inline-flex;
     justify-content: center;
-    margin-bottom: 40px;
+    align-items: center;
+    min-width: 40px;
+    height: 30px;
+    padding: 0 5px;
+    background: #e0e0e0;
+    color: #333;
+    border-bottom: 4px solid #999;
+    border-radius: 6px;
+    font-weight: 800;
+    font-family: monospace;
+    font-size: 14px;
+}
+
+.icon {
+    font-size: 24px;
+    width: 30px;
+    text-align: center;
+}
+
+/* Difficulty Buttons Enhanced */
+.difficulty-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    background: transparent; /* No bg for right panel to let buttons pop */
+    border: none;
+    padding: 0;
 }
 
 .diff-btn {
-    padding: 15px 40px;
-    font-size: 20px;
-    font-weight: 700;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 15px 25px;
     border: none;
-    border-radius: 50px;
+    border-radius: 15px;
     cursor: pointer;
-    transition: all 0.3s ease;
-    font-family: 'Nunito', sans-serif;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-align: left;
+    width: 100%;
 }
 
+.diff-btn:hover {
+    transform: scale(1.02) translateX(5px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+}
+
+.diff-name {
+    font-family: 'Fredoka One', cursive;
+    font-size: 24px;
+    margin-bottom: 4px;
+    display: block;
+}
+
+.diff-desc {
+    font-size: 14px;
+    opacity: 0.9;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+}
+
+/* Button Colors */
 .diff-btn.easy {
     background: linear-gradient(135deg, #2ecc71, #27ae60);
     color: white;
+    border: 2px solid #2ecc71;
 }
 
 .diff-btn.normal {
-    background: linear-gradient(135deg, #f39c12, #e67e22);
+    background: linear-gradient(135deg, #f39c12, #d35400);
     color: white;
+    border: 2px solid #f39c12;
 }
 
 .diff-btn.hard {
     background: linear-gradient(135deg, #e74c3c, #c0392b);
     color: white;
+    border: 2px solid #e74c3c;
 }
 
-.diff-btn:hover {
-    transform: scale(1.1) translateY(-3px);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-}
-
-/* Instructions */
-.instructions {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 20px 30px;
-    border-radius: 15px;
-    max-width: 400px;
-    margin: 0 auto;
-}
-
-.instructions h3 {
-    color: #D2691E;
-    margin-bottom: 10px;
-}
-
-.instructions p {
-    font-size: 14px;
-    margin-bottom: 8px;
-    text-align: left;
+/* Responsive */
+@media (max-width: 768px) {
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
 }
 
 /* Game UI */
@@ -288,6 +374,12 @@ body {
     font-weight: 700;
     text-align: center;
     font-family: 'Fredoka One', cursive;
+    transform: scale(0.8);
+    transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+#messageOverlay:not(.hidden) #messageText {
+    transform: scale(1);
 }
 
 #messageText.success {

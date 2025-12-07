@@ -18,6 +18,12 @@
     <audio id="jumpSound">
         <source src="../assets/luksong_baka_assets/jump_sound.mp3" type="audio/mpeg">
     </audio>
+    <audio id="runSound" loop>
+        <source src="../assets/luksong_baka_assets/running_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound">
+        <source src="../assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+    </audio>
 
     <!-- Sound Controls (Top Left) -->
     <div class="sound-controls">
@@ -35,20 +41,50 @@
 
     <!-- Difficulty Selection Screen -->
     <div id="difficultyScreen" class="overlay">
-        <div class="overlay-content">
-            <h1>🐃 Luksong Baka</h1>
-            <p>Choose Difficulty</p>
-            <div class="difficulty-buttons">
-                <button id="easyBtn" class="diff-btn easy">Easy</button>
-                <button id="normalBtn" class="diff-btn normal">Normal</button>
-                <button id="hardBtn" class="diff-btn hard">Hard</button>
-            </div>
-            <div class="instructions">
-                <h3>How to Play:</h3>
-                <p>1. Press <strong>SPACE</strong> or <strong>CLICK</strong> to start running</p>
-                <p>2. Hold to charge your jump angle</p>
-                <p>3. Release to jump over the baka!</p>
-                <p>4. Clear all 5 levels to win!</p>
+        <div class="overlay-content enhanced-overlay">
+            <h1 class="game-title">🐃 Luksong Baka</h1>
+
+            <div class="menu-grid">
+                <!-- Left Column: Instructions -->
+                <div class="instructions-panel">
+                    <h3>How to Play</h3>
+                    <div class="instruction-item">
+                        <span class="key-icon">␣</span>
+                        <span><strong>Press Space</strong> or <strong>Click</strong> to start running</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="icon">📐</span>
+                        <span><strong>Hold</strong> to aim your jump angle</span>
+                    </div>
+                    <div class="instruction-item">
+                        <span class="icon">🚀</span>
+                        <span><strong>Release</strong> to jump over the baka</span>
+                    </div>
+                    <div class="instruction-item highlight">
+                        <span class="icon">✨</span>
+                        <span><strong>Press AGAIN</strong> on top to <strong>BOUNCE!</strong></span>
+                    </div>
+                </div>
+
+                <!-- Right Column: Difficulty Selection -->
+                <div class="difficulty-panel">
+                    <h3>Select Difficulty</h3>
+
+                    <button id="easyBtn" class="diff-btn easy">
+                        <span class="diff-name">Easy</span>
+                        <span class="diff-desc">Slow aiming. Relaxed pace.</span>
+                    </button>
+
+                    <button id="normalBtn" class="diff-btn normal">
+                        <span class="diff-name">Normal</span>
+                        <span class="diff-desc">Standard speed. Balanced challenge.</span>
+                    </button>
+
+                    <button id="hardBtn" class="diff-btn hard">
+                        <span class="diff-name">Hard</span>
+                        <span class="diff-desc">Fast aiming! Precision required.</span>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

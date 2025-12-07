@@ -4,6 +4,7 @@
  */
 
 const Assets = {
+    background: new Image(),
     platform: new Image(),
     runningSprites: [],
     jumpChargeSprites: [],
@@ -12,6 +13,9 @@ const Assets = {
     
     load() {
         const path = CONFIG.assetPath;
+
+        // Background
+        this.background.src = path + 'game_background.png';
         
         // Platform/midground
         this.platform.src = path + 'player_platform_midground_variation_1.png';
