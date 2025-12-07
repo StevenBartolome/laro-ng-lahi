@@ -17,29 +17,19 @@ import * as HoleMode from "./HoleMode.js";
 import * as TumbangMode from "./TumbangMode.js";
 import * as LineMode from "./LineMode.js";
 
+import { UI } from "./UI.js";
+import Sound from "./Sound.js";
+
 document.addEventListener("DOMContentLoaded", () => {
+  // Init Modules
+  Sound.init();
+  UI.init();
+
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
-  const modeScreen = document.getElementById("mode-screen");
-  const difficultyScreen = document.getElementById("difficulty-screen");
-  const targetModeBtn = document.getElementById("target-mode-btn");
-  const circleModeBtn = document.getElementById("circle-mode-btn");
-  const holeModeBtn = document.getElementById("hole-mode-btn");
-  const tumbangModeBtn = document.getElementById("tumbang-mode-btn");
-  const lineModeBtn = document.getElementById("line-mode-btn");
-  const backToModesBtn = document.getElementById("back-to-modes-btn");
-  const modeTitleDisplay = document.getElementById("mode-title-display");
-  const easyBtn = document.getElementById("easy-btn");
-  const normalBtn = document.getElementById("normal-btn");
-  const hardBtn = document.getElementById("hard-btn");
-  const levelDisplay = document.getElementById("level-number");
-  const scoreDisplay = document.getElementById("score-display");
-  const targetsLeftDisplay = document.getElementById("targets-left");
+  
   const instructionPrompt = document.getElementById("instruction-prompt");
-  const helpBtn = document.getElementById("help-btn");
-  const helpModal = document.getElementById("help-modal");
-  const closeModal = document.querySelector(".close-btn");
-
+  
   canvas.width = 1280;
   canvas.height = 720;
 
@@ -73,7 +63,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Initialization ---
   loadAssets().then(() => {
-    // console.log("Assets loaded");
+    console.log("Assets loaded");
+    // Show menu initially, disable close button to force selection
+    UI.showMenu('both', false);
+    UI.highlightMode(gameMode); // Highlight default mode
   });
 
   // --- Helper Functions ---
@@ -100,8 +93,8 @@ document.addEventListener("DOMContentLoaded", () => {
       score = 0;
     }
 
-    levelDisplay.textContent = level;
-    scoreDisplay.textContent = score;
+    UI.updateLevel(level);
+    UI.updateScore(score);
     resetPlayerMarble();
 
     // Initialize Mode State
@@ -110,12 +103,13 @@ document.addEventListener("DOMContentLoaded", () => {
     updateTargetsLeft();
     gameState = "idle";
     isDragging = false;
-    instructionPrompt.style.display = "flex";
+    if (instructionPrompt) instructionPrompt.style.display = "flex";
   }
 
   function updateTargetsLeft() {
     const count = currentModeModule.countRemaining(modeState);
-    targetsLeftDisplay.textContent = count;
+    const targetsDisplay = document.getElementById('targets-left');
+    if (targetsDisplay) targetsDisplay.textContent = count;
   }
 
   // --- Drawing ---
@@ -235,7 +229,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.anyMoving) anyMoving = true;
       if (result.scoreIncrease) {
         score += result.scoreIncrease;
-        scoreDisplay.textContent = score;
+        UI.updateScore(score);
         updateTargetsLeft();
       }
 
@@ -250,7 +244,7 @@ document.addEventListener("DOMContentLoaded", () => {
         } else {
           gameState = "idle";
           stopPlayerMarble();
-          instructionPrompt.style.display = "flex";
+          if (instructionPrompt) instructionPrompt.style.display = "flex";
         }
       }
     }
@@ -291,9 +285,11 @@ document.addEventListener("DOMContentLoaded", () => {
   // --- Input Handlers ---
   function getMousePos(e) {
     const rect = canvas.getBoundingClientRect();
+    const scaleX = canvas.width / rect.width;
+    const scaleY = canvas.height / rect.height;
     return {
-      x: e.clientX - rect.left,
-      y: e.clientY - rect.top,
+      x: (e.clientX - rect.left) * scaleX,
+      y: (e.clientY - rect.top) * scaleY,
     };
   }
 
@@ -315,7 +311,7 @@ document.addEventListener("DOMContentLoaded", () => {
       dragCurrentX = pos.x;
       dragCurrentY = pos.y;
       gameState = "dragging";
-      instructionPrompt.style.display = "none";
+      if (instructionPrompt) instructionPrompt.style.display = "none";
     }
   }
 
@@ -343,134 +339,67 @@ document.addEventListener("DOMContentLoaded", () => {
       gameState = "shooting";
     } else {
       gameState = "idle";
-      instructionPrompt.style.display = "flex";
+      if (instructionPrompt) instructionPrompt.style.display = "flex";
     }
     isDragging = false;
   }
-
-  // Add Touch support functions (omitted for brevity but added in final if needed, similar to original)
-  // I will add them back to be safe.
-
-  function handleTouchStart(e) {
-    e.preventDefault();
-    if (gameState !== "idle") return;
-    const touch = e.touches[0];
-    const pos = getMousePos(touch);
-    if (isMouseOnMarble(pos.x, pos.y)) {
-      isDragging = true;
-      dragStartX = pos.x;
-      dragStartY = pos.y;
-      dragCurrentX = pos.x;
-      dragCurrentY = pos.y;
-      gameState = "dragging";
-      instructionPrompt.style.display = "none";
-    }
-  }
-  function handleTouchMove(e) {
-    e.preventDefault();
-    if (!isDragging || gameState !== "dragging") return;
-    const touch = e.touches[0];
-    const pos = getMousePos(touch);
-    dragCurrentX = pos.x;
-    dragCurrentY = pos.y;
-  }
-  function handleTouchEnd(e) {
-    e.preventDefault();
-    if (!isDragging || gameState !== "dragging") return;
-    // ... same logic as mouse up ...
-    // To avoid duplication, I will just call handleMouseUp logic or copy it.
-    // Copying to ensure availability of variables like dragCurrentX.
-    const dx = dragCurrentX - playerMarble.x;
-    const dy = dragCurrentY - playerMarble.y;
-    const distance = Math.sqrt(dx * dx + dy * dy);
-
-    if (distance > 5) {
-      const clampedDistance = Math.min(distance, MAX_DRAG_DISTANCE);
-      const power = clampedDistance * POWER_MULTIPLIER;
-      const angle = Math.atan2(-dy, -dx);
-      playerMarble.vx = Math.cos(angle) * power;
-      playerMarble.vy = Math.sin(angle) * power;
-      playerMarble.isMoving = true;
-      gameState = "shooting";
-    } else {
-      gameState = "idle";
-      instructionPrompt.style.display = "flex";
-    }
-    isDragging = false;
-  }
-
-  // --- Modal Handlers ---
-  helpBtn.addEventListener("click", () => {
-    helpModal.style.display = "block";
-  });
-  closeModal.addEventListener("click", () => {
-    helpModal.style.display = "none";
-  });
-  window.addEventListener("click", (e) => {
-    if (e.target === helpModal) {
-      helpModal.style.display = "none";
-    }
-  });
 
   // --- Difficulty Selection ---
   function startGame(difficulty) {
-    difficultyScreen.style.display = "none";
+    UI.hideMenu();
     document.getElementById("game-container").style.display = "block";
 
     canvas.addEventListener("mousedown", handleMouseDown);
     canvas.addEventListener("mousemove", handleMouseMove);
     canvas.addEventListener("mouseup", handleMouseUp);
-    canvas.addEventListener("touchstart", handleTouchStart, { passive: false });
-    canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
-    canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
+    // Add touch if needed
 
-    resetGame(true);
+    resetGame(false); // Reset to level 1
     update();
   }
 
   // --- Mode Selection ---
-  function selectMode(mode, modeName) {
+  function selectMode(mode) {
     gameMode = mode;
+    UI.highlightMode(mode);
+    
     switch (mode) {
-      case "target":
-        currentModeModule = TargetMode;
-        break;
-      case "circle":
-        currentModeModule = CircleMode;
-        break;
-      case "hole":
-        currentModeModule = HoleMode;
-        break;
-      case "tumbang":
-        currentModeModule = TumbangMode;
-        break;
-      case "line":
-        currentModeModule = LineMode;
-        break;
+      case "target": currentModeModule = TargetMode; break;
+      case "circle": currentModeModule = CircleMode; break;
+      case "hole": currentModeModule = HoleMode; break;
+      case "tumbang": currentModeModule = TumbangMode; break;
+      case "line": currentModeModule = LineMode; break;
     }
-    modeScreen.style.display = "none";
-    difficultyScreen.style.display = "flex";
-    modeTitleDisplay.textContent = modeName;
   }
 
-  targetModeBtn.addEventListener("click", () =>
-    selectMode("target", "TARGET SHOOTING")
-  );
-  circleModeBtn.addEventListener("click", () =>
-    selectMode("circle", "CIRCLE GAME")
-  );
-  holeModeBtn.addEventListener("click", () => selectMode("hole", "HOLE GAME"));
-  tumbangModeBtn.addEventListener("click", () =>
-    selectMode("tumbang", "TUMBANG PRESO")
-  );
-  lineModeBtn.addEventListener("click", () => selectMode("line", "LINE GAME"));
-
-  backToModesBtn.addEventListener("click", () => {
-    difficultyScreen.style.display = "none";
-    modeScreen.style.display = "flex";
+  // Bind Buttons
+  UI.elements.modeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+           Sound.playClick();
+           const modeParts = btn.id.split('-'); // mode-target
+           const mode = modeParts[1];
+           selectMode(mode);
+      });
   });
 
-  easyBtn.addEventListener("click", () => startGame("easy"));
-  normalBtn.addEventListener("click", () => startGame("normal"));
-  hardBtn.addEventListener("click", () => startGame("hard"));
+  UI.elements.diffBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+           Sound.playClick();
+           const diffParts = btn.id.split('-'); // diff-easy
+           const diff = diffParts[1];
+           startGame(diff);
+      });
+  });
+
+  const menuBtn = document.getElementById('menuBtn');
+  if(menuBtn) menuBtn.addEventListener('click', () => {
+       Sound.playClick();
+       UI.showMenu('both', true);
+  });
+
+  const infoBtn = document.getElementById('infoBtn');
+  if(infoBtn) infoBtn.addEventListener('click', () => {
+       Sound.playClick();
+       UI.showMenu('instructions', true);
+  });
 });
