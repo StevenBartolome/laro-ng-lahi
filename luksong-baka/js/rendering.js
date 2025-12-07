@@ -11,6 +11,12 @@ const Rendering = {
         ctx = canvas.getContext('2d');
         canvas.width = CONFIG.canvasWidth;
         canvas.height = CONFIG.canvasHeight;
+        
+        // Disable smoothing for pixel art look
+        ctx.imageSmoothingEnabled = false;
+        ctx.mozImageSmoothingEnabled = false;
+        ctx.webkitImageSmoothingEnabled = false;
+        ctx.msImageSmoothingEnabled = false;
     },
     
     clear() {
@@ -41,13 +47,18 @@ const Rendering = {
     
     drawPlatform() {
         if (Assets.platform.complete) {
-            ctx.drawImage(
-                Assets.platform,
-                0,
-                CONFIG.groundY - 62,
-                canvas.width,
-                200
-            );
+            // Use tiling/pattern instead of stretching to prevent distortion
+            const overflow = 20;
+            const y = CONFIG.groundY - 38;
+            const height = 300; // Enough to cover bottom
+            
+            const pattern = ctx.createPattern(Assets.platform, 'repeat');
+            ctx.fillStyle = pattern;
+            
+            ctx.save();
+            ctx.translate(-overflow, y); // Align pattern start
+            ctx.fillRect(0, 0, canvas.width + (overflow * 2), height);
+            ctx.restore();
         }
     },
     

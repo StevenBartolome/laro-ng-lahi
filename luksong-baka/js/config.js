@@ -26,7 +26,7 @@ const CONFIG = {
     successMargin: 25,
     
     // Positions
-    groundY: 480,
+    groundY: 520,
     playerStartX: 80,
     bakaX: 700,
     

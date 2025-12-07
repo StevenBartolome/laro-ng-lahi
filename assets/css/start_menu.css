@@ -158,15 +158,18 @@ body {
 .game-title {
     position: relative;
     z-index: 10;
-    margin-bottom: 200px;
-    margin-top: -300px;
+    margin-bottom: 100px;
+    margin-top: -100px; /* Reduced from -300px to prevent top cutoff */
     animation: float 3s ease-in-out infinite;
+    padding: 0 20px;
 }
 
 .game-title img {
-    max-width: 900px;
-    width: 95vw;
+    max-width: 800px;
+    width: 100%; /* Responsive width */
     height: auto;
+    max-height: 30vh; /* Limit vertical height to 30% of viewport */
+    object-fit: contain;
     filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.5));
 }
 
