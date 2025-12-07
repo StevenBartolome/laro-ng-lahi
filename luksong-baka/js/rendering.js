@@ -18,21 +18,25 @@ const Rendering = {
     },
     
     drawBackground() {
-        // Sky gradient
-        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-        gradient.addColorStop(0, '#87CEEB');
-        gradient.addColorStop(0.6, '#98D8C8');
-        gradient.addColorStop(1, '#7CB342');
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-        // Ground
-        ctx.fillStyle = '#5D4037';
-        ctx.fillRect(0, CONFIG.groundY, canvas.width, canvas.height - CONFIG.groundY);
-        
-        // Grass line
-        ctx.fillStyle = '#4CAF50';
-        ctx.fillRect(0, CONFIG.groundY - 5, canvas.width, 10);
+        if (Assets.background.complete) {
+            ctx.drawImage(Assets.background, 0, 0, canvas.width, canvas.height);
+        } else {
+            // Sky gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(0.6, '#98D8C8');
+            gradient.addColorStop(1, '#7CB342');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Ground
+            ctx.fillStyle = '#5D4037';
+            ctx.fillRect(0, CONFIG.groundY, canvas.width, canvas.height - CONFIG.groundY);
+            
+            // Grass line
+            ctx.fillStyle = '#4CAF50';
+            ctx.fillRect(0, CONFIG.groundY - 5, canvas.width, 10);
+        }
     },
     
     drawPlatform() {
