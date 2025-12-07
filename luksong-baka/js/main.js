@@ -54,6 +54,45 @@ const Game = {
             });
         }
         
+        // Facts Feature listeners
+        const factsBtn = document.getElementById('factsBtn');
+        if (factsBtn) {
+            factsBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.showFacts();
+                GameState.state = 'menu';
+            });
+        }
+        
+        const closeFactsBtn = document.getElementById('closeFactsBtn');
+        if (closeFactsBtn) {
+            closeFactsBtn.addEventListener('click', () => {
+                Sound.playClick();
+                UI.hideFacts();
+                if (GameState.state === 'menu') {
+                    GameState.state = 'idle';
+                }
+            });
+        }
+        
+        const factsBoard = document.getElementById('factsBoard');
+        if (factsBoard) {
+            factsBoard.addEventListener('click', () => {
+                UI.nextFact();
+            });
+        }
+        
+        document.querySelectorAll('.dot').forEach(dot => {
+            dot.addEventListener('click', (e) => {
+                const index = parseInt(e.target.dataset.index);
+                UI.setFact(index);
+            });
+        });
+        
+        // Hide close button initially (must select difficulty to start)
+        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+        if (closeOverlayBtn) closeOverlayBtn.style.display = 'none';
+        
         // Setup generic button sounds (back buttons, etc)
         document.querySelectorAll('a, button').forEach(el => {
             el.addEventListener('click', () => Sound.playClick());
@@ -61,6 +100,10 @@ const Game = {
     },
     
     start(difficulty) {
+        // Show close button for future menu pauses
+        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+        if (closeOverlayBtn) closeOverlayBtn.style.display = 'block';
+        
         // Stop previous loop if running
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);

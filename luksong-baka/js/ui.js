@@ -11,8 +11,59 @@ const UI = {
             messageOverlay: document.getElementById('messageOverlay'),
             messageText: document.getElementById('messageText'),
             levelText: document.getElementById('levelText'),
-            difficultyScreen: document.getElementById('difficultyScreen')
+            levelText: document.getElementById('levelText'),
+            difficultyScreen: document.getElementById('difficultyScreen'),
+            factsOverlay: document.getElementById('factsOverlay')
         };
+    },
+    
+    // Facts Logic
+    facts: {
+        current: 1,
+        total: 3
+    },
+    
+    showFacts() {
+        this.facts.current = 1;
+        this.updateFactDisplay();
+        this.elements.factsOverlay.classList.remove('hidden');
+    },
+    
+    hideFacts() {
+        this.elements.factsOverlay.classList.add('hidden');
+    },
+    
+    nextFact() {
+        this.facts.current++;
+        if (this.facts.current > this.facts.total) {
+            this.facts.current = 1;
+        }
+        this.updateFactDisplay();
+    },
+    
+    setFact(index) {
+        this.facts.current = index;
+        this.updateFactDisplay();
+    },
+    
+    updateFactDisplay() {
+        const board = document.getElementById('factsBoard');
+        const dots = document.querySelectorAll('.dot');
+        
+        // Simple fade out/in effect
+        board.style.opacity = '0';
+        board.style.transform = 'translateY(10px)';
+        
+        setTimeout(() => {
+            board.src = `../assets/game_facts_assets/luksong_baka_facts_board_${this.facts.current}.png`;
+            board.style.opacity = '1';
+            board.style.transform = 'translateY(0)';
+            
+            // Update dots
+            dots.forEach(dot => {
+                dot.classList.toggle('active', parseInt(dot.dataset.index) === this.facts.current);
+            });
+        }, 200);
     },
     
     showMessage(text, type) {

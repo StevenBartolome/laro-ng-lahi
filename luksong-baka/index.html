@@ -123,6 +123,11 @@
         <div class="level-display">Baka Level: <span id="levelText">1</span></div>
     </div>
 
+    <!-- Facts Button (Above How to Play) -->
+    <button id="factsBtn" class="info-fab facts-btn" title="Game Facts">
+        <img src="../assets/game_facts_assets/fact_icon.png" alt="Facts">
+    </button>
+
     <!-- How to Play Button (Bottom Right) -->
     <button id="infoBtn" class="info-fab" title="How to Play">
         ❓
@@ -131,6 +136,25 @@
     <!-- Message Overlay -->
     <div id="messageOverlay" class="hidden">
         <div id="messageText"></div>
+    </div>
+
+    <!-- Facts Overlay -->
+    <div id="factsOverlay" class="overlay hidden">
+        <div class="overlay-content facts-content">
+            <button id="closeFactsBtn" class="close-btn" title="Close">×</button>
+            <img src="../assets/game_facts_assets/luksong_baka_facts_title.png" class="facts-title" alt="Facts">
+
+            <div class="facts-container">
+                <img id="factsBoard" src="../assets/game_facts_assets/luksong_baka_facts_board_1.png"
+                    class="facts-board" alt="Fact Board">
+                <div class="facts-nav">
+                    <span class="dot active" data-index="1"></span>
+                    <span class="dot" data-index="2"></span>
+                    <span class="dot" data-index="3"></span>
+                </div>
+            </div>
+            <p class="click-hint">Click board to read next page ➡️</p>
+        </div>
     </div>
 
     <!-- Modular JS Files (load order matters!) -->
