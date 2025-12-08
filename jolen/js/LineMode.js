@@ -6,6 +6,7 @@ import {
   drawMarble,
   updateMarble,
 } from "./Common.js";
+import Sound from "./Sound.js";
 
 export function setup(level, canvasWidth, canvasHeight) {
   const targets = [];
@@ -67,6 +68,7 @@ export function update(
   // Hit marbles in sequence
   targets.forEach((target) => {
     if (!target.hit && checkMarbleCollision(playerMarble, target)) {
+      Sound.playHit();
       // Check if this is the next marble in sequence
       const previousHit =
         target.hitOrder === 0 || targets[target.hitOrder - 1].hit;
@@ -84,7 +86,9 @@ export function update(
   for (let i = 0; i < targets.length; i++) {
     for (let j = i + 1; j < targets.length; j++) {
       if (!targets[i].hit && !targets[j].hit) {
-        checkMarbleCollision(targets[i], targets[j]);
+        if (checkMarbleCollision(targets[i], targets[j])) {
+            Sound.playHit();
+        }
       }
     }
   }

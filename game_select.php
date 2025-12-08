@@ -48,8 +48,8 @@ $email = "test@example.com";
             <a href="games/patintero.php" class="game-card" title="Play Patintero">
                 <img src="assets/startmenu/patintero_gamecard.png" alt="Patintero">
             </a>
-            <a href="luksong-tinik/index.html" class="game-card" title="Play Luksong Tinik">
-                <img src="assets/startmenu/holen_gamecard.png" alt="Luksong Tinik">
+            <a href="jolen/index.html" class="game-card" title="Play Jolen">
+                <img src="assets/startmenu/jolen_gamecard.png" alt="Luksong Tinik">
             </a>
             <a href="luksong-baka/index.html" class="game-card" title="Play Luksong Baka">
                 <img src="assets/startmenu/luksong_baka_gamecard.png" alt="Luksong Baka">

@@ -6,6 +6,7 @@ import {
   drawMarble,
   updateMarble,
 } from "./Common.js";
+import Sound from "./Sound.js";
 
 export function setup(level, canvasWidth, canvasHeight) {
   const targets = [];
@@ -69,7 +70,10 @@ export function update(
       target.hit = true;
       target.vx = 0;
       target.vy = 0;
+      target.vx = 0;
+      target.vy = 0;
       scoreIncrease += 10;
+      Sound.playHit();
     }
   });
 
@@ -77,7 +81,9 @@ export function update(
   for (let i = 0; i < targets.length; i++) {
     for (let j = i + 1; j < targets.length; j++) {
       if (!targets[i].hit && !targets[j].hit) {
-        checkMarbleCollision(targets[i], targets[j]);
+        if (checkMarbleCollision(targets[i], targets[j])) {
+            Sound.playHit();
+        }
       }
     }
   }

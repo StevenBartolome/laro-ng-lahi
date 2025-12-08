@@ -89,7 +89,10 @@ h1 {
     position: relative;
     width: 100%;
     height: 600px;
-    background: #8BC34A;
+    background-image: url('../assets/patintero_assets/Patintero_floor.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
     border: 5px solid #558B2F;
     border-radius: 10px;
     margin-bottom: 20px;
@@ -98,17 +101,18 @@ h1 {
 
 .line {
     position: absolute;
-    background: rgba(255, 255, 255, 0.8);
+    background: rgba(255, 255, 255, 0.9);
+    box-shadow: 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
 .horizontal-line {
     width: 100%;
-    height: 4px;
+    height: 6px;
     left: 0;
 }
 
 .vertical-line {
-    width: 4px;
+    width: 6px;
     height: 100%;
     top: 0;
     left: 50%;
@@ -152,10 +156,6 @@ h1 {
     color: #333;
     border: 3px solid #fff;
     box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="%23333"><path d="M13.5 5.5c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zM9.8 8.9L7 23h2.1l1.8-8 2.1 2v6h2v-7.5l-2.1-2 .6-3C14.8 12 16.8 13 19 13v-2c-1.9 0-3.5-1-4.3-2.4l-1-1.6c-.4-.6-1-1-1.7-1-.3 0-.5.1-.8.1L6 8.3V13h2V9.6l1.8-.7z"/></svg>');
-    background-size: 24px;
-    background-repeat: no-repeat;
-    background-position: center;
 }
 
 .tagger {
@@ -163,11 +163,6 @@ h1 {
     color: white;
     border: 3px solid #fff;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    /* Angry Tagger Icon */
-    background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="white"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm3.5-9c.83 0 1.5-.67 1.5-1.5S16.33 8 15.5 8 14 8.67 14 9.5s.67 1.5 1.5 1.5zm-7 0c.83 0 1.5-.67 1.5-1.5S9.33 8 8.5 8 7 8.67 7 9.5 7.67 11 8.5 11zm3.5 6.5c2.33 0 4.31-1.46 5.11-3.5H6.89c.8 2.04 2.78 3.5 5.11 3.5z"/></svg>');
-    background-size: 28px;
-    background-repeat: no-repeat;
-    background-position: center;
 }
 
 .boost-meter-container {
