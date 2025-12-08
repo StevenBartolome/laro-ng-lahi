@@ -18,6 +18,21 @@ import { checkBoostInput } from './input.js';
  * Start the game with selected difficulty
  */
 export function startGame(difficulty) {
+    // Clean up existing game state to prevent double speed
+    if (gameState.animationFrameId) {
+        cancelAnimationFrame(gameState.animationFrameId);
+        gameState.animationFrameId = null;
+    }
+    if (gameState.timerInterval) {
+        clearInterval(gameState.timerInterval);
+        gameState.timerInterval = null;
+    }
+    gameState.gameActive = false;
+
+    // Reset game area visibility
+    document.getElementById('gameArea').classList.remove('active');
+    document.getElementById('boostMeter').classList.remove('active');
+
     gameState.selectedDifficulty = difficulty || 'medium';
 
     // Hide difficulty screen and show coin flip
