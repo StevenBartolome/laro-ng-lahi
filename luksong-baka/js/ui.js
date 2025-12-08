@@ -183,12 +183,12 @@ const UI = {
         
         // Reset layout based on mode
         if (mode === 'both') {
-            overlayContent.style.maxWidth = '900px';
+            overlayContent.style.maxWidth = '1100px';
             menuGrid.classList.remove('single');
             instructionsPanel.style.display = 'block';
             difficultyPanel.style.display = 'flex';
         } else if (mode === 'instructions') {
-            overlayContent.style.maxWidth = '500px';
+            overlayContent.style.maxWidth = '800px';
             menuGrid.classList.add('single');
             instructionsPanel.style.display = 'block';
             difficultyPanel.style.display = 'none';

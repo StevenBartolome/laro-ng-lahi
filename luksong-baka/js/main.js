@@ -40,21 +40,14 @@ const Game = {
                 Sound.playClick();
                 UI.showDifficultyScreen('instructions'); // Show instructions only
                 GameState.state = 'menu'; // Pause game logic
+                GameState.openedViaInfoButton = true; // Track how overlay was opened
+                
+                // Show close button for instructions view
+                const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+                if (closeOverlayBtn) closeOverlayBtn.style.display = 'flex';
             });
         }
         
-        const closeBtn = document.getElementById('closeOverlayBtn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                Sound.playClick();
-                UI.hideDifficultyScreen();
-                if (GameState.state === 'menu') {
-                     GameState.state = 'idle';
-                }
-            });
-        }
-        
-        // Facts Feature listeners
         const factsBtn = document.getElementById('factsBtn');
         if (factsBtn) {
             factsBtn.addEventListener('click', () => {
@@ -129,9 +122,34 @@ const Game = {
             });
         });
         
-        // Hide close button initially (must select difficulty to start)
-        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
-        if (closeOverlayBtn) closeOverlayBtn.style.display = 'none';
+        // Close button handler - enforce difficulty selection
+        const closeBtn = document.getElementById('closeOverlayBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                Sound.playClick();
+                
+                // If game hasn't started yet (no difficulty selected)
+                if (!GameState.difficulty) {
+                    // If opened via info button on start screen, return to main difficulty view
+                    if (GameState.openedViaInfoButton) {
+                        UI.showDifficultyScreen('both');
+                    } else {
+                        // Otherwise it's the main close button, go back to game select
+                        window.location.href = '../game_select.php';
+                    }
+                } 
+                // Game has started (Paused), simply resume
+                else {
+                    UI.hideDifficultyScreen();
+                    if (GameState.state === 'menu') {
+                        GameState.state = 'idle'; // Resume to idle (running waiting for jump)
+                    }
+                }
+                
+                // Always reset the flag
+                GameState.openedViaInfoButton = false;
+            });
+        }
         
         // Setup generic button sounds (back buttons, etc)
         document.querySelectorAll('a, button').forEach(el => {
@@ -142,12 +160,15 @@ const Game = {
     start(difficulty) {
         // Show close button for future menu pauses
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
-        if (closeOverlayBtn) closeOverlayBtn.style.display = 'block';
+        if (closeOverlayBtn) closeOverlayBtn.style.display = 'flex';
         
         // Stop previous loop if running
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
+        
+        // Store difficulty for later checks
+        GameState.difficulty = difficulty;
         
         // Set angle speed based on difficulty
         switch (difficulty) {
