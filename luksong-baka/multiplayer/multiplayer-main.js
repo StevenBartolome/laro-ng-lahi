@@ -45,6 +45,9 @@ async function init() {
         return;
     }
 
+    // Override speed to constant medium
+    CONFIG.runSpeed = 5; // Medium difficulty speed
+
     console.log('Multiplayer initialized successfully');
 
     // Display lobby code - get it from Firebase lobby data
@@ -592,7 +595,32 @@ function update() {
  */
 async function handlePlayerSuccess() {
     GameState.totalJumps++;
-    const nextLevel = Math.min(GameState.currentLevel + 1, 5);
+
+    // Check if player finished level 5 (WINNER)
+    if (GameState.currentLevel >= 5) {
+        const score = GameState.totalJumps * 100 + 1000; // Bonus for winning
+
+        UI.showMessage(`🏆 WINNER! 🏆`, 'success');
+
+        // Update Firebase with win status
+        await multiplayer.updatePlayerAction({
+            type: 'game_complete',
+            level: 5,
+            lives: GameState.lives,
+            totalJumps: GameState.totalJumps,
+            score: score,
+            angle: GameState.chargeAngle
+        });
+
+        // End the game for everyone
+        setTimeout(async () => {
+            await multiplayer.endGame();
+        }, 1500);
+
+        return;
+    }
+
+    const nextLevel = GameState.currentLevel + 1;
     const score = GameState.totalJumps * 100;
 
     UI.showMessage(`Level ${nextLevel}!`, 'success');
@@ -608,17 +636,6 @@ async function handlePlayerSuccess() {
     });
 
     setTimeout(async () => {
-        if (nextLevel > 5) {
-            // Player completed all levels
-            await multiplayer.updatePlayerAction({
-                type: 'game_complete',
-                level: 5,
-                lives: GameState.lives,
-                totalJumps: GameState.totalJumps,
-                score: score
-            });
-        }
-
         Player.reset();
         GameState.state = 'idle';
 
