@@ -5,10 +5,14 @@
 
 import { startGame, resetGame } from './game.js';
 import { initInputHandlers } from './input.js';
+import { showDifficultyScreen, hideDifficultyScreen, handleCloseOverlay } from './ui.js';
 
 // Expose functions to window for HTML onclick handlers
 window.startGame = startGame;
 window.resetGame = resetGame;
+window.showDifficultyScreen = showDifficultyScreen;
+window.hideDifficultyScreen = hideDifficultyScreen;
+window.handleCloseOverlay = handleCloseOverlay;
 
 // Initialize input handlers when DOM is ready
 if (document.readyState === 'loading') {

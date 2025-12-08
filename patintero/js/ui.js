@@ -16,21 +16,29 @@ export function setGameFlowFunctions(endGame, switchRolesAfterTag) {
  * Show a status toast message
  */
 export function updateStatus(msg) {
+    // Remove existing status toasts to prevent stacking
+    const existing = document.querySelectorAll('.game-status-toast');
+    existing.forEach(el => el.remove());
+
     const toast = document.createElement('div');
-    toast.style.position = 'absolute';
-    toast.style.top = '20%';
+    toast.className = 'game-status-toast'; // Add class for easy selection
+    toast.style.position = 'fixed'; // Changed to fixed
+    toast.style.top = '10%'; // Top position
     toast.style.left = '50%';
     toast.style.transform = 'translate(-50%, -50%)';
-    toast.style.background = 'rgba(0,0,0,0.8)';
-    toast.style.color = '#fff';
-    toast.style.padding = '20px';
-    toast.style.borderRadius = '10px';
-    toast.style.fontSize = '24px';
+    toast.style.background = 'rgba(0, 0, 0, 0.85)';
+    toast.style.color = '#ffd700'; // Gold text
+    toast.style.padding = '10px 20px';
+    toast.style.borderRadius = '20px';
+    toast.style.fontSize = '20px';
     toast.style.fontWeight = 'bold';
+    toast.style.fontFamily = "var(--font-heading, 'Arial')";
     toast.style.zIndex = '1000';
+    toast.style.border = '2px solid #ffd700';
+    toast.style.boxShadow = '0 5px 15px rgba(0,0,0,0.5)';
     toast.textContent = msg;
     document.body.appendChild(toast);
-    setTimeout(() => toast.remove(), 2000);
+    setTimeout(() => toast.remove(), 3000);
 }
 
 /**
@@ -115,28 +123,104 @@ export function updateTimer() {
  */
 export function showPointNotification(text, type = 'player') {
     const notification = document.createElement('div');
-    notification.style.position = 'absolute';
-    notification.style.top = '30%';
+    notification.style.position = 'fixed'; // Changed to fixed
+    notification.style.top = '15%'; // Moved up
     notification.style.left = '50%';
     notification.style.transform = 'translate(-50%, -50%)';
 
     // Different colors based on type
     if (type === 'enemy') {
-        notification.style.background = 'rgba(244, 67, 54, 0.9)'; // Red for enemy
+        notification.style.background = 'linear-gradient(135deg, #e74c3c, #c0392b)'; // Red gradient
+        notification.style.boxShadow = '0 0 20px rgba(231, 76, 60, 0.6)';
     } else if (type === 'team') {
-        notification.style.background = 'rgba(33, 150, 243, 0.9)'; // Blue for team bot
+        notification.style.background = 'linear-gradient(135deg, #3498db, #2980b9)'; // Blue gradient
+        notification.style.boxShadow = '0 0 20px rgba(52, 152, 219, 0.6)';
     } else {
-        notification.style.background = 'rgba(76, 175, 80, 0.9)'; // Green for player
+        notification.style.background = 'linear-gradient(135deg, #2ecc71, #27ae60)'; // Green gradient
+        notification.style.boxShadow = '0 0 20px rgba(46, 204, 113, 0.6)';
     }
 
     notification.style.color = '#fff';
-    notification.style.padding = '15px 30px';
-    notification.style.borderRadius = '10px';
-    notification.style.fontSize = '28px';
+    notification.style.padding = '12px 25px';
+    notification.style.borderRadius = '30px';
+    notification.style.fontSize = '24px';
     notification.style.fontWeight = 'bold';
-    notification.style.zIndex = '1000';
-    notification.style.animation = 'fadeInOut 1.5s ease-out';
+    notification.style.fontFamily = "var(--font-heading, 'Arial')";
+    notification.style.zIndex = '2000'; // Higher z-index
+    notification.style.border = '3px solid white';
+    notification.style.animation = 'slideDownFade 2s ease-out forwards';
     notification.textContent = text;
     document.body.appendChild(notification);
-    setTimeout(() => notification.remove(), 1500);
+    setTimeout(() => notification.remove(), 2000);
+}
+
+// Track current overlay mode
+let currentOverlayMode = 'both';
+
+/**
+ * Show difficulty/menu screen with specific mode
+ * mode: 'both', 'instructions', 'difficulty'
+ */
+export function showDifficultyScreen(mode = 'both') {
+    currentOverlayMode = mode; // Store mode
+    const difficultyScreen = document.getElementById('difficultyScreen');
+    const instructionsPanel = difficultyScreen.querySelector('.instructions-panel');
+    const difficultyPanel = difficultyScreen.querySelector('.difficulty-panel');
+    const overlayContent = difficultyScreen.querySelector('.overlay-content');
+    const menuGrid = difficultyScreen.querySelector('.menu-grid');
+    
+    // Reset layout based on mode
+    if (mode === 'both') {
+        overlayContent.style.maxWidth = '900px';
+        menuGrid.classList.remove('single');
+        instructionsPanel.style.display = 'block';
+        difficultyPanel.style.display = 'flex';
+    } else if (mode === 'instructions') {
+        overlayContent.style.maxWidth = '500px';
+        menuGrid.classList.add('single');
+        instructionsPanel.style.display = 'block';
+        difficultyPanel.style.display = 'none';
+    } else if (mode === 'difficulty') {
+        overlayContent.style.maxWidth = '500px';
+        menuGrid.classList.add('single');
+        instructionsPanel.style.display = 'none';
+        difficultyPanel.style.display = 'flex';
+    }
+    
+    difficultyScreen.classList.remove('hidden');
+}
+
+/**
+ * Hide difficulty screen
+ */
+export function hideDifficultyScreen() {
+    document.getElementById('difficultyScreen').classList.add('hidden');
+}
+
+/**
+ * Handle closing the overlay (X button)
+ * Logic:
+ * - If Instructions open:
+ *   - If Game Active: Resume game (Hide)
+ *   - If Not Active: Back to Menu (Difficulty)
+ * - If Difficulty/Menu open:
+ *   - If Game Active: Resume game (Hide)
+ *   - If Not Active: Exit to Game Select hierarchy
+ */
+export function handleCloseOverlay() {
+    if (currentOverlayMode === 'instructions') {
+        if (gameState.gameActive || gameState.roundsCompleted > 0) {
+            hideDifficultyScreen();
+        } else {
+            // If at start screen, return to main menu (both panels)
+            showDifficultyScreen('both');
+        }
+    } else {
+        // Mode is 'difficulty' or 'both'
+        if (gameState.gameActive || gameState.roundsCompleted > 0) {
+            hideDifficultyScreen();
+        } else {
+            window.location.href = '../game_select.php';
+        }
+    }
 }

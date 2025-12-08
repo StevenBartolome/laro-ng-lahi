@@ -40,27 +40,46 @@
     <div id="difficultyScreen" class="overlay">
         <div class="overlay-content enhanced-overlay">
             <button id="closeOverlayBtn" class="close-btn" title="Close">×</button>
-            <h1 class="game-title">🏃 Patintero</h1>
+            <div class="header-area">
+                <h1 class="game-title">PATINTERO</h1>
+                <p class="subtitle">Traditional Filipino Tag Game</p>
+            </div>
 
             <div class="menu-grid">
                 <!-- Left Column: Instructions -->
                 <div class="instructions-panel">
                     <h3>How to Play</h3>
-                    <div class="instruction-item">
-                        <span class="key-icon">WASD</span>
-                        <span><strong>Move</strong> your character around the field</span>
+
+                    <div class="tutorial-step">
+                        <div class="step-icon">🕹️</div>
+                        <div class="step-text">
+                            <h4>Move</h4>
+                            <p>Use <strong>WASD</strong> to run</p>
+                        </div>
                     </div>
-                    <div class="instruction-item">
-                        <span class="icon">🏃</span>
-                        <span><strong>Run</strong> from top to bottom and back</span>
+
+                    <div class="tutorial-step">
+                        <div class="step-icon">⚡</div>
+                        <div class="step-text">
+                            <h4>Sprint</h4>
+                            <p>Press <strong>SPACE</strong> to boost</p>
+                        </div>
                     </div>
-                    <div class="instruction-item">
-                        <span class="icon">⚡</span>
-                        <span><strong>Space</strong> to activate speed boost</span>
+
+                    <div class="tutorial-step">
+                        <div class="step-icon">🔃</div>
+                        <div class="step-text">
+                            <h4>Switch</h4>
+                            <p>Press <strong>1-5</strong> to swap players</p>
+                        </div>
                     </div>
-                    <div class="instruction-item highlight">
-                        <span class="icon">🔢</span>
-                        <span>Press <strong>1-5</strong> to switch characters!</span>
+
+                    <div class="tutorial-step">
+                        <div class="step-icon">🏆</div>
+                        <div class="step-text">
+                            <h4>Win</h4>
+                            <p>Cross the lines to score!</p>
+                        </div>
                     </div>
                 </div>
 
@@ -256,18 +275,27 @@
         }, { once: true });
 
         // Close overlay button
+        // Close overlay button
         document.getElementById('closeOverlayBtn')?.addEventListener('click', () => {
-            window.location.href = '../game_select.php';
+            if (window.handleCloseOverlay) {
+                window.handleCloseOverlay();
+            } else {
+                window.location.href = '../game_select.php';
+            }
         });
 
-        // Info button - show difficulty screen
+        // Info button - show instructions only
         document.getElementById('infoBtn')?.addEventListener('click', () => {
-            document.getElementById('difficultyScreen').classList.remove('hidden');
+            if (window.showDifficultyScreen) {
+                window.showDifficultyScreen('instructions');
+            }
         });
 
-        // Menu button - show difficulty screen
+        // Menu button - show difficulty only
         document.getElementById('menuBtn')?.addEventListener('click', () => {
-            document.getElementById('difficultyScreen').classList.remove('hidden');
+            if (window.showDifficultyScreen) {
+                window.showDifficultyScreen('difficulty');
+            }
         });
 
         // Facts overlay

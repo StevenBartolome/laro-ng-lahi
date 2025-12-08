@@ -61,9 +61,26 @@ export function createRunner(type, x, y) {
     };
 
     if (type === 'player') {
-        runner.el.style.border = '4px solid #FFD700'; // Gold border for player
+        runner.el.classList.add('player-controlled');
         runner.el.style.zIndex = '20';
+        
+        // Add indicator
+        const indicator = document.createElement('div');
+        indicator.className = 'player-indicator';
+        runner.el.appendChild(indicator);
+
         gameState.playerControlledRunner = runnerIndex;
+    } else {
+        // If not player, check if enemy team
+        const isEnemy = gameState.currentRole === 'tagger'; // If I am tagger, runners are enemies
+        if (isEnemy) {
+            runner.el.classList.add('enemy-entity');
+            
+            // Add enemy indicator
+            const indicator = document.createElement('div');
+            indicator.className = 'enemy-indicator';
+            runner.el.appendChild(indicator);
+        }
     }
 
     field.appendChild(runner.el);
@@ -98,9 +115,26 @@ export function createTagger(id, type, fixedPos, diff, controller) {
     taggerObj.el = createEntity(className, label, x, y, 'tagger');
 
     if (controller === 'player') {
-        taggerObj.el.style.border = '4px solid #FFD700'; // Gold border for player tagger
+        taggerObj.el.classList.add('player-tagger');
         taggerObj.el.style.zIndex = '20';
+
+        // Add indicator
+        const indicator = document.createElement('div');
+        indicator.className = 'player-indicator';
+        taggerObj.el.appendChild(indicator);
+
         gameState.playerControlledTagger = taggers.length; // Set index before pushing
+    } else {
+        // If not player, check if enemy team
+        const isEnemy = gameState.currentRole === 'runner'; // If I am runner, taggers are enemies
+        if (isEnemy) {
+            taggerObj.el.classList.add('enemy-entity');
+            
+            // Add enemy indicator
+            const indicator = document.createElement('div');
+            indicator.className = 'enemy-indicator';
+            taggerObj.el.appendChild(indicator);
+        }
     }
 
     field.appendChild(taggerObj.el);

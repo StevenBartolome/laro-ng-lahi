@@ -68,14 +68,25 @@ export function switchToRunner(newIndex) {
         // Update label
         const oldLabel = oldRunner.el.querySelector('.entity-label');
         if (oldLabel) oldLabel.textContent = `R${gameState.playerControlledRunner + 1}`;
+        
+        // Remove indicator
+        const indicator = oldRunner.el.querySelector('.player-indicator');
+        if (indicator) indicator.remove();
+
+        oldRunner.el.classList.remove('player-controlled');
     }
 
     // Convert new runner to player
     const newRunner = runners[newIndex];
     newRunner.type = 'player';
-    newRunner.el.style.border = '4px solid #FFD700';
     newRunner.el.style.filter = 'none';
     newRunner.el.style.zIndex = '20';
+    newRunner.el.classList.add('player-controlled');
+    
+    // Add indicator
+    const indicator = document.createElement('div');
+    indicator.className = 'player-indicator';
+    newRunner.el.appendChild(indicator);
 
     // Update label
     const newLabel = newRunner.el.querySelector('.entity-label');
@@ -104,14 +115,24 @@ export function switchToTagger(newIndex) {
         // Update label
         const oldLabel = oldTagger.el.querySelector('.entity-label');
         if (oldLabel) oldLabel.textContent = `T${oldTagger.id}`;
+        
+        // Remove indicator
+        const indicator = oldTagger.el.querySelector('.player-indicator');
+        if (indicator) indicator.remove();
+        
+        oldTagger.el.classList.remove('player-tagger');
     }
 
     // Convert new tagger to player
     const newTagger = taggers[newIndex];
     newTagger.controller = 'player';
-    newTagger.el.style.border = '4px solid #FFD700';
     newTagger.el.style.zIndex = '20';
     newTagger.el.classList.add('player-tagger');
+    
+    // Add indicator
+    const indicator = document.createElement('div');
+    indicator.className = 'player-indicator';
+    newTagger.el.appendChild(indicator);
 
     // Update label
     const newLabel = newTagger.el.querySelector('.entity-label');
