@@ -170,9 +170,18 @@ function handleGameStateUpdate(gameState) {
         console.log('Spectating...');
         yourTurnBanner.classList.add('hidden');
         if (gameState.gamePhase === 'playing') {
-            spectatorOverlay.classList.remove('hidden');
-            // Check if current turn player is Taya? Should not happen based on turn logic, but good safety
-            spectatorOverlay.innerHTML = '<div class="spectator-message"><h2>Waiting for your turn...</h2><p>Watch other players!</p></div>';
+            // Count the number of players
+            const playerCount = Object.keys(gameState.playerStates).length;
+
+            // Only show waiting overlay for 2-player games
+            // For 3+ players, let them watch the gameplay without the blocking overlay
+            if (playerCount <= 2) {
+                spectatorOverlay.classList.remove('hidden');
+                spectatorOverlay.innerHTML = '<div class="spectator-message"><h2>Waiting for your turn...</h2><p>Watch other players!</p></div>';
+            } else {
+                // Hide the overlay for 3+ player games so everyone can see the gameplay
+                spectatorOverlay.classList.add('hidden');
+            }
         }
         inputEnabled = false;
     }
