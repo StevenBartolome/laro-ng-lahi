@@ -32,6 +32,10 @@
         <source src="../assets/patintero_assets/patintero_character_switch.mp3" type="audio/mpeg">
     </audio>
 
+    <audio id="factsMusic" loop>
+        <source src="../assets/game_facts_assets/fact_cards_music.mp3" type="audio/mpeg">
+    </audio>
+
     <!-- Sound Controls (Top Left) -->
     <div class="sound-controls">
         <div class="volume-control">
@@ -285,10 +289,16 @@
             }
         });
 
-        // Try to start background music on first interaction
-        document.addEventListener('click', () => {
-            bgMusic.play().catch(() => { });
-        }, { once: true });
+        // Try to start background music immediately
+        const playPromise = bgMusic.play();
+        if (playPromise !== undefined) {
+            playPromise.catch(() => {
+                // Autoplay blocked - add click listener fallback
+                document.addEventListener('click', () => {
+                    bgMusic.play().catch(() => { });
+                }, { once: true });
+            });
+        }
 
         // Close overlay button
         // Close overlay button
@@ -323,17 +333,56 @@
         let currentFactIndex = 1;
         const totalFacts = 3;
 
+        const factsMusic = document.getElementById('factsMusic');
+
+        // Set volume for facts music matching bgm
+        if (factsMusic) factsMusic.volume = 0.5;
+
         factsBtn?.addEventListener('click', () => {
             factsOverlay.classList.remove('hidden');
+
+            // Pause BGM and play Facts Music
+            bgMusic.pause();
+            if (factsMusic) {
+                factsMusic.currentTime = 0;
+                factsMusic.play().catch(() => { });
+            }
+
+            // Generate Particles
+            const container = document.querySelector('.facts-container');
+            if (container) {
+                // Clear existing
+                const oldParticles = container.querySelectorAll('.particle');
+                oldParticles.forEach(p => p.remove());
+
+                // Spawn new ones
+                for (let i = 0; i < 50; i++) {
+                    const p = document.createElement('div');
+                    p.classList.add('particle');
+                    p.style.left = Math.random() * 100 + '%';
+                    p.style.top = Math.random() * 100 + '%';
+                    p.style.width = (Math.random() * 10 + 5) + 'px';
+                    p.style.height = p.style.width;
+                    p.style.animationDelay = Math.random() * 2 + 's';
+                    p.style.background = `radial-gradient(circle, ${['#00e5ff', '#ffd700', '#fff'][Math.floor(Math.random() * 3)]}, transparent)`;
+                    container.appendChild(p);
+                }
+            }
         });
 
         closeFactsBtn?.addEventListener('click', () => {
             factsOverlay.classList.add('hidden');
+            // Stop Facts Music and Resume BGM
+            if (factsMusic) {
+                factsMusic.pause();
+                factsMusic.currentTime = 0;
+            }
+            bgMusic.play().catch(() => { });
         });
 
         factsBoard?.addEventListener('click', () => {
             currentFactIndex = currentFactIndex % totalFacts + 1;
-            factsBoard.src = `../assets/game_facts_assets/patintero_facts_board_${currentFactIndex}.png`;
+            factsBoard.src = `../assets/patintero_assets/patintero_facts_board_${currentFactIndex}.png`;
             dots.forEach((dot, i) => {
                 dot.classList.toggle('active', i + 1 === currentFactIndex);
             });
@@ -343,7 +392,7 @@
             dot.addEventListener('click', (e) => {
                 e.stopPropagation();
                 currentFactIndex = parseInt(dot.dataset.index);
-                factsBoard.src = `../assets/game_facts_assets/patintero_facts_board_${currentFactIndex}.png`;
+                factsBoard.src = `../assets/patintero_assets/patintero_facts_board_${currentFactIndex}.png`;
                 dots.forEach((d, i) => {
                     d.classList.toggle('active', i + 1 === currentFactIndex);
                 });

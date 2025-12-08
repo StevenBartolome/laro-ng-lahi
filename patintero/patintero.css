@@ -104,6 +104,18 @@ body {
     text-align: center;
     color: white;
     position: relative;
+    animation: fadeIn 0.5s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 .close-btn {
@@ -135,6 +147,7 @@ body {
     border-radius: 25px;
     border: 3px solid var(--primary-color);
     box-shadow: 0 0 30px rgba(41, 128, 185, 0.2);
+    animation: fadeIn 0.5s ease-out;
 }
 
 .game-title {
@@ -688,6 +701,41 @@ body {
 }
 
 /* Character Selection Panel - Kid-friendly */
+/* Game Facts Enhancements */
+.facts-board {
+    box-shadow: 0 0 30px rgba(0, 229, 255, 0.6), 0 0 60px rgba(0, 229, 255, 0.3);
+    border-radius: 12px;
+    position: relative;
+    z-index: 5;
+    animation: boardFloat 4s ease-in-out infinite;
+}
+
+@keyframes boardFloat {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-10px); }
+}
+
+/* Particle Container */
+.facts-container {
+    position: relative;
+}
+
+/* Particle Effect */
+.particle {
+    position: absolute;
+    background: radial-gradient(circle, #fff, transparent);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 4;
+    animation: particleFloat 3s linear infinite;
+}
+
+@keyframes particleFloat {
+    0% { transform: translateY(0) scale(0); opacity: 0; }
+    50% { opacity: 0.8; }
+    100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
 .character-selection-panel {
     position: relative;
     background: rgba(0, 0, 0, 0.9);

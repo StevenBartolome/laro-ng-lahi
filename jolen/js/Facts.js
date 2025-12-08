@@ -58,10 +58,50 @@ const Facts = {
     show() {
         this.elements.overlay.classList.remove('hidden');
         this.gotoPage(1); // Reset to page 1
+
+        // Generate Particles
+        const container = document.querySelector('.facts-container');
+        if (container) {
+            // Clear existing
+            const oldParticles = container.querySelectorAll('.particle');
+            oldParticles.forEach(p => p.remove());
+
+            // Spawn new ones
+            for (let i = 0; i < 50; i++) {
+                const p = document.createElement('div');
+                p.classList.add('particle');
+                p.style.left = Math.random() * 100 + '%';
+                p.style.top = Math.random() * 100 + '%';
+                p.style.width = (Math.random() * 10 + 5) + 'px';
+                p.style.height = p.style.width;
+                p.style.animationDelay = Math.random() * 2 + 's';
+                p.style.background = `radial-gradient(circle, ${['#00e5ff', '#ffd700', '#fff'][Math.floor(Math.random()*3)]}, transparent)`;
+                container.appendChild(p);
+            }
+        }
+        
+        // Pause BGM and Play Facts Music
+        const bgMusic = document.getElementById('bgMusic');
+        const factsMusic = document.getElementById('factsMusic');
+        if (bgMusic) bgMusic.pause();
+        if (factsMusic) {
+            factsMusic.volume = 0.5;
+            factsMusic.currentTime = 0;
+            factsMusic.play().catch(()=>{});
+        }
     },
 
     hide() {
         this.elements.overlay.classList.add('hidden');
+
+        // Stop Facts Music and Resume BGM
+        const bgMusic = document.getElementById('bgMusic');
+        const factsMusic = document.getElementById('factsMusic');
+        if (factsMusic) {
+            factsMusic.pause();
+            factsMusic.currentTime = 0;
+        }
+        if (bgMusic) bgMusic.play().catch(()=>{});
     },
 
     nextPage() {
