@@ -12,6 +12,7 @@ const multiplayer = new MultiplayerGame();
 let gameInitialized = false;
 let inputEnabled = false;
 let gameLoopRunning = false; // Guard to prevent multiple game loops
+let previousPlayers = {}; // Track players to detect when someone leaves - DO NOT REMOVE!
 
 // UI Elements
 const waitingScreen = document.getElementById('waitingScreen');
@@ -74,6 +75,10 @@ async function init() {
 
     // Show waiting screen
     waitingScreen.classList.remove('hidden');
+
+    // Initialize previousPlayers with current players for leave detection
+    previousPlayers = { ...multiplayer.players };
+
     updateReadyDisplay();
 
     console.log('Multiplayer setup complete, waiting for players to ready up');
@@ -189,6 +194,11 @@ function handleGameStateUpdate(gameState) {
     // Update players list
     updatePlayersDisplay(gameState);
 
+    // Update ready display if still in waiting phase (sync ready status across all players)
+    if (gameState.gamePhase === 'waiting') {
+        updateReadyDisplay();
+    }
+
     // Handle game phase changes
     if (gameState.gamePhase === 'playing' && waitingScreen.classList.contains('overlay')) {
         console.log('Starting game!');
@@ -211,7 +221,99 @@ function handleGameStateUpdate(gameState) {
  * Handle players updates
  */
 function handlePlayersUpdate(players) {
+    if (!players) return;
+
+    // Check if any player left (compare with previous players list)
+    const currentPlayerIds = Object.keys(players);
+    const previousPlayerIds = Object.keys(previousPlayers);
+
+    console.log('Players update:', {
+        current: currentPlayerIds,
+        previous: previousPlayerIds,
+        currentObj: players,
+        previousObj: previousPlayers
+    });
+
+    // Find players who left
+    const leftPlayers = previousPlayerIds.filter(id => !currentPlayerIds.includes(id));
+
+    console.log('Left players detected:', leftPlayers);
+
+    // Show notification for each player who left
+    leftPlayers.forEach(playerId => {
+        const playerName = previousPlayers[playerId]?.name || 'A player';
+        console.log('Showing notification for:', playerName);
+        showPlayerLeftNotification(playerName);
+
+        // If host, remove the player from game state
+        if (multiplayer.isHost && multiplayer.syncedGameState) {
+            console.log('I am host, removing player from game state:', playerId);
+            multiplayer.removePlayerFromGameState(playerId);
+        }
+    });
+
+    // Update previous players for next comparison
+    previousPlayers = { ...players };
+
+    // Check minimum player requirement (needs at least 2 players)
+    const remainingPlayerCount = Object.keys(players).length;
+    const gamePhase = multiplayer.syncedGameState?.gamePhase;
+
+    if (remainingPlayerCount < 2 && gamePhase === 'playing') {
+        console.log('Not enough players to continue. Returning to lobby...');
+
+        // Show notification
+        const notification = document.createElement('div');
+        notification.className = 'player-left-notification';
+        notification.style.background = 'linear-gradient(135deg, rgba(241, 196, 15, 0.95), rgba(243, 156, 18, 0.95))';
+        notification.innerHTML = `
+            <span class="notification-icon">⚠️</span>
+            <span class="notification-text">Not enough players. Returning to lobby...</span>
+        `;
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.classList.add('show');
+        }, 10);
+
+        // Redirect to lobby after 2 seconds
+        setTimeout(() => {
+            window.location.href = '../../multiplayer-menu.php';
+        }, 2000);
+
+        return; // Don't update ready display if returning to lobby
+    }
+
     updateReadyDisplay();
+}
+
+/**
+ * Show notification when a player leaves
+ */
+function showPlayerLeftNotification(playerName) {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = 'player-left-notification';
+    notification.innerHTML = `
+        <span class="notification-icon">👋</span>
+        <span class="notification-text">${playerName} has left the lobby</span>
+    `;
+
+    // Add to body
+    document.body.appendChild(notification);
+
+    // Trigger animation
+    setTimeout(() => {
+        notification.classList.add('show');
+    }, 10);
+
+    // Remove after 3 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            notification.remove();
+        }, 300);
+    }, 3000);
 }
 
 /**

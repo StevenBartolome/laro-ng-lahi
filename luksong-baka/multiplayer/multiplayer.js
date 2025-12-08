@@ -462,6 +462,59 @@ class MultiplayerGame {
     }
 
     /**
+     * Remove a player from the game state (when they leave)
+     */
+    async removePlayerFromGameState(playerId) {
+        if (!this.syncedGameState) return;
+
+        // Remove from playerOrder
+        const newPlayerOrder = this.syncedGameState.playerOrder.filter(id => id !== playerId);
+
+        // Remove from playerStates
+        const newPlayerStates = { ...this.syncedGameState.playerStates };
+        delete newPlayerStates[playerId];
+
+        // Check if the leaving player was the current turn
+        let newTurnIndex = this.syncedGameState.currentTurnIndex;
+        let newTurnPlayerId = this.syncedGameState.currentTurnPlayerId;
+
+        if (newTurnPlayerId === playerId && newPlayerOrder.length > 0) {
+            // Move to next valid player
+            newTurnIndex = newTurnIndex % newPlayerOrder.length;
+            newTurnPlayerId = newPlayerOrder[newTurnIndex];
+
+            // Skip Taya if needed
+            const tayaId = this.syncedGameState.tayaPlayerId;
+            if (newTurnPlayerId === tayaId && newPlayerOrder.length > 1) {
+                newTurnIndex = (newTurnIndex + 1) % newPlayerOrder.length;
+                newTurnPlayerId = newPlayerOrder[newTurnIndex];
+            }
+        }
+
+        // Check if the leaving player was Taya - assign new Taya if needed
+        let newTayaId = this.syncedGameState.tayaPlayerId;
+        if (newTayaId === playerId && newPlayerOrder.length > 0) {
+            // Assign random new Taya
+            const randomIndex = Math.floor(Math.random() * newPlayerOrder.length);
+            newTayaId = newPlayerOrder[randomIndex];
+
+            // Update isTaya flags
+            Object.keys(newPlayerStates).forEach(id => {
+                newPlayerStates[id].isTaya = (id === newTayaId);
+            });
+        }
+
+        // Update Firebase
+        await update(ref(database, `lobbies/${this.lobbyId}/gameState`), {
+            playerOrder: newPlayerOrder,
+            playerStates: newPlayerStates,
+            currentTurnIndex: newTurnIndex,
+            currentTurnPlayerId: newTurnPlayerId,
+            tayaPlayerId: newTayaId
+        });
+    }
+
+    /**
      * Callback for players updates (override in game)
      */
     onPlayersUpdate(players) {
