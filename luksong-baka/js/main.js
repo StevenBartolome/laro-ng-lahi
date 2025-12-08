@@ -40,27 +40,51 @@ const Game = {
                 Sound.playClick();
                 UI.showDifficultyScreen('instructions'); // Show instructions only
                 GameState.state = 'menu'; // Pause game logic
+                GameState.openedViaInfoButton = true; // Track how overlay was opened
+                
+                // Show close button for instructions view
+                const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+                if (closeOverlayBtn) closeOverlayBtn.style.display = 'flex';
             });
         }
         
-        const closeBtn = document.getElementById('closeOverlayBtn');
-        if (closeBtn) {
-            closeBtn.addEventListener('click', () => {
-                Sound.playClick();
-                UI.hideDifficultyScreen();
-                if (GameState.state === 'menu') {
-                     GameState.state = 'idle';
-                }
-            });
-        }
-        
-        // Facts Feature listeners
         const factsBtn = document.getElementById('factsBtn');
         if (factsBtn) {
             factsBtn.addEventListener('click', () => {
                 Sound.playClick();
                 UI.showFacts();
                 GameState.state = 'menu';
+
+                // Facts Music Logic
+                const bgMusic = document.getElementById('bgMusic');
+                const factsMusic = document.getElementById('factsMusic');
+                if (bgMusic) bgMusic.pause();
+                if (factsMusic) {
+                    factsMusic.volume = 0.5;
+                    factsMusic.currentTime = 0;
+                    factsMusic.play().catch(()=>{});
+                }
+
+                // Generate Particles
+                const container = document.querySelector('.facts-container');
+                if (container) {
+                    // Clear existing
+                    const oldParticles = container.querySelectorAll('.particle');
+                    oldParticles.forEach(p => p.remove());
+    
+                    // Spawn new ones
+                    for (let i = 0; i < 50; i++) {
+                        const p = document.createElement('div');
+                        p.classList.add('particle');
+                        p.style.left = Math.random() * 100 + '%';
+                        p.style.top = Math.random() * 100 + '%';
+                        p.style.width = (Math.random() * 10 + 5) + 'px';
+                        p.style.height = p.style.width;
+                        p.style.animationDelay = Math.random() * 2 + 's';
+                        p.style.background = `radial-gradient(circle, ${['#00e5ff', '#ffd700', '#fff'][Math.floor(Math.random()*3)]}, transparent)`;
+                        container.appendChild(p);
+                    }
+                }
             });
         }
         
@@ -72,6 +96,15 @@ const Game = {
                 if (GameState.state === 'menu') {
                     GameState.state = 'idle';
                 }
+
+                // Facts Music Logic
+                const bgMusic = document.getElementById('bgMusic');
+                const factsMusic = document.getElementById('factsMusic');
+                if (factsMusic) {
+                    factsMusic.pause();
+                    factsMusic.currentTime = 0;
+                }
+                if (bgMusic) bgMusic.play().catch(()=>{});
             });
         }
         
@@ -89,9 +122,34 @@ const Game = {
             });
         });
         
-        // Hide close button initially (must select difficulty to start)
-        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
-        if (closeOverlayBtn) closeOverlayBtn.style.display = 'none';
+        // Close button handler - enforce difficulty selection
+        const closeBtn = document.getElementById('closeOverlayBtn');
+        if (closeBtn) {
+            closeBtn.addEventListener('click', () => {
+                Sound.playClick();
+                
+                // If game hasn't started yet (no difficulty selected)
+                if (!GameState.difficulty) {
+                    // If opened via info button on start screen, return to main difficulty view
+                    if (GameState.openedViaInfoButton) {
+                        UI.showDifficultyScreen('both');
+                    } else {
+                        // Otherwise it's the main close button, go back to game select
+                        window.location.href = '../game_select.php';
+                    }
+                } 
+                // Game has started (Paused), simply resume
+                else {
+                    UI.hideDifficultyScreen();
+                    if (GameState.state === 'menu') {
+                        GameState.state = 'idle'; // Resume to idle (running waiting for jump)
+                    }
+                }
+                
+                // Always reset the flag
+                GameState.openedViaInfoButton = false;
+            });
+        }
         
         // Setup generic button sounds (back buttons, etc)
         document.querySelectorAll('a, button').forEach(el => {
@@ -102,12 +160,15 @@ const Game = {
     start(difficulty) {
         // Show close button for future menu pauses
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
-        if (closeOverlayBtn) closeOverlayBtn.style.display = 'block';
+        if (closeOverlayBtn) closeOverlayBtn.style.display = 'flex';
         
         // Stop previous loop if running
         if (this.animationFrameId) {
             cancelAnimationFrame(this.animationFrameId);
         }
+        
+        // Store difficulty for later checks
+        GameState.difficulty = difficulty;
         
         // Set angle speed based on difficulty
         switch (difficulty) {

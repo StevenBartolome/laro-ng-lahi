@@ -378,37 +378,48 @@ document.addEventListener("DOMContentLoaded", () => {
       case "hole": currentModeModule = HoleMode; break;
       case "tumbang": currentModeModule = TumbangMode; break;
       case "line": currentModeModule = LineMode; break;
+      default: currentModeModule = TargetMode; break;
     }
   }
 
-  // Bind Buttons
-  UI.elements.modeBtns.forEach(btn => {
+  // --- Bind Buttons ---
+  
+  // Global button click sound
+  document.querySelectorAll('button, a').forEach(btn => {
       btn.addEventListener('click', () => {
-           Sound.playClick();
-           const modeParts = btn.id.split('-'); // mode-target
-           const mode = modeParts[1];
-           selectMode(mode);
+          Sound.playClick();
       });
   });
 
-  UI.elements.diffBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-           Sound.playClick();
-           const diffParts = btn.id.split('-'); // diff-easy
-           const diff = diffParts[1];
-           startGame(diff);
+  if (UI.elements.modeBtns) {
+      UI.elements.modeBtns.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+              // Sound.playClick(); // Handled globally above, but specific logic below
+              const modeParts = btn.id.split('-'); // mode-target
+              const mode = modeParts[1];
+              selectMode(mode);
+          });
       });
-  });
+  }
+
+  if (UI.elements.diffBtns) {
+      UI.elements.diffBtns.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+               // Sound.playClick(); 
+               const diffParts = btn.id.split('-'); // diff-easy
+               const diff = diffParts[1];
+               startGame(diff);
+          });
+      });
+  }
 
   const menuBtn = document.getElementById('menuBtn');
   if(menuBtn) menuBtn.addEventListener('click', () => {
-       Sound.playClick();
        UI.showMenu('both', true);
   });
 
   const infoBtn = document.getElementById('infoBtn');
   if(infoBtn) infoBtn.addEventListener('click', () => {
-       Sound.playClick();
        UI.showMenu('instructions', true);
   });
 });
