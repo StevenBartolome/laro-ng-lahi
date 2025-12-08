@@ -19,11 +19,13 @@ import * as LineMode from "./LineMode.js";
 
 import { UI } from "./UI.js";
 import Sound from "./Sound.js";
+import Facts from "./Facts.js";
 
 document.addEventListener("DOMContentLoaded", () => {
   // Init Modules
   Sound.init();
   UI.init();
+  Facts.init();
 
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");

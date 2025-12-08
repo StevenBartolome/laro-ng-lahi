@@ -607,6 +607,9 @@ canvas {
   max-height: 90vh;
   overflow-y: auto;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   box-shadow: var(--shadow-card);
 }
 
@@ -761,7 +764,8 @@ h3 {
   border-radius: 50%;
   font-size: 30px;
   cursor: pointer;
-  z-index: 90;
+  cursor: pointer;
+  z-index: 200;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.4);
   transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   display: flex;
@@ -772,6 +776,45 @@ h3 {
 .info-fab:hover {
   transform: scale(1.1) rotate(10deg);
   box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
+}
+
+.facts-btn {
+  bottom: 100px;
+  background: linear-gradient(135deg, #8d6e63, #5d4037);
+}
+
+.facts-title {
+  display: block;
+  margin: 0 auto 1rem auto;
+  max-width: 80%;
+}
+
+.click-hint {
+  text-align: center;
+  margin-top: 1rem;
+  color: #ffecb3;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.facts-nav {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.dot {
+  width: 10px;
+  height: 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+  border-radius: 50%;
+  display: inline-block;
+  cursor: pointer;
+}
+
+.dot.active {
+  background-color: #ffca28;
 }
 
 /* Back Button Styles matching LB but Jolen theme */
