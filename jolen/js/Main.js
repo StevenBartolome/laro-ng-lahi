@@ -353,6 +353,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   // --- Difficulty Selection ---
   function startGame(difficulty) {
+    UI.setGameStarted(true);
     UI.hideMenu();
     document.getElementById("game-container").style.display = "block";
 
