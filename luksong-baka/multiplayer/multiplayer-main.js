@@ -46,7 +46,7 @@ async function init() {
     }
 
     // Override speed to constant medium
-    CONFIG.runSpeed = 5; // Medium difficulty speed
+    CONFIG.runSpeed = 2; // Medium difficulty speed
 
     console.log('Multiplayer initialized successfully');
 
@@ -443,6 +443,11 @@ function setupInputHandlers() {
 
     function handleInputDown(e) {
         if (!inputEnabled || !multiplayer.isMyTurn()) return;
+
+        // Block input if the message overlay is visible (doesn't have hidden class)
+        const msgOverlay = document.getElementById('messageOverlay');
+        if (msgOverlay && !msgOverlay.classList.contains('hidden')) return;
+
         if (isInputDown) return;
         if (GameState.state === 'success' || GameState.state === 'fail' || GameState.state === 'gameover') return;
 
