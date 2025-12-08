@@ -411,6 +411,11 @@
     display: none !important;
 }
 
+/* Hide health bar in multiplayer */
+.lives-display {
+    display: none !important;
+}
+
 /* Scrollbar styling */
 .players-container::-webkit-scrollbar {
     width: 6px;

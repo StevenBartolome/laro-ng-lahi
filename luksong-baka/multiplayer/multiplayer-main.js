@@ -13,6 +13,8 @@ let gameInitialized = false;
 let inputEnabled = false;
 let gameLoopRunning = false; // Guard to prevent multiple game loops
 let previousPlayers = {}; // Track players to detect when someone leaves - DO NOT REMOVE!
+let wasMyTurn = false; // Track previous turn state
+let turnStartTime = Date.now(); // Timestamp when turn started (default to now to block immediate input)
 
 // UI Elements
 const waitingScreen = document.getElementById('waitingScreen');
@@ -158,6 +160,13 @@ function handleGameStateUpdate(gameState) {
     const isMyTurn = multiplayer.isMyTurn();
     const myState = multiplayer.getMyState();
     const isTaya = myState && myState.isTaya;
+
+    // Detect turn start
+    if (isMyTurn && !wasMyTurn) {
+        turnStartTime = Date.now();
+        console.log('Turn started at:', turnStartTime);
+    }
+    wasMyTurn = isMyTurn;
 
     if (isTaya) {
         console.log('You are the Taya!');
@@ -417,6 +426,9 @@ function startGame() {
     // Reset game state
     GameLogic.resetGame();
 
+    // Reset turn timer to block immediate input
+    turnStartTime = Date.now();
+
     // Start game loop only if not already running
     if (!gameLoopRunning) {
         gameLoopRunning = true;
@@ -448,6 +460,11 @@ function setupInputHandlers() {
         // Block input if the message overlay is visible (doesn't have hidden class)
         const msgOverlay = document.getElementById('messageOverlay');
         if (msgOverlay && !msgOverlay.classList.contains('hidden')) return;
+
+        // Block input for a short delay after turn starts (prevent accidental clicks)
+        // Also block if turnStartTime is 0 (shouldn't happen with new init, but safe)
+        // Increased to 2s to ensure transition timeouts complete
+        if (!turnStartTime || Date.now() - turnStartTime < 1200) return;
 
         if (isInputDown) return;
         if (GameState.state === 'success' || GameState.state === 'fail' || GameState.state === 'gameover') return;
@@ -660,6 +677,9 @@ async function handlePlayerSuccess() {
         Player.reset();
         GameState.state = 'idle';
 
+        // Reset turn timer to block immediate input on turn transition
+        turnStartTime = Date.now();
+
         // Advance turn
         await multiplayer.nextTurn();
     }, 1500);
@@ -693,6 +713,9 @@ async function handlePlayerFail(message) {
     setTimeout(async () => {
         Player.reset();
         GameState.state = 'idle';
+
+        // Reset turn timer to block immediate input on turn transition
+        turnStartTime = Date.now();
 
         // Advance turn (will skip new Taya automatically and pick next jumper)
         await multiplayer.nextTurn();
