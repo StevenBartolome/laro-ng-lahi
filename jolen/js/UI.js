@@ -1,5 +1,11 @@
 export const UI = {
   elements: {},
+  gameStarted: false,
+  
+  setGameStarted(val) {
+      console.log('UI: Game started set to', val);
+      this.gameStarted = val;
+  },
 
   init() {
     this.elements = {
@@ -20,101 +26,17 @@ export const UI = {
       });
     }
 
-    // --- Facts Init ---
-    this.elements.factsBtn = document.getElementById("factsBtn");
-    this.elements.factsOverlay = document.getElementById("factsOverlay");
-    this.elements.closeFactsBtn = document.getElementById("closeFactsBtn");
-    this.elements.factsBoard = document.getElementById("factsBoard");
-    this.elements.dots = document.querySelectorAll(".dot");
-
-    if (this.elements.factsBtn) {
-      this.elements.factsBtn.addEventListener("click", () => {
-        this.showFacts();
-      });
-    }
-
-    if (this.elements.closeFactsBtn) {
-      this.elements.closeFactsBtn.addEventListener("click", () => {
-        this.hideFacts();
-      });
-    }
-
-    if (this.elements.factsBoard) {
-      this.elements.factsBoard.addEventListener("click", () => {
-        this.nextFact();
-      });
-    }
-
-    if (this.elements.dots) {
-      this.elements.dots.forEach((dot) => {
-        dot.addEventListener("click", (e) => {
-          const index = parseInt(e.target.dataset.index);
-          this.setFact(index);
-        });
+    if (this.elements.closeOverlayBtn) {
+      this.elements.closeOverlayBtn.addEventListener("click", () => {
+        this.hideMenu();
       });
     }
   },
 
-  // --- Facts Logic ---
-  facts: {
-    current: 1,
-    total: 3,
-  },
 
-  showFacts() {
-    this.facts.current = 1;
-    this.updateFactDisplay();
-    if (this.elements.factsOverlay)
-      this.elements.factsOverlay.classList.remove("hidden");
-  },
-
-  hideFacts() {
-    if (this.elements.factsOverlay)
-      this.elements.factsOverlay.classList.add("hidden");
-  },
-
-  nextFact() {
-    this.facts.current++;
-    if (this.facts.current > this.facts.total) {
-      this.facts.current = 1;
-    }
-    this.updateFactDisplay();
-  },
-
-  setFact(index) {
-    this.facts.current = index;
-    this.updateFactDisplay();
-  },
-
-  updateFactDisplay() {
-    const board = this.elements.factsBoard;
-    const dots = this.elements.dots;
-
-    if (!board) return;
-
-    // Simple fade out/in effect
-    board.style.opacity = "0";
-    board.style.transform = "translateY(10px)";
-
-    setTimeout(() => {
-      // Using jolen assets
-      board.src = `../assets/game_facts_assets/jolen_facts_board_${this.facts.current}.png`;
-      board.style.opacity = "1";
-      board.style.transform = "translateY(0)";
-
-      // Update dots
-      if (dots) {
-        dots.forEach((dot) => {
-          dot.classList.toggle(
-            "active",
-            parseInt(dot.dataset.index) === this.facts.current
-          );
-        });
-      }
-    }, 200);
-  },
 
   showMenu(mode = "both", showClose = true) {
+    console.log('UI: showMenu', { mode, showClose, gameStarted: this.gameStarted });
     if (!this.elements.menuOverlay) return;
 
     // Manage Close Button Visibility
@@ -163,8 +85,18 @@ export const UI = {
   },
 
   hideMenu() {
-    if (this.elements.menuOverlay) {
-      this.elements.menuOverlay.classList.add("hidden");
+    // Check if game container is visible to determine state
+    const isGameVisible = this.elements.gameContainer && this.elements.gameContainer.style.display === "block";
+    console.log('UI: hideMenu called. isGameVisible:', isGameVisible);
+
+    if (!isGameVisible) {
+        console.log('UI: Game not visible, forcing Main Menu return');
+        this.showMenu('both', false);
+    } else {
+        console.log('UI: Game visible, hiding overlay');
+        if (this.elements.menuOverlay) {
+          this.elements.menuOverlay.classList.add("hidden");
+        }
     }
   },
 
