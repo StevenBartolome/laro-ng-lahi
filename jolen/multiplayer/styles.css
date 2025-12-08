@@ -1,0 +1,352 @@
+/* Multiplayer-specific styles */
+
+.loading-spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+/* Ready/Waiting Screen */
+.game-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 48px;
+    color: white;
+    margin: 0 0 30px 0;
+    text-align: center;
+}
+
+.waiting-message {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.waiting-message p {
+    color: white;
+    font-family: 'Poppins', sans-serif;
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.spinner {
+    border: 4px solid rgba(255, 255, 255, 0.3);
+    border-top: 4px solid #fff;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+.ready-players {
+    margin: 30px 0;
+    max-width: 400px;
+}
+
+.ready-player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+.ready-player-item.ready {
+    background: rgba(76, 175, 80, 0.3);
+    border: 2px solid #4CAF50;
+}
+
+.ready-player-name {
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+}
+
+.ready-status {
+    font-family: 'Poppins', sans-serif;
+    font-size: 14px;
+    padding: 5px 15px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    color: #ccc;
+}
+
+.ready-status.ready {
+    background: #4CAF50;
+    color: white;
+    font-weight: 600;
+}
+
+.btn-ready {
+    background: linear-gradient(135deg, #4CAF50 0%, #45a049 100%);
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    border-radius: 50px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    margin-top: 20px;
+}
+
+.btn-ready:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(76, 175, 80, 0.5);
+}
+
+.btn-ready:disabled {
+    background: linear-gradient(135deg, #888 0%, #666 100%);
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+
+/* Turn Indicator */
+.turn-indicator {
+    position: fixed;
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 30px;
+    border-radius: 50px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    font-family: 'Fredoka One', cursive;
+    font-size: 20px;
+    text-align: center;
+    animation: pulse 2s ease-in-out infinite;
+}
+
+.turn-indicator.your-turn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    animation: pulse-fast 1s ease-in-out infinite;
+}
+
+@keyframes pulse {
+
+    0%,
+    100% {
+        transform: translateX(-50%) scale(1);
+    }
+
+    50% {
+        transform: translateX(-50%) scale(1.05);
+    }
+}
+
+@keyframes pulse-fast {
+
+    0%,
+    100% {
+        transform: translateX(-50%) scale(1);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    50% {
+        transform: translateX(-50%) scale(1.08);
+        box-shadow: 0 6px 25px rgba(245, 87, 108, 0.5);
+    }
+}
+
+.waiting-message {
+    margin-top: 10px;
+    font-size: 14px;
+    font-family: 'Poppins', sans-serif;
+    font-weight: normal;
+    opacity: 0.9;
+}
+
+/* Players Panel */
+.players-panel {
+    position: fixed;
+    top: 160px;
+    right: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    border-radius: 15px;
+    padding: 20px;
+    min-width: 250px;
+    max-width: 300px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+    z-index: 90;
+}
+
+.players-panel h3 {
+    margin: 0 0 15px 0;
+    font-family: 'Fredoka One', cursive;
+    color: #fff;
+    font-size: 18px;
+    text-align: center;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+    padding-bottom: 10px;
+}
+
+.players-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.player-item {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    padding: 12px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.player-item.active-turn {
+    background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+    box-shadow: 0 0 20px rgba(245, 87, 108, 0.5);
+    transform: scale(1.05);
+}
+
+.player-item.current-user {
+    border: 2px solid #4CAF50;
+}
+
+.player-name {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 600;
+    color: white;
+    font-size: 14px;
+}
+
+.player-score {
+    font-family: 'Poppins', sans-serif;
+    font-weight: 800;
+    color: #FFD700;
+    font-size: 16px;
+}
+
+.player-badge {
+    background: rgba(255, 215, 0, 0.3);
+    color: #FFD700;
+    padding: 2px 8px;
+    border-radius: 5px;
+    font-size: 10px;
+    font-weight: 600;
+    margin-left: 5px;
+}
+
+/* Game Over Overlay */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    transition: opacity 0.3s ease;
+}
+
+.overlay.hidden {
+    display: none;
+    opacity: 0;
+}
+
+.final-scores {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    padding: 30px;
+    margin: 30px 0;
+    max-width: 400px;
+}
+
+.score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.score-item.winner {
+    background: linear-gradient(135deg, #FFD700 0%, #FFA500 100%);
+    color: #000;
+    font-weight: bold;
+    transform: scale(1.05);
+    box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+}
+
+.score-item .rank {
+    font-size: 24px;
+    font-weight: bold;
+    min-width: 40px;
+}
+
+.score-item .player-info {
+    flex: 1;
+    margin: 0 15px;
+}
+
+.score-item .score {
+    font-size: 24px;
+    font-weight: bold;
+    color: #FFD700;
+}
+
+.score-item.winner .score {
+    color: #000;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 50px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .players-panel {
+        top: 140px;
+        right: 10px;
+        min-width: 200px;
+        padding: 15px;
+    }
+
+    .turn-indicator {
+        font-size: 16px;
+        padding: 10px 20px;
+    }
+}

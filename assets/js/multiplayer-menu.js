@@ -430,14 +430,33 @@ class MultiplayerMenu {
                         onDisconnect(playerRef).cancel();
                     }
 
-                    // Route to the correct game based on game_id
+                    // Route to the correct game based on game_id or game name
+                    console.log('🎮 Game Info:', lobby.game);
+
                     const gameRoutes = {
-                        '1': 'jolen/index.html',
-                        '2': 'luksong-baka/multiplayer/index.html',  // Multiplayer version
-                        '3': 'patintero/index.html'
+                        '1': 'patintero/index.html',
+                        '2': 'luksong-baka/multiplayer/index.html',
+                        '3': 'jolen/multiplayer/index.html'
                     };
 
-                    const gameUrl = gameRoutes[lobby.game.id] || 'game.php';
+                    // Fallback to name-based routing
+                    const gameNameRoutes = {
+                        'jolen': 'jolen/multiplayer/index.html',
+                        'luksong baka': 'luksong-baka/multiplayer/index.html',
+                        'patintero': 'patintero/index.html'
+                    };
+
+                    let gameUrl = gameRoutes[lobby.game.id];
+
+                    // If no route found by ID, try by name
+                    if (!gameUrl && lobby.game.name) {
+                        const gameName = lobby.game.name.toLowerCase();
+                        gameUrl = gameNameRoutes[gameName];
+                    }
+
+                    gameUrl = gameUrl || 'game.php';
+                    console.log('🎯 Routing to:', gameUrl);
+
                     // CRITICAL: Use the lobbyId parameter, not this.currentLobbyId
                     // because this function is called with the actual lobby ID
                     window.location.href = `${gameUrl}?lobby=${lobbyId}`;
@@ -457,9 +476,9 @@ class MultiplayerMenu {
 
             // Route to the correct game based on game_id
             const gameRoutes = {
-                '1': 'jolen/index.html',                      // Assuming game_id 1 is jolen
+                '1': 'patintero/index.html',          // Multiplayer version for jolen
                 '2': 'luksong-baka/multiplayer/index.html',   // Multiplayer version for luksong-baka
-                '3': 'patintero/index.html'                   // Assuming game_id 3 is patintero
+                '3': 'jolen/multiplayer/index.html'                   // Assuming game_id 3 is patintero
             };
 
             const gameUrl = gameRoutes[this.selectedGame.id] || 'game.php';

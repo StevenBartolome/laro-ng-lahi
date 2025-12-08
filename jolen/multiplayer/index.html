@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jolen Multiplayer - Filipino Marble Game</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="../styles.css" />
+    <link rel="stylesheet" href="styles.css" />
+</head>
+
+<body>
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="../../assets/jolen_assets/jolen_bg_music.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="clickSound">
+        <source src="../../assets/audio/click_sound_effect.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="hitSound">
+        <source src="../../assets/jolen_assets/jolen_hit_impact.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- Sound Controls -->
+    <div class="sound-controls">
+        <div class="volume-control">
+            <span class="volume-label">🎵 BGM</span>
+            <input type="range" id="bgmVolume" class="volume-slider" min="0" max="100" value="50" />
+        </div>
+        <div class="volume-control">
+            <span class="volume-label">🔊 SFX</span>
+            <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="70" />
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Loading Screen -->
+        <div id="loadingScreen" class="screen-panel overlay">
+            <div class="panel-content overlay-content">
+                <div class="header-area">
+                    <h1>JOLEN</h1>
+                    <p class="subtitle">Multiplayer Mode</p>
+                </div>
+                <div class="loading-spinner"></div>
+                <p style="text-align: center; margin-top: 20px; color: white;">
+                    Connecting to lobby...
+                </p>
+            </div>
+        </div>
+
+        <!-- Waiting/Ready Screen -->
+        <div id="waitingScreen" class="overlay hidden">
+            <div class="overlay-content">
+                <h1 class="game-title">🎯 Jolen - Multiplayer</h1>
+                <div class="waiting-message">
+                    <p>Waiting for all players to be ready...</p>
+                    <div class="spinner"></div>
+                </div>
+                <div id="readyPlayersDisplay" class="ready-players">
+                    <!-- Ready status will be shown here -->
+                </div>
+                <button id="readyBtn" class="btn-ready">I'm Ready!</button>
+            </div>
+        </div>
+
+        <!-- Game Container -->
+        <div id="game-container" style="display: none">
+            <!-- Turn Indicator -->
+            <div id="turnIndicator" class="turn-indicator">
+                <div class="turn-content">
+                    <span id="turnPlayerName">Player 1</span>'s Turn
+                </div>
+                <div id="waitingMessage" class="waiting-message" style="display: none;">
+                    Waiting for other players...
+                </div>
+            </div>
+
+            <!-- Players Panel -->
+            <div id="playersPanel" class="players-panel">
+                <h3>Players</h3>
+                <div id="playersList" class="players-list">
+                    <!-- Players will be populated here -->
+                </div>
+            </div>
+
+            <!-- Game UI -->
+            <div id="gameUI">
+                <div class="stat-box">
+                    <span class="stat-label">LEVEL</span>
+                    <span id="level-display" class="stat-value">1</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">MODE</span>
+                    <span id="mode-display" class="stat-value">Target</span>
+                </div>
+
+                <button id="menuBtn" class="ui-icon-btn" title="Menu">
+                    <span style="font-size: 24px">⚙️</span>
+                </button>
+            </div>
+
+            <!-- Canvas -->
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+
+            <!-- Back Button -->
+            <a href="../../multiplayer-menu.php" class="back-btn" title="Exit">
+                <img src="../../assets/startmenu/back_button.png" alt="Back" style="width: 150px" />
+            </a>
+        </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameOverOverlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h1 id="gameOverTitle">Game Over!</h1>
+            <div id="finalScores" class="final-scores">
+                <!-- Final scores will be populated here -->
+            </div>
+            <button id="returnToLobbyBtn" class="btn-primary">Return to Lobby</button>
+        </div>
+    </div>
+
+    <script type="module" src="Main.js"></script>
+</body>
+
+</html>
