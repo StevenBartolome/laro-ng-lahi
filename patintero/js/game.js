@@ -20,14 +20,9 @@ import { checkBoostInput } from './input.js';
 export function startGame(difficulty) {
     gameState.selectedDifficulty = difficulty || 'medium';
 
-    // Highlight difficulty
-    document.querySelectorAll('.runner-card').forEach(c => c.classList.remove('selected'));
-    const chosen = document.getElementById(`diff-${gameState.selectedDifficulty}`);
-    if (chosen) chosen.classList.add('selected');
-
     // Hide difficulty screen and show coin flip
-    document.getElementById('difficultyScreen').style.display = 'none';
-    document.getElementById('coinFlipScreen').style.display = 'block';
+    document.getElementById('difficultyScreen').classList.add('hidden');
+    document.getElementById('coinFlipScreen').classList.remove('hidden');
 
     // Perform coin flip after a short delay
     setTimeout(() => performCoinFlip(), 500);
@@ -62,7 +57,7 @@ export function performCoinFlip() {
 
             // Start game after showing result
             setTimeout(() => {
-                document.getElementById('coinFlipScreen').style.display = 'none';
+                document.getElementById('coinFlipScreen').classList.add('hidden');
                 document.getElementById('gameArea').classList.add('active');
                 document.getElementById('boostMeter').classList.add('active');
                 startRound();
