@@ -7,6 +7,7 @@ import {
   drawMarble,
   updateMarble,
 } from "./Common.js";
+import Sound from "./Sound.js";
 
 export function setup(level, canvasWidth, canvasHeight) {
   const targets = [];
@@ -54,7 +55,9 @@ export function update(playerMarble, state, score, canvasWidth, canvasHeight) {
   // Check collisions between player and targets
   targets.forEach((target) => {
     if (!target.outOfCircle) {
-      checkMarbleCollision(playerMarble, target);
+      if (checkMarbleCollision(playerMarble, target)) {
+        Sound.playHit();
+      }
     }
   });
 
@@ -62,7 +65,9 @@ export function update(playerMarble, state, score, canvasWidth, canvasHeight) {
   for (let i = 0; i < targets.length; i++) {
     for (let j = i + 1; j < targets.length; j++) {
       if (!targets[i].outOfCircle && !targets[j].outOfCircle) {
-        checkMarbleCollision(targets[i], targets[j]);
+        if (checkMarbleCollision(targets[i], targets[j])) {
+            Sound.playHit();
+        }
       }
     }
   }

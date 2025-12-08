@@ -234,9 +234,8 @@ body {
 }
 
 .menu-btn img {
-    width: 120px;
     height: 120px;
-    min-width: 120px;
+    width: auto;
     min-height: 120px;
     object-fit: contain;
     display: block;
@@ -345,10 +344,7 @@ body {
     text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
 }
 
-/* Scale up achievements button since its source image is smaller */
-.achievements-btn img {
-    transform: scale(1.15);
-}
+
 
 /* Music Toggle Button */
 .music-toggle {
@@ -388,8 +384,8 @@ body {
     }
     
     .menu-btn img {
-        width: 90px;
         height: 90px;
+        width: auto;
     }
     
     .secondary-buttons {
@@ -417,8 +413,8 @@ body {
     }
     
     .menu-btn img {
-        width: 75px;
         height: 75px;
+        width: auto;
     }
     
     .secondary-buttons {

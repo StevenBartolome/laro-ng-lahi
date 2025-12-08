@@ -13,169 +13,198 @@
     />
     <link rel="stylesheet" href="styles.css" />
   </head>
+
   <body>
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+      <source
+        src="../assets/jolen_assets/jolen_bg_music.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+    <audio id="clickSound">
+      <source src="../assets/audio/click_sound_effect.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="hitSound">
+      <source
+        src="../assets/jolen_assets/jolen_hit_impact.mp3"
+        type="audio/mpeg"
+      />
+    </audio>
+
+    <!-- Sound Controls -->
+    <div class="sound-controls">
+      <div class="volume-control">
+        <span class="volume-label">🎵 BGM</span>
+        <input
+          type="range"
+          id="bgmVolume"
+          class="volume-slider"
+          min="0"
+          max="100"
+          value="50"
+        />
+      </div>
+      <div class="volume-control">
+        <span class="volume-label">🔊 SFX</span>
+        <input
+          type="range"
+          id="sfxVolume"
+          class="volume-slider"
+          min="0"
+          max="100"
+          value="70"
+        />
+      </div>
+    </div>
+
     <div class="app-container">
-      <!-- Game Mode Selection Screen -->
-      <div id="mode-screen" class="screen-panel">
-        <div class="panel-content">
-          <div class="logo-area">
+      <!-- Mode/Difficulty Overlay (Unified) -->
+      <div id="menuOverlay" class="screen-panel overlay">
+        <div class="panel-content overlay-content">
+          <button id="closeOverlayBtn" class="close-btn" title="Close">
+            ×
+          </button>
+
+          <div class="header-area">
             <h1>JOLEN</h1>
             <p class="subtitle">Classic Filipino Marble Game</p>
           </div>
 
-          <div class="selection-area">
-            <p class="instruction-text">CHOOSE YOUR GAME MODE</p>
-            <div class="mode-grid">
-              <button id="target-mode-btn" class="game-card">
-                <div class="card-icon">🎯</div>
-                <div class="card-info">
-                  <span class="card-title">Target Shooting</span>
-                  <span class="card-desc">Hit all marbles</span>
-                </div>
-              </button>
-
-              <button id="circle-mode-btn" class="game-card">
-                <div class="card-icon">⭕</div>
-                <div class="card-info">
-                  <span class="card-title">Circle Game</span>
-                  <span class="card-desc">Knock 'em out</span>
-                </div>
-              </button>
-
-              <button id="hole-mode-btn" class="game-card">
-                <div class="card-icon">🕳️</div>
-                <div class="card-info">
-                  <span class="card-title">Hole Game</span>
-                  <span class="card-desc">Shoot into holes</span>
-                </div>
-              </button>
-
-              <button id="tumbang-mode-btn" class="game-card">
-                <div class="card-icon">🎪</div>
-                <div class="card-info">
-                  <span class="card-title">Tumbang Preso</span>
-                  <span class="card-desc">Hit the target</span>
-                </div>
-              </button>
-
-              <button id="line-mode-btn" class="game-card full-width">
-                <div class="card-icon">📏</div>
-                <div class="card-info">
-                  <span class="card-title">Line Game</span>
-                  <span class="card-desc">Hit in sequence</span>
-                </div>
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Difficulty Selection Screen -->
-      <div id="difficulty-screen" class="screen-panel" style="display: none">
-        <div class="panel-content">
-          <div class="header-area">
-            <h2 id="mode-title-display">MODE SELECTED</h2>
-            <p class="instruction-text">SELECT DIFFICULTY</p>
-          </div>
-
-          <div class="difficulty-options">
-            <button id="easy-btn" class="diff-btn easy">
-              <span class="diff-label">EASY</span>
-              <span class="diff-stars">★</span>
-            </button>
-            <button id="normal-btn" class="diff-btn normal">
-              <span class="diff-label">NORMAL</span>
-              <span class="diff-stars">★★</span>
-            </button>
-            <button id="hard-btn" class="diff-btn hard">
-              <span class="diff-label">HARD</span>
-              <span class="diff-stars">★★★</span>
-            </button>
-          </div>
-
-          <button id="back-to-modes-btn" class="nav-btn back">
-            <span class="icon">↩</span> Back to Menu
-          </button>
-        </div>
-      </div>
-
-      <!-- Game Container -->
-      <div id="game-container" style="display: none">
-        <!-- Top Bar -->
-        <div class="game-top-bar">
-          <div class="stat-box level-box">
-            <span class="stat-label">LEVEL</span>
-            <span id="level-number" class="stat-value">1</span>
-          </div>
-
-          <div class="stat-box score-box">
-            <span class="stat-label">SCORE</span>
-            <span id="score-display" class="stat-value">0</span>
-          </div>
-
-          <div class="stat-box target-box">
-            <span class="stat-label">TARGETS</span>
-            <span id="targets-left" class="stat-value">0</span>
-          </div>
-
-          <button id="help-btn" class="icon-btn help" aria-label="Help">
-            ?
-          </button>
-        </div>
-
-        <!-- Canvas Wrapper -->
-        <div class="canvas-wrapper">
-          <canvas id="gameCanvas"></canvas>
-
-          <!-- Floating Instruction -->
-          <div id="instruction-prompt" class="floating-instruction">
-            <div class="mouse-icon">🖱️</div>
-            <p>DRAG & RELEASE TO SHOOT</p>
-          </div>
-        </div>
-
-        <!-- Back Button -->
-        <a href="../game_select.php" class="nav-btn quit">Exit Game</a>
-
-        <!-- Help Modal -->
-        <div id="help-modal" class="modal-overlay">
-          <div class="modal-card">
-            <button class="close-btn">&times;</button>
-            <div class="modal-header">
-              <h2>How to Play</h2>
-            </div>
-            <div class="modal-body">
+          <div class="menu-grid">
+            <!-- Left: How to Play -->
+            <div class="instructions-panel">
+              <h3>How to Play</h3>
               <div class="tutorial-step">
                 <div class="step-icon">👆</div>
                 <div class="step-text">
-                  <h3>Click & Hold</h3>
+                  <h4>Click & Hold</h4>
                   <p>Grab your marble</p>
                 </div>
               </div>
               <div class="tutorial-step">
                 <div class="step-icon">🏹</div>
                 <div class="step-text">
-                  <h3>Pull Back</h3>
-                  <p>Drag opposite to aim</p>
+                  <h4>Drag Back</h4>
+                  <p>Aim and power up</p>
                 </div>
               </div>
               <div class="tutorial-step">
                 <div class="step-icon">🚀</div>
                 <div class="step-text">
-                  <h3>Release</h3>
-                  <p>Launch the marble!</p>
+                  <h4>Release</h4>
+                  <p>Shoot the marble!</p>
                 </div>
               </div>
+            </div>
 
-              <div class="tips-box">
-                <h4>PRO TIP</h4>
-                <p>
-                  Pulling further increases shot power. Use walls to bounce!
-                </p>
+            <!-- Right: Mode Selection -->
+            <div class="difficulty-panel">
+              <h3>Select Mode</h3>
+              <div class="mode-options">
+                <button id="mode-target" class="game-card mode-btn">
+                  <span class="card-icon">🎯</span> Target
+                </button>
+                <button id="mode-circle" class="game-card mode-btn">
+                  <span class="card-icon">⭕</span> Circle
+                </button>
+                <button id="mode-hole" class="game-card mode-btn">
+                  <span class="card-icon">🕳️</span> Hole
+                </button>
+                <button id="mode-tumbang" class="game-card mode-btn">
+                  <span class="card-icon">🥫</span> Tumbang
+                </button>
+                <button id="mode-line" class="game-card mode-btn">
+                  <span class="card-icon">📏</span> Line
+                </button>
+              </div>
+
+              <h3>Difficulty</h3>
+              <div class="difficulty-options">
+                <button id="diff-easy" class="diff-btn easy">
+                  <span class="diff-name">Easy</span>
+                  <span class="diff-desc">Big targets, slow pace</span>
+                </button>
+                <button id="diff-normal" class="diff-btn normal">
+                  <span class="diff-name">Normal</span>
+                  <span class="diff-desc">Standard rules & speed</span>
+                </button>
+                <button id="diff-hard" class="diff-btn hard">
+                  <span class="diff-name">Hard</span>
+                  <span class="diff-desc">Small targets, fast pace</span>
+                </button>
               </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Game Container -->
+      <div id="game-container" style="display: none">
+        <!-- Game UI -->
+        <div id="gameUI">
+          <div class="stat-box">
+            <span class="stat-label">LEVEL</span>
+            <span id="level-display" class="stat-value">1</span>
+          </div>
+          <div class="stat-box">
+            <span class="stat-label">SCORE</span>
+            <span id="score-display" class="stat-value">0</span>
+          </div>
+
+          <button id="menuBtn" class="ui-icon-btn" title="Menu">
+            <span style="font-size: 24px">⚙️</span>
+          </button>
+        </div>
+
+        <!-- Canvas -->
+        <div class="canvas-wrapper">
+          <canvas id="gameCanvas"></canvas>
+        </div>
+
+        <!-- Back Button -->
+        <a href="../game_select.php" class="back-btn" title="Exit">
+          <img
+            src="../assets/startmenu/back_button.png"
+            alt="Back"
+            style="width: 150px"
+          />
+        </a>
+      </div>
+    </div>
+
+    <!-- Facts Button (Above How to Play) -->
+    <button id="factsBtn" class="info-fab facts-btn" title="Game Facts">
+      <img src="../assets/game_facts_assets/fact_icon.png" alt="Facts" />
+    </button>
+
+    <!-- Help Button -->
+    <button id="infoBtn" class="info-fab" title="How to Play">❓</button>
+
+    <!-- Facts Overlay -->
+    <div id="factsOverlay" class="overlay hidden">
+      <div class="overlay-content facts-content">
+        <button id="closeFactsBtn" class="close-btn" title="Close">×</button>
+        <img
+          src="../assets/game_facts_assets/jolen_facts_title.png"
+          class="facts-title"
+          alt="Facts"
+        />
+
+        <div class="facts-container">
+          <img
+            id="factsBoard"
+            src="../assets/game_facts_assets/jolen_facts_board_1.png"
+            class="facts-board"
+            alt="Fact Board"
+          />
+          <div class="facts-nav">
+            <span class="dot active" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
+            <span class="dot" data-index="3"></span>
+          </div>
+        </div>
+        <p class="click-hint">Click board to read next page ➡️</p>
       </div>
     </div>
 
