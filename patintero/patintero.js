@@ -22,7 +22,7 @@ let currentRole = 'runner';
 let initialRole = null; // Role determined by coin flip
 
 // Timer and Game Phase
-let gameTimer = 0; // No time limit - round ends when all runners are tagged
+let gameTimer = 120; // 2 minutes countdown (120 seconds)
 let timerInterval = null;
 let gamePhase = 'first-round'; // 'first-round' or 'second-round'
 let playerScore = 0; // Points earned by completing runs
@@ -121,11 +121,11 @@ function startRound() {
     const diff = DIFFICULTY[selectedDifficulty];
     CONFIG.taggerSpeed = diff.speed;
 
-    // Initialize/Reset Timer (counting up for display purposes)
-    gameTimer = 0;
+    // Initialize/Reset Timer (2 minutes countdown)
+    gameTimer = 120;
     updateTimerDisplay();
 
-    // Start timer counting up
+    // Start timer countdown
     if (timerInterval) clearInterval(timerInterval);
     timerInterval = setInterval(updateTimer, 1000);
 
@@ -218,15 +218,13 @@ function createRunner(type, x, y) {
         y: y,
         active: true,
         reachedBottom: false,
-        el: createEntity(type === 'player' ? 'entity runner' : 'entity runner bot', label, x, y)
+        el: createEntity(type === 'player' ? 'entity runner' : 'entity runner bot', label, x, y, 'runner')
     };
 
     if (type === 'player') {
         runner.el.style.border = '4px solid #FFD700'; // Gold border for player
         runner.el.style.zIndex = '20';
         playerControlledRunner = runnerIndex;
-    } else {
-        runner.el.style.filter = 'hue-rotate(180deg)';
     }
 
     field.appendChild(runner.el);
@@ -255,7 +253,7 @@ function createTagger(id, type, fixedPos, diff, controller) {
 
     // Visual distinction for Player Tagger if needed
     const className = controller === 'player' ? 'entity tagger player-tagger' : 'entity tagger';
-    taggerObj.el = createEntity(className, label, x, y);
+    taggerObj.el = createEntity(className, label, x, y, 'tagger');
 
     if (controller === 'player') {
         taggerObj.el.style.border = '4px solid #FFD700'; // Gold border for player tagger
@@ -267,11 +265,21 @@ function createTagger(id, type, fixedPos, diff, controller) {
     taggers.push(taggerObj);
 }
 
-function createEntity(className, labelText, x, y) {
+function createEntity(className, labelText, x, y, entityType) {
     const div = document.createElement('div');
     div.className = className;
     div.style.left = `${x}px`;
     div.style.top = `${y}px`;
+
+    // Randomly select a player head image (1, 2, or 3)
+    const randomHead = Math.floor(Math.random() * 3) + 1;
+    const headImage = `../assets/patintero_assets/player_head ${randomHead}.png`;
+
+    // Set the background image for this specific entity
+    div.style.backgroundImage = `url('${headImage}')`;
+    div.style.backgroundSize = 'cover';
+    div.style.backgroundRepeat = 'no-repeat';
+    div.style.backgroundPosition = 'center';
 
     // Add label if provided
     if (labelText) {
@@ -509,7 +517,7 @@ function updateTaggers() {
     const field = document.getElementById('field');
     const fw = field.offsetWidth;
     const fh = field.offsetHeight;
-    const horizontalZoneThreshold = 120
+    const horizontalZoneThreshold = 200 // Increased from 120 to better detect side runners
 
     taggers.forEach(t => {
         // PLAYER CONTROLLED TAGGER
@@ -551,12 +559,13 @@ function updateTaggers() {
         }
 
         // AI TAGGER LOGIC
-        // Focus nearest active runner
+        // Focus nearest active runner using Euclidean distance for accuracy
         let target = null;
         let minDist = Infinity;
         runners.forEach(r => {
             if (!r.active) return;
-            const dist = Math.abs(r.y - t.y) + Math.abs(r.x - t.x);
+            // Use Euclidean distance (straight-line) for more accurate proximity
+            const dist = Math.sqrt((r.x - t.x) ** 2 + (r.y - t.y) ** 2);
             if (dist < minDist) {
                 minDist = dist;
                 target = r;
@@ -573,6 +582,10 @@ function updateTaggers() {
             const distY = Math.abs(target.y - t.y);
             if (distY < horizontalZoneThreshold) chasing = true;
 
+            // Check if runner is near edges (exploiting sides)
+            const edgeThreshold = 150; // Distance from edge to be considered "on the side"
+            const isRunnerOnEdge = target.x < edgeThreshold || target.x > fw - edgeThreshold;
+
             if (chasing) {
                 desiredX = target.x;
 
@@ -585,12 +598,19 @@ function updateTaggers() {
 
                 // Calculate scaled responsiveness (inversely proportional to distance)
                 const distanceRatio = Math.min(distanceToTarget / maxDistance, 1);
-                const scaledResp = t.resp * (1 - distanceRatio * 0.9) + minResponsiveness;
+                let scaledResp = t.resp * (1 - distanceRatio * 0.9) + minResponsiveness;
+
+                // Boost responsiveness if runner is on edge (counter side exploit)
+                if (isRunnerOnEdge) {
+                    scaledResp *= 1.5; // 50% faster when chasing edge runners
+                }
 
                 t.x += (desiredX - t.x) * scaledResp;
             } else {
-                // Return to center
-                t.x += ((fw / 2) - t.x) * 0.05;
+                // Instead of returning to center, move toward nearest runner's X position
+                // This helps cover the field better and prevents side exploits
+                desiredX = target.x;
+                t.x += (desiredX - t.x) * 0.02; // Slow positioning toward runner
             }
             // Clamp
             if (t.x < 20) t.x = 20;
@@ -673,16 +693,44 @@ function updateTimerDisplay() {
     const timeString = `${minutes}:${seconds.toString().padStart(2, '0')}`;
     document.getElementById('timerValue').textContent = timeString;
 
-    // Keep timer white (counting up, no urgency)
+    // Change color when time is running low
     const timerValue = document.getElementById('timerValue');
-    timerValue.style.color = 'white';
-    timerValue.style.animation = 'none';
+    if (gameTimer <= 10) {
+        timerValue.style.color = '#ff4444';
+        timerValue.style.animation = 'pulse 1s infinite';
+    } else if (gameTimer <= 30) {
+        timerValue.style.color = '#ffaa00';
+        timerValue.style.animation = 'none';
+    } else {
+        timerValue.style.color = 'white';
+        timerValue.style.animation = 'none';
+    }
 }
 
 function updateTimer() {
-    gameTimer++; // Count up instead of down
+    gameTimer--; // Count down
     updateTimerDisplay();
-    // No time limit - game continues until all runners are tagged
+
+    // Check if time is up
+    if (gameTimer <= 0) {
+        gameActive = false;
+        clearInterval(timerInterval);
+        roundsCompleted++;
+
+        if (roundsCompleted === 1) {
+            // First round complete - switch roles for second round
+            showRoundModal(
+                "TIME'S UP!",
+                `Round 1 Complete! ${currentRole === 'runner' ? 'My Team' : 'Enemy Team'} scored ${currentRole === 'runner' ? playerTeamScore : enemyTeamScore} points!\n\nSwitching roles...`,
+                () => {
+                    switchRolesAfterTag();
+                }
+            );
+        } else {
+            // Both rounds complete - end game
+            endGame();
+        }
+    }
 }
 
 function switchRoles() {
@@ -942,8 +990,8 @@ function switchRolesAfterTag() {
     playerControlledRunner = null;
     playerControlledTagger = null;
 
-    // Reset timer for second round
-    gameTimer = 0;
+    // Reset timer for second round (will be set to 120 in startRound)
+    gameTimer = 120;
 
     // Start new round with switched roles
     startRound();
