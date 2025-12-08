@@ -5,17 +5,17 @@
 
 const Game = {
     canvas: null,
-    
+
     init() {
         // Get canvas
         this.canvas = document.getElementById('gameCanvas');
-        
+
         // Initialize modules
         Rendering.init(this.canvas);
         UI.init();
         Assets.load();
         Sound.init();
-        
+
         // Setup difficulty buttons
         ['easyBtn', 'normalBtn', 'hardBtn'].forEach(id => {
             document.getElementById(id).addEventListener('click', () => {
@@ -98,7 +98,7 @@ const Game = {
             el.addEventListener('click', () => Sound.playClick());
         });
     },
-    
+
     start(difficulty) {
         // Show close button for future menu pauses
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
@@ -129,7 +129,7 @@ const Game = {
         GameLogic.resetGame();
         Input.init(this.canvas);
         Sound.startMusic();
-        
+
         // Start game loop
         this.loop();
     },
@@ -140,7 +140,7 @@ const Game = {
         switch (GameState.state) {
             case 'running':
                 Player.x += CONFIG.runSpeed * GameState.difficultyMultiplier;
-                
+
                 // Check if player ran into the baka (didn't jump!)
                 // Check if player ran into the baka (didn't jump!)
                 if (Player.x + Player.width > Baka.x + 30) {
@@ -159,7 +159,7 @@ const Game = {
                     }
                 }
                 break;
-                
+
             case 'charging':
                 // Oscillate angle with extended range
                 GameState.chargeAngle += GameState.angleDirection * GameState.angleSpeed * GameState.difficultyMultiplier;
@@ -195,15 +195,15 @@ const Game = {
                     }
                 }
                 break;
-                
+
             case 'jumping':
                 const landed = GameLogic.updateJumpArc();
                 const collision = GameLogic.checkBakaCollision();
-                
+
                 // Bounce off top - REQUIRES TIMING!
                 if (collision === 'bounce') {
                     const timeSinceInput = Date.now() - GameState.bounceInputTime;
-                    
+
                     // Check if player pressed space recently (within 250ms)
                     if (timeSinceInput < 250) {
                         // SUCCESSFUL BOUNCE
@@ -228,11 +228,11 @@ const Game = {
                         }
                     }
                 }
-                
+
                 // Levels 1-3: Cannot hit the baka (collision disabled)
                 // BUT landing short still costs a life on ALL levels!
                 const canHitBaka = GameState.currentLevel >= 4;
-                
+
                 // Hit the baka body (only on levels 4-5)
                 if (canHitBaka && collision === 'hit') {
                     GameState.state = 'fail';
@@ -279,7 +279,7 @@ const Game = {
                 break;
         }
     },
-    
+
     loop() {
         this.update();
         Rendering.render();
