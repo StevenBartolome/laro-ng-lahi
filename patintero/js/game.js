@@ -91,6 +91,7 @@ export function startRound() {
     // Reset Boost
     boost.ready = true;
     boost.active = false;
+    boost.currentCharges = boost.maxCharges;
     taggerBoost.ready = true;
     taggerBoost.active = false;
     updateBoostUI();

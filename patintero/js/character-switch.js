@@ -92,6 +92,10 @@ export function switchToRunner(newIndex) {
     const newLabel = newRunner.el.querySelector('.entity-label');
     if (newLabel) newLabel.textContent = `R${newIndex + 1} (YOU)`;
 
+    // Play Switch Sound
+    const snd = document.getElementById('switchSound');
+    if (snd) { snd.currentTime = 0; snd.play().catch(()=>{}); }
+
     gameState.playerControlledRunner = newIndex;
     updateCharacterPanel();
 }
@@ -137,6 +141,10 @@ export function switchToTagger(newIndex) {
     // Update label
     const newLabel = newTagger.el.querySelector('.entity-label');
     if (newLabel) newLabel.textContent = `T${newTagger.id} (YOU)`;
+
+    // Play Switch Sound
+    const snd = document.getElementById('switchSound');
+    if (snd) { snd.currentTime = 0; snd.play().catch(()=>{}); }
 
     gameState.playerControlledTagger = newIndex;
     updateCharacterPanel();

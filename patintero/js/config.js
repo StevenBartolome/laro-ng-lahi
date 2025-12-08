@@ -38,7 +38,9 @@ export const boost = {
     cooldown: 5000,
     duration: 1500,
     multiplier: 1.5,
-    lastUsed: 0
+    lastUsed: 0,
+    maxCharges: 3,
+    currentCharges: 3
 };
 
 // Tagger Boost State (Player Tagger)

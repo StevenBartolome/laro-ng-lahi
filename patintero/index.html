@@ -15,11 +15,21 @@
 
 <body>
     <!-- Audio Elements -->
+    <!-- Audio Elements -->
     <audio id="bgMusic" loop>
         <source src="../assets/patintero_assets/patintero_bgm.mp3" type="audio/mpeg">
     </audio>
     <audio id="clickSound">
         <source src="../assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="boostSound">
+        <source src="../assets/patintero_assets/boost_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="tagSound">
+        <source src="../assets/patintero_assets/patintero_character_tag.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="switchSound">
+        <source src="../assets/patintero_assets/patintero_character_switch.mp3" type="audio/mpeg">
     </audio>
 
     <!-- Sound Controls (Top Left) -->
@@ -196,6 +206,12 @@
 
             <!-- Boost Meter -->
             <div class="boost-meter-container" id="boostMeter">
+                <!-- Boost Indicators (3 Uses) -->
+                <div class="boost-indicators" id="boostIndicators">
+                    <img src="../assets/patintero_assets/boost_icon.png" class="boost-icon active" id="boost-1">
+                    <img src="../assets/patintero_assets/boost_icon.png" class="boost-icon active" id="boost-2">
+                    <img src="../assets/patintero_assets/boost_icon.png" class="boost-icon active" id="boost-3">
+                </div>
                 <div class="boost-fill" id="boostFill"></div>
                 <span class="boost-text">⚡ BOOST (SPACE)</span>
             </div>
@@ -223,10 +239,10 @@
     <div id="factsOverlay" class="overlay hidden">
         <div class="overlay-content facts-content">
             <button id="closeFactsBtn" class="close-btn" title="Close">×</button>
-            <img src="../assets/game_facts_assets/patintero_facts_title.png" class="facts-title" alt="Facts">
+            <img src="../assets/patintero_assets/patintero_facts_title.png" class="facts-title" alt="Facts">
 
             <div class="facts-container">
-                <img id="factsBoard" src="../assets/game_facts_assets/patintero_facts_board_1.png" class="facts-board"
+                <img id="factsBoard" src="../assets/patintero_assets/patintero_facts_board_1.png" class="facts-board"
                     alt="Fact Board">
                 <div class="facts-nav">
                     <span class="dot active" data-index="1"></span>

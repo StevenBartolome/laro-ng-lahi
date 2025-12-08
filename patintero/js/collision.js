@@ -13,6 +13,13 @@ export function checkCollisions() {
                 r.active = false;
                 r.el.style.opacity = '0.3';
                 r.el.style.filter = 'grayscale(100%)';
+                
+                // Play Tag Sound
+                const snd = document.getElementById('tagSound');
+                if (snd) { snd.currentTime = 0; snd.play().catch(()=>{}); }
+
+                // Initial feedback is simple, ui.js/game.js handles game over if all out
+                console.log("Runner tagged!");
             }
         }
     });
