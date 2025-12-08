@@ -94,6 +94,26 @@ export class FirebaseSync {
         });
     }
 
+    // Set selected mode (host only)
+    async setSelectedMode(mode) {
+        await update(this.gameRef, {
+            selectedMode: mode,
+            gameState: 'mode_selection',
+            'lastAction/type': 'mode_select',
+            'lastAction/timestamp': Date.now()
+        });
+    }
+
+    // Start game with selected mode (host only)
+    async startGameWithMode(mode) {
+        await update(this.gameRef, {
+            gameMode: mode,
+            gameState: 'playing',
+            'lastAction/type': 'game_start_with_mode',
+            'lastAction/timestamp': Date.now()
+        });
+    }
+
     // Get current game state
     async getGameState() {
         const snapshot = await get(this.gameRef);

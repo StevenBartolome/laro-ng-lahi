@@ -18,6 +18,7 @@ import * as HoleMode from "../js/HoleMode.js";
 import * as TumbangMode from "../js/TumbangMode.js";
 import * as LineMode from "../js/LineMode.js";
 
+import { ModeSelection } from "./ModeSelection.js";
 import Sound from "../js/Sound.js";
 import { FirebaseSync } from "./FirebaseSync.js";
 import { MultiplayerUI } from "./UI.js";
@@ -77,6 +78,10 @@ class MultiplayerJolen {
         // Sync state
         this.lastSyncedState = null;
         this.isWaitingForSync = false;
+
+        // Mode selection
+        this.modeSelection = new ModeSelection();
+        this.modeSelection.onModeSelected = (mode) => this.onHostSelectMode(mode);
 
         this.init();
     }
@@ -289,11 +294,27 @@ class MultiplayerJolen {
 
             // Check if all players are ready
             const allReady = Object.values(gameState.playerStates).every(state => state.isReady);
-            if (allReady && this.isHost) {
-                console.log('✓ All players ready! Starting game...');
-                setTimeout(async () => {
-                    await this.firebaseSync.startGame();
-                }, 1000);
+            if (allReady) {
+                // Show mode selection screen
+                const waitingScreen = document.getElementById('waitingScreen');
+                if (!waitingScreen.classList.contains('hidden')) {
+                    console.log('✓ All players ready! Showing mode selection...');
+                    waitingScreen.classList.add('hidden');
+                    this.modeSelection.show(this.isHost);
+                }
+            }
+            return;
+        }
+
+        // Handle mode selection state
+        if (gameState.gameState === 'mode_selection') {
+            // Non-host: update display to show selected mode
+            if (!this.isHost && gameState.selectedMode) {
+                this.modeSelection.showSelectedMode(gameState.selectedMode);
+                // Auto-transition after 2 seconds
+                setTimeout(() => {
+                    this.modeSelection.hide();
+                }, 2000);
             }
             return;
         }
@@ -301,10 +322,16 @@ class MultiplayerJolen {
         // Handle transition to playing state
         if (gameState.gameState === 'playing') {
             const waitingScreen = document.getElementById('waitingScreen');
+            const modeSelectionScreen = document.getElementById('modeSelectionScreen');
             const gameContainer = document.getElementById('game-container');
 
             if (!waitingScreen.classList.contains('hidden')) {
                 waitingScreen.classList.add('hidden');
+            }
+            if (modeSelectionScreen && !modeSelectionScreen.classList.contains('hidden')) {
+                modeSelectionScreen.classList.add('hidden');
+            }
+            if (gameContainer.style.display === 'none') {
                 gameContainer.style.display = 'block';
                 console.log('✓ Game started!');
             }
@@ -347,9 +374,13 @@ class MultiplayerJolen {
         // Update players list
         this.ui.updatePlayersList(this.players, this.scores, this.currentTurnPlayerId);
 
-        // Sync mode state (targets)
+        // Sync mode state (targets/objects)
         if (gameState.modeState) {
-            console.log('✓ Received mode state with', gameState.modeState.length, 'targets');
+            if (Array.isArray(gameState.modeState)) {
+                console.log('✓ Received mode state with', gameState.modeState.length, 'objects');
+            } else {
+                console.log('✓ Received mode state (object-based)');
+            }
             this.modeState = gameState.modeState;
         } else {
             console.warn('⚠️ No mode state in game update');
@@ -373,10 +404,46 @@ class MultiplayerJolen {
             }
         }
 
+
         // Check for game over
         if (gameState.gameState === 'finished') {
             this.showGameOver();
         }
+    }
+
+
+    // Host selects mode and starts game
+    async onHostSelectMode(mode) {
+        if (!this.isHost) return;
+
+        console.log('🎯 Host selected mode:', mode);
+
+        // Set local game mode FIRST
+        this.gameMode = mode;
+        this.setGameMode(mode);
+
+        // NOW setup the level with the correct mode
+        this.modeState = this.currentModeModule.setup(this.level, this.canvas.width, this.canvas.height);
+
+        // Log based on mode state type
+        if (Array.isArray(this.modeState)) {
+            console.log('✓ Level 1 setup for mode:', mode, '- created', this.modeState.length, 'objects');
+        } else {
+            console.log('✓ Level 1 setup for mode:', mode, '- state initialized');
+        }
+
+        // Sync to Firebase (this will update gameState.selectedMode)
+        await this.firebaseSync.setSelectedMode(mode);
+
+        // Sync the mode state to Firebase
+        await this.firebaseSync.updateModeState(this.modeState);
+        console.log('✓ Mode state synced to Firebase');
+
+        // Hide mode selection
+        this.modeSelection.hide();
+
+        // Start the game with the selected mode
+        await this.firebaseSync.startGameWithMode(mode);
     }
 
     setupLevel() {
@@ -614,15 +681,9 @@ class MultiplayerJolen {
             this.ctx.drawImage(images.background, 0, 0, this.canvas.width, this.canvas.height);
         }
 
-        // Draw mode specifics (targets)
-        if (this.modeState) {
-            // Draw targets manually using our local drawMarble function
-            // instead of TargetMode.draw which uses the wrong images
-            this.modeState.forEach((target) => {
-                if (!target.hit) {
-                    drawMarble(this.ctx, target, false, false);
-                }
-            });
+        // Draw mode specifics using the mode's draw function
+        if (this.modeState && this.currentModeModule) {
+            this.currentModeModule.draw(this.ctx, this.modeState);
         } else {
             // Debug: Show waiting message
             this.ctx.fillStyle = "white";

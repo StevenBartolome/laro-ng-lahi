@@ -68,6 +68,44 @@
             </div>
         </div>
 
+        <!-- Mode Selection Screen -->
+        <div id="modeSelectionScreen" class="overlay hidden">
+            <div class="overlay-content">
+                <h1 class="game-title">🎯 Select Game Mode</h1>
+                <p id="hostSelectionMessage" class="host-message">Waiting for host...</p>
+
+                <div class="mode-grid">
+                    <button class="mode-btn game-card" data-mode="target">
+                        <span class="card-icon">🎯</span>
+                        <span class="mode-name">Target</span>
+                        <span class="mode-desc">Hit all targets</span>
+                    </button>
+                    <button class="mode-btn game-card" data-mode="circle">
+                        <span class="card-icon">⭕</span>
+                        <span class="mode-name">Circle</span>
+                        <span class="mode-desc">Keep marbles in circle</span>
+                    </button>
+                    <button class="mode-btn game-card" data-mode="hole">
+                        <span class="card-icon">🕳️</span>
+                        <span class="mode-name">Hole</span>
+                        <span class="mode-desc">Sink marbles in hole</span>
+                    </button>
+                    <button class="mode-btn game-card" data-mode="tumbang">
+                        <span class="card-icon">🥫</span>
+                        <span class="mode-name">Tumbang</span>
+                        <span class="mode-desc">Knock down the can</span>
+                    </button>
+                    <button class="mode-btn game-card" data-mode="line">
+                        <span class="card-icon">📏</span>
+                        <span class="mode-name">Line</span>
+                        <span class="mode-desc">Form a straight line</span>
+                    </button>
+                </div>
+
+                <button id="startGameBtn" class="btn-start" style="display: none;">Start Game</button>
+            </div>
+        </div>
+
         <!-- Game Container -->
         <div id="game-container" style="display: none">
             <!-- Turn Indicator -->
