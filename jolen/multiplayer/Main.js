@@ -12,7 +12,7 @@ import {
     drawMarble,
 } from "./Common.js";
 
-import * as TargetMode from "../js/TargetMode.js";
+import * as TargetMode from "./TargetMode.js"; // Multiplayer version with physics
 import * as CircleMode from "../js/CircleMode.js";
 import * as HoleMode from "../js/HoleMode.js";
 import * as TumbangMode from "../js/TumbangMode.js";
@@ -376,12 +376,16 @@ class MultiplayerJolen {
 
         // Sync mode state (targets/objects)
         if (gameState.modeState) {
-            if (Array.isArray(gameState.modeState)) {
-                console.log('✓ Received mode state with', gameState.modeState.length, 'objects');
-            } else {
-                console.log('✓ Received mode state (object-based)');
+            // Only update local state if it's NOT my turn
+            // (If it is my turn, I'm the one simulating the physics!)
+            if (!this.isMyTurn) {
+                if (Array.isArray(gameState.modeState)) {
+                    console.log('✓ Received mode state with', gameState.modeState.length, 'objects');
+                } else {
+                    console.log('✓ Received mode state (object-based)');
+                }
+                this.modeState = gameState.modeState;
             }
-            this.modeState = gameState.modeState;
         } else {
             console.warn('⚠️ No mode state in game update');
         }
@@ -588,8 +592,9 @@ class MultiplayerJolen {
                         this.firebaseSync.updateScore(this.userId, newScore);
                     }
 
-                    // Sync mode state changes
-                    if (result.scoreIncrease) {
+                    // Sync mode state changes (on score change OR if things are moving)
+                    // We sync periodically if moving so spectators see targets fly
+                    if (result.scoreIncrease || (anyMoving && this.syncCounter % 5 === 0)) {
                         this.firebaseSync.updateModeState(this.modeState);
                     }
 
