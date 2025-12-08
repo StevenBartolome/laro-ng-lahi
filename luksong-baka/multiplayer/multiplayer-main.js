@@ -47,6 +47,7 @@ async function init() {
 
     // Override speed to constant medium
     CONFIG.runSpeed = 2; // Medium difficulty speed
+    GameState.angleSpeed = 2; // Medium difficulty angle speed
 
     console.log('Multiplayer initialized successfully');
 
@@ -460,6 +461,7 @@ function setupInputHandlers() {
             GameState.state = 'charging';
             Sound.stopRun();
             GameState.chargeAngle = CONFIG.minAngle + 15;
+            GameState.chargeCycles = 0; // Reset charge cycles
             GameState.angleDirection = 1;
         } else if (GameState.state === 'jumping') {
             // Record bounce input time
@@ -556,6 +558,20 @@ function update() {
             } else if (GameState.chargeAngle <= CONFIG.minAngle) {
                 GameState.chargeAngle = CONFIG.minAngle;
                 GameState.angleDirection = 1;
+
+                // Increment cycle count
+                GameState.chargeCycles = (GameState.chargeCycles || 0) + 1;
+
+                // Warning sound when holding too long (1 full cycle)
+                if (GameState.chargeCycles === 1) {
+                    if (Sound.playOvercharge) Sound.playOvercharge();
+                }
+
+                // Penalize if held even longer (2 full cycles)
+                if (GameState.chargeCycles >= 2) {
+                    GameState.state = 'fail';
+                    handlePlayerFail('Lost Momentum! (Held too long)');
+                }
             }
             break;
 
