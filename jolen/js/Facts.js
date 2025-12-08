@@ -82,17 +82,19 @@ const Facts = {
     updateUI() {
         // Update Image
         if (this.elements.board) {
-            this.elements.board.src = `../assets/jolen_assets/jolen_facts_board_${this.currentPage}.png`;
+            this.elements.board.src = `../assets/game_facts_assets/jolen_facts_board_${this.currentPage}.png`;
         }
 
         // Update Dots
-        this.elements.dots.forEach(dot => {
-            if (parseInt(dot.dataset.index) === this.currentPage) {
-                dot.classList.add('active');
-            } else {
-                dot.classList.remove('active');
-            }
-        });
+        if (this.elements.dots) {
+            this.elements.dots.forEach(dot => {
+                if (parseInt(dot.dataset.index) === this.currentPage) {
+                    dot.classList.add('active');
+                } else {
+                    dot.classList.remove('active');
+                }
+            });
+        }
     }
 };
 
