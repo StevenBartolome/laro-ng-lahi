@@ -83,7 +83,14 @@ export function update(
 
         targets.forEach((target) => {
             if (!target.hit && checkMarbleCollision(playerMarble, target)) {
+                console.log('💥 Collision! Player velocity before:', { vx: playerMarble.vx, vy: playerMarble.vy });
+
                 target.hit = true;
+                // Zero out target velocity after collision (like single-player)
+                target.vx = 0;
+                target.vy = 0;
+
+                console.log('💥 Player velocity after:', { vx: playerMarble.vx, vy: playerMarble.vy });
 
                 // Only count this hit if it's the current player's marble
                 if (playerId === currentPlayerId) {
@@ -139,6 +146,9 @@ export function checkLevelComplete(targets) {
     return targets.every((target) => target.hit);
 }
 
+
 export function countRemaining(targets) {
     return targets.filter((target) => !target.hit).length;
 }
+
+

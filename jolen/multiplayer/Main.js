@@ -415,6 +415,9 @@ class MultiplayerJolen {
                     console.log('✓ Received mode state (object-based)');
                 }
                 this.modeState = gameState.modeState;
+
+                // Update target count display for non-active players
+                this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
             }
         } else {
             console.warn('⚠️ No mode state in game update');
@@ -716,11 +719,15 @@ class MultiplayerJolen {
                 const winner = this.determineWinner();
                 console.log('🏆 Winner:', winner.name, 'with score:', winner.score);
 
-                // Set game to finished state
+                // Set game to finished state in Firebase
                 await this.firebaseSync.setGameOver();
+                console.log('✓ Game over state set in Firebase');
             }
 
-            this.gameState = "waiting";
+            // Show game over immediately for all players
+            console.log('🎉 Showing game over screen...');
+            this.showGameOver();
+
             this.currentTurnHitCount = 0;
         } else {
             // Check if player hit any targets this turn
@@ -925,6 +932,9 @@ class MultiplayerJolen {
     }
 
     showGameOver() {
+        console.log('🎊 showGameOver() called');
+        console.log('Players:', this.players);
+        console.log('Scores:', this.scores);
         this.ui.showGameOver(this.players, this.scores);
     }
 }
