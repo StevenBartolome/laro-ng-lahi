@@ -5,6 +5,7 @@
 
 const UI = {
     elements: {},
+    messageTimeout: null,
 
     init() {
         this.elements = {
@@ -67,11 +68,13 @@ const UI = {
     },
 
     showMessage(text, type) {
+        if (this.messageTimeout) clearTimeout(this.messageTimeout);
+
         this.elements.messageText.textContent = text;
         this.elements.messageText.className = type;
         this.elements.messageOverlay.classList.remove('hidden');
 
-        setTimeout(() => {
+        this.messageTimeout = setTimeout(() => {
             this.elements.messageOverlay.classList.add('hidden');
         }, 1500);
     },
@@ -90,21 +93,23 @@ const UI = {
     },
 
     showGameComplete() {
+        if (this.messageTimeout) clearTimeout(this.messageTimeout);
+
         // Add backdrop class to overlay
         this.elements.messageOverlay.classList.add('game-complete-backdrop');
 
         this.elements.messageText.innerHTML = `
             <div class="game-complete-content">
-                <div style="font-size: 42px; margin-bottom: 15px;">🎉 GAME COMPLETE! 🎉</div>
-                <div style="font-size: 24px; margin-bottom: 10px;">You cleared all 5 levels!</div>
-                <div style="font-size: 32px; color: #ffd700; margin-bottom: 25px;">Score: ${GameState.totalJumps * 100} points</div>
+                <div class="complete-header">🎉 VICTORY! 🎉</div>
+                <div class="complete-sub">You cleared all 5 levels!</div>
+                <div class="complete-score">Score: ${GameState.totalJumps * 100}</div>
                 <div class="complete-buttons">
-                    <button id="restartBtn" class="restart-btn">🔄 Play Again</button>
-                    <a href="../game_select.php" class="back-menu-btn">🏠 Back to Menu</a>
+                    <button id="restartBtn" class="restart-btn">Play Again</button>
+                    <a href="../game_select.php" class="back-menu-btn">Main Menu</a>
                 </div>
             </div>
         `;
-        this.elements.messageText.className = 'levelup game-complete-box';
+        this.elements.messageText.className = 'game-complete-box';
         this.elements.messageOverlay.classList.remove('hidden');
 
         // Setup restart button
@@ -132,20 +137,22 @@ const UI = {
     },
 
     showGameOver() {
+        if (this.messageTimeout) clearTimeout(this.messageTimeout);
+
         this.elements.messageOverlay.classList.add('game-complete-backdrop');
 
         this.elements.messageText.innerHTML = `
             <div class="game-complete-content">
-                <div style="font-size: 42px; margin-bottom: 15px; color: #e74c3c;">💔 GAME OVER 💔</div>
-                <div style="font-size: 24px; margin-bottom: 10px;">You ran out of lives!</div>
-                <div style="font-size: 28px; color: #ffd700; margin-bottom: 25px;">Score: ${GameState.totalJumps * 100} points</div>
+                <div class="complete-header fail">GAME OVER</div>
+                <div class="complete-sub">You ran out of lives!</div>
+                <div class="complete-score">Score: ${GameState.totalJumps * 100}</div>
                 <div class="complete-buttons">
-                    <button id="retryBtn" class="restart-btn">🔄 Try Again</button>
-                    <a href="../game_select.php" class="back-menu-btn">🏠 Menu</a>
+                    <button id="retryBtn" class="restart-btn">Try Again</button>
+                    <a href="../game_select.php" class="back-menu-btn">Main Menu</a>
                 </div>
             </div>
         `;
-        this.elements.messageText.className = 'fail game-complete-box';
+        this.elements.messageText.className = 'game-complete-box';
         this.elements.messageOverlay.classList.remove('hidden');
 
         // Setup retry button
@@ -156,9 +163,17 @@ const UI = {
                     Sound.playClick();
                     UI.elements.messageOverlay.classList.add('hidden');
                     UI.elements.messageOverlay.classList.remove('game-complete-backdrop');
-                    GameState.totalJumps = 0;
-                    GameLogic.resetGame();
-                    GameState.state = 'idle';
+
+                    // CRITICAL FIX: Explicitly call Game.start to reset multipliers and speed!
+                    // This ensures "Try Again" doesn't revert to Easy mode physics
+                    if (window.Game) {
+                        Game.start(GameState.difficulty || 'normal');
+                    } else {
+                        // Fallback if Game object isn't global yet (rare)
+                        GameState.totalJumps = 0;
+                        GameLogic.resetGame();
+                        GameState.state = 'idle';
+                    }
                 });
             }
 
@@ -183,12 +198,12 @@ const UI = {
 
         // Reset layout based on mode
         if (mode === 'both') {
-            overlayContent.style.maxWidth = '900px';
+            overlayContent.style.maxWidth = '1100px';
             menuGrid.classList.remove('single');
             instructionsPanel.style.display = 'block';
             difficultyPanel.style.display = 'flex';
         } else if (mode === 'instructions') {
-            overlayContent.style.maxWidth = '500px';
+            overlayContent.style.maxWidth = '800px';
             menuGrid.classList.add('single');
             instructionsPanel.style.display = 'block';
             difficultyPanel.style.display = 'none';

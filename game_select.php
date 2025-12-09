@@ -45,7 +45,7 @@ $email = "test@example.com";
         
         <!-- Game Cards -->
         <div class="game-cards-container">
-            <a href="games/patintero.php" class="game-card" title="Play Patintero">
+            <a href="patintero/index.html" class="game-card" title="Play Patintero">
                 <img src="assets/startmenu/patintero_gamecard.png" alt="Patintero">
             </a>
             <a href="jolen/index.html" class="game-card" title="Play Jolen">

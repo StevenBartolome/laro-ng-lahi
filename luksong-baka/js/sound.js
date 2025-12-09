@@ -52,6 +52,23 @@ const Sound = {
         // Apply initial volumes
         if (this.bgMusic) this.bgMusic.volume = this.bgmVolume;
         if (this.jumpSound) this.jumpSound.volume = this.sfxVolume;
+        
+        // Try to autoplay BGM on load
+        this.tryAutoplayBGM();
+    },
+    
+    tryAutoplayBGM() {
+        if (this.bgMusic) {
+            const playPromise = this.bgMusic.play();
+            if (playPromise !== undefined) {
+                playPromise.catch(() => {
+                    // Autoplay blocked - add click listener fallback
+                    document.addEventListener('click', () => {
+                        this.bgMusic.play().catch(() => {});
+                    }, { once: true });
+                });
+            }
+        }
     },
     
     startMusic() {

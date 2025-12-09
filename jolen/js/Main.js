@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAssets().then(() => {
     console.log("Assets loaded");
     // Show menu initially, disable close button to force selection
-    UI.showMenu('both', false);
+    UI.showMenu('both', true);
     UI.highlightMode(gameMode); // Highlight default mode
   });
 
@@ -214,13 +214,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Game Loop ---
-  function update() {
+  let lastTime = 0;
+  function update(timestamp) {
+    if (!lastTime) lastTime = timestamp;
+    const deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+
+    // Target 60 FPS (approx 16.67ms per frame)
+    // timeScale will be ~1.0 at 60fps, ~0.5 at 120fps, ~2.0 at 30fps
+    const timeScale = deltaTime / (1000 / 60);
+
+    // Limit timeScale to prevent huge jumps if lag occurs (e.g. max 3 frames skipped)
+    const clampedTimeScale = Math.min(timeScale, 4.0);
+
     // Update marbles
     if (gameState === "shooting") {
       let anyMoving = false;
 
       // Update player marble
-      if (updateMarble(playerMarble, canvas.width, canvas.height)) {
+      if (updateMarble(playerMarble, canvas.width, canvas.height, clampedTimeScale)) {
         anyMoving = true;
       }
 
@@ -230,7 +242,8 @@ document.addEventListener("DOMContentLoaded", () => {
         modeState,
         score,
         canvas.width,
-        canvas.height
+        canvas.height,
+        clampedTimeScale
       );
 
       if (result.anyMoving) anyMoving = true;
@@ -378,37 +391,48 @@ document.addEventListener("DOMContentLoaded", () => {
       case "hole": currentModeModule = HoleMode; break;
       case "tumbang": currentModeModule = TumbangMode; break;
       case "line": currentModeModule = LineMode; break;
+      default: currentModeModule = TargetMode; break;
     }
   }
 
-  // Bind Buttons
-  UI.elements.modeBtns.forEach(btn => {
+  // --- Bind Buttons ---
+  
+  // Global button click sound
+  document.querySelectorAll('button, a').forEach(btn => {
       btn.addEventListener('click', () => {
-           Sound.playClick();
-           const modeParts = btn.id.split('-'); // mode-target
-           const mode = modeParts[1];
-           selectMode(mode);
+          Sound.playClick();
       });
   });
 
-  UI.elements.diffBtns.forEach(btn => {
-      btn.addEventListener('click', () => {
-           Sound.playClick();
-           const diffParts = btn.id.split('-'); // diff-easy
-           const diff = diffParts[1];
-           startGame(diff);
+  if (UI.elements.modeBtns) {
+      UI.elements.modeBtns.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+              // Sound.playClick(); // Handled globally above, but specific logic below
+              const modeParts = btn.id.split('-'); // mode-target
+              const mode = modeParts[1];
+              selectMode(mode);
+          });
       });
-  });
+  }
+
+  if (UI.elements.diffBtns) {
+      UI.elements.diffBtns.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+               // Sound.playClick(); 
+               const diffParts = btn.id.split('-'); // diff-easy
+               const diff = diffParts[1];
+               startGame(diff);
+          });
+      });
+  }
 
   const menuBtn = document.getElementById('menuBtn');
   if(menuBtn) menuBtn.addEventListener('click', () => {
-       Sound.playClick();
        UI.showMenu('both', true);
   });
 
   const infoBtn = document.getElementById('infoBtn');
   if(infoBtn) infoBtn.addEventListener('click', () => {
-       Sound.playClick();
        UI.showMenu('instructions', true);
   });
 });

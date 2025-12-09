@@ -7,7 +7,9 @@
     <title>Luksong Baka - Laro ng Lahi</title>
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
         rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/overlays.css">
+    <link rel="stylesheet" href="css/hud.css">
 </head>
 
 <body>
@@ -26,6 +28,9 @@
     </audio>
     <audio id="overchargeSound">
         <source src="../assets/luksong_baka_assets/overcharge_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="factsMusic" loop>
+        <source src="../assets/game_facts_assets/fact_cards_music.mp3" type="audio/mpeg">
     </audio>
 
     <!-- Sound Controls (Top Left) -->
@@ -46,7 +51,11 @@
     <div id="difficultyScreen" class="overlay">
         <div class="overlay-content enhanced-overlay">
             <button id="closeOverlayBtn" class="close-btn" title="Close">×</button>
-            <h1 class="game-title">🐃 Luksong Baka</h1>
+
+            <div class="header-area">
+                <h1 class="game-title">Luksong Baka</h1>
+                <p class="subtitle">Jump Over the Cow!</p>
+            </div>
 
             <div class="menu-grid">
                 <!-- Left Column: Instructions -->
