@@ -162,6 +162,92 @@
         </div>
     </div>
 
+    <!-- Settings Overlay -->
+    <div id="settingsOverlay" class="screen-panel overlay hidden">
+        <div class="panel-content overlay-content">
+            <button id="closeSettingsBtn" class="close-btn" title="Close">×</button>
+
+            <div class="header-area">
+                <h1>JOLEN</h1>
+                <p class="subtitle">Multiplayer Mode</p>
+            </div>
+
+            <div class="menu-grid">
+                <!-- Left: How to Play -->
+                <div class="instructions-panel">
+                    <h3>How to Play</h3>
+                    <div class="tutorial-step">
+                        <div class="step-icon">👆</div>
+                        <div class="step-text">
+                            <h4>Click & Hold</h4>
+                            <p>Grab your marble</p>
+                        </div>
+                    </div>
+                    <div class="tutorial-step">
+                        <div class="step-icon">🏹</div>
+                        <div class="step-text">
+                            <h4>Drag Back</h4>
+                            <p>Aim and power up</p>
+                        </div>
+                    </div>
+                    <div class="tutorial-step">
+                        <div class="step-icon">🚀</div>
+                        <div class="step-text">
+                            <h4>Release</h4>
+                            <p>Shoot the marble!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Mode Selection -->
+                <div class="difficulty-panel">
+                    <h3>Current Mode</h3>
+                    <div id="currentModeDisplay" class="current-mode-display">
+                        <span class="mode-icon">🎯</span>
+                        <span id="settingsModeText">Target</span>
+                    </div>
+
+                    <h3 id="changeModeSection">Change Mode <span class="host-only-badge">(Host Only)</span></h3>
+                    <div class="mode-options">
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="target">
+                            <span class="card-icon">🎯</span> Target
+                        </button>
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="circle">
+                            <span class="card-icon">⭕</span> Circle
+                        </button>
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="hole">
+                            <span class="card-icon">🕳️</span> Hole
+                        </button>
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="tumbang">
+                            <span class="card-icon">🥫</span> Tumbang
+                        </button>
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="line">
+                            <span class="card-icon">📏</span> Line
+                        </button>
+                    </div>
+
+                    <div class="leave-lobby-section">
+                        <button id="leaveLobbyBtn" class="btn-leave-lobby">
+                            🚪 Leave Lobby
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmDialog" class="overlay hidden">
+        <div class="overlay-content confirm-content">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="confirm-buttons">
+                <button id="confirmYesBtn" class="btn-confirm-yes">Yes</button>
+                <button id="confirmNoBtn" class="btn-confirm-no">Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Game Over Overlay -->
     <div id="gameOverOverlay" class="overlay hidden">
         <div class="overlay-content">

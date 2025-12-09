@@ -540,6 +540,169 @@ class MultiplayerJolen {
                 window.location.href = '../../multiplayer-menu.php';
             });
         }
+
+        // Settings menu button
+        const menuBtn = document.getElementById('menuBtn');
+        if (menuBtn) {
+            menuBtn.addEventListener('click', () => this.openSettings());
+        }
+
+        // Close settings button
+        const closeSettingsBtn = document.getElementById('closeSettingsBtn');
+        if (closeSettingsBtn) {
+            closeSettingsBtn.addEventListener('click', () => this.closeSettings());
+        }
+
+        // Leave lobby button
+        const leaveLobbyBtn = document.getElementById('leaveLobbyBtn');
+        if (leaveLobbyBtn) {
+            leaveLobbyBtn.addEventListener('click', () => this.showConfirmDialog(
+                'Leave Lobby',
+                'Are you sure you want to leave the lobby?',
+                () => {
+                    window.location.href = '../../multiplayer-menu.php';
+                }
+            ));
+        }
+
+        // Mode change buttons (host only)
+        const modeBtns = document.querySelectorAll('.settings-mode-btn');
+        modeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!this.isHost) return;
+                const newMode = btn.dataset.mode;
+                if (newMode === this.gameMode) return; // Already on this mode
+
+                this.showConfirmDialog(
+                    'Change Mode',
+                    `Change game mode to ${this.getModeDisplayName(newMode)}? This will restart the game.`,
+                    async () => {
+                        await this.changeGameMode(newMode);
+                    }
+                );
+            });
+        });
+
+        // Confirmation dialog buttons
+        const confirmYesBtn = document.getElementById('confirmYesBtn');
+        const confirmNoBtn = document.getElementById('confirmNoBtn');
+        if (confirmYesBtn) {
+            confirmYesBtn.addEventListener('click', () => {
+                if (this.confirmCallback) {
+                    this.confirmCallback();
+                }
+                this.closeConfirmDialog();
+            });
+        }
+        if (confirmNoBtn) {
+            confirmNoBtn.addEventListener('click', () => this.closeConfirmDialog());
+        }
+    }
+
+    openSettings() {
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        const changeModeSection = document.getElementById('changeModeSection');
+        const settingsModeText = document.getElementById('settingsModeText');
+        const currentModeDisplay = document.getElementById('currentModeDisplay');
+
+        // Update current mode display
+        settingsModeText.textContent = this.getModeDisplayName(this.gameMode);
+        currentModeDisplay.querySelector('.mode-icon').textContent = this.getModeIcon(this.gameMode);
+
+        // Show/hide host-only section (the h3 "Change Mode" and mode-options)
+        const changeModeHeader = document.getElementById('changeModeSection');
+        const modeOptions = document.querySelector('#settingsOverlay .mode-options');
+        if (changeModeHeader) {
+            changeModeHeader.style.display = this.isHost ? 'block' : 'none';
+        }
+        if (modeOptions) {
+            modeOptions.style.display = this.isHost ? 'flex' : 'none';
+        }
+
+        // Update active mode button
+        document.querySelectorAll('.settings-mode-btn').forEach(btn => {
+            btn.classList.toggle('selected', btn.dataset.mode === this.gameMode);
+            btn.disabled = !this.isHost;
+        });
+
+        settingsOverlay.classList.remove('hidden');
+    }
+
+    closeSettings() {
+        const settingsOverlay = document.getElementById('settingsOverlay');
+        settingsOverlay.classList.add('hidden');
+    }
+
+    getModeDisplayName(mode) {
+        const names = {
+            'target': 'Target',
+            'circle': 'Circle',
+            'hole': 'Hole',
+            'tumbang': 'Tumbang',
+            'line': 'Line'
+        };
+        return names[mode] || mode;
+    }
+
+    getModeIcon(mode) {
+        const icons = {
+            'target': '🎯',
+            'circle': '⭕',
+            'hole': '🕳️',
+            'tumbang': '🥫',
+            'line': '📏'
+        };
+        return icons[mode] || '🎮';
+    }
+
+    showConfirmDialog(title, message, callback) {
+        this.confirmCallback = callback;
+        const dialog = document.getElementById('confirmDialog');
+        document.getElementById('confirmTitle').textContent = title;
+        document.getElementById('confirmMessage').textContent = message;
+        dialog.classList.remove('hidden');
+    }
+
+    closeConfirmDialog() {
+        const dialog = document.getElementById('confirmDialog');
+        dialog.classList.add('hidden');
+        this.confirmCallback = null;
+    }
+
+    async changeGameMode(newMode) {
+        if (!this.isHost) return;
+
+        console.log('🔄 Changing game mode to:', newMode);
+
+        // Update local mode
+        this.gameMode = newMode;
+        this.setGameMode(newMode);
+
+        // Reset and setup new targets
+        this.modeState = this.currentModeModule.setup(this.targetCount, this.canvas.width, this.canvas.height);
+
+        // Reset all player marbles to starting position
+        this.resetAllPlayerMarbles();
+
+        // Reset scores
+        Object.keys(this.scores).forEach(playerId => {
+            this.scores[playerId] = 0;
+        });
+
+        // Update UI
+        this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
+        this.ui.updateMode(newMode);
+        this.ui.updatePlayersList(this.players, this.scores, this.currentTurnPlayerId);
+
+        // Sync to Firebase
+        await this.firebaseSync.updateModeState(this.modeState);
+        await this.firebaseSync.updateGameMode(newMode, this.scores);
+        await this.firebaseSync.updateAllPlayerMarbles(this.getPlayerMarblesForSync());
+
+        // Close settings
+        this.closeSettings();
+
+        console.log('✓ Game mode changed to:', newMode);
     }
 
     resetPlayerMarble() {
@@ -571,6 +734,20 @@ class MultiplayerJolen {
             this.playerMarbles[playerId].vy = 0;
             this.playerMarbles[playerId].isMoving = false;
         });
+    }
+
+    getPlayerMarblesForSync() {
+        const marblesForSync = {};
+        Object.keys(this.playerMarbles).forEach(playerId => {
+            const marble = this.playerMarbles[playerId];
+            marblesForSync[playerId] = {
+                x: marble.x,
+                y: marble.y,
+                vx: marble.vx,
+                vy: marble.vy
+            };
+        });
+        return marblesForSync;
     }
 
     // Input handlers

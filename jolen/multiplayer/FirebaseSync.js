@@ -228,6 +228,18 @@ export class FirebaseSync {
         });
     }
 
+    // Update game mode and reset scores (host only)
+    async updateGameMode(newMode, resetScores) {
+        await update(this.gameRef, {
+            gameMode: newMode,
+            scores: resetScores,
+            currentTurnIndex: 0,
+            currentTurnPlayerId: null, // Will be set on next getGameState
+            'lastAction/type': 'mode_change',
+            'lastAction/timestamp': Date.now()
+        });
+    }
+
     // Set game over state
     async setGameOver() {
         await update(this.gameRef, {

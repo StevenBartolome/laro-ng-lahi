@@ -655,3 +655,183 @@ h3 {
   background: linear-gradient(135deg, #a1887f 0%, #5d4037 100%);
   color: #fff;
 }
+
+/* ========================================
+   SETTINGS OVERLAY
+   ======================================== */
+
+.settings-content {
+  max-width: 500px !important;
+  padding: 2rem !important;
+}
+
+.settings-title {
+  text-align: center;
+  font-family: var(--font-heading);
+  font-size: 2rem;
+  color: var(--secondary-color);
+  margin-bottom: 1.5rem;
+}
+
+.settings-section {
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 15px;
+}
+
+.settings-section h3 {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: var(--secondary-color);
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.host-only-badge {
+  font-size: 0.7rem;
+  background: rgba(255, 193, 7, 0.3);
+  color: #FFC107;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 5px;
+}
+
+.current-mode-display {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.3), rgba(46, 125, 50, 0.3));
+  border: 2px solid #4CAF50;
+  border-radius: 15px;
+  font-size: 1.2rem;
+  font-weight: 600;
+  color: white;
+}
+
+.current-mode-display .mode-icon {
+  font-size: 1.5rem;
+}
+
+.mode-options-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.settings-mode-btn {
+  padding: 12px 15px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.2);
+  border-radius: 10px;
+  color: white;
+  font-family: var(--font-body);
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-mode-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: var(--secondary-color);
+  transform: scale(1.02);
+}
+
+.settings-mode-btn.active {
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.5), rgba(46, 125, 50, 0.5));
+  border-color: #4CAF50;
+}
+
+.settings-mode-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.leave-lobby-section {
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-leave-lobby {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 100%);
+  border: 2px solid #e74c3c;
+  border-radius: 50px;
+  color: white;
+  font-family: var(--font-heading);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-leave-lobby:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* Confirmation Dialog */
+.confirm-content {
+  max-width: 400px !important;
+  text-align: center;
+  padding: 2rem !important;
+}
+
+.confirm-content h3 {
+  font-family: var(--font-heading);
+  font-size: 1.5rem;
+  color: var(--secondary-color);
+  margin-bottom: 1rem;
+}
+
+.confirm-content p {
+  color: #d7ccc8;
+  margin-bottom: 1.5rem;
+  font-size: 1.1rem;
+}
+
+.confirm-buttons {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+}
+
+.btn-confirm-yes {
+  padding: 12px 40px;
+  background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
+  border: none;
+  border-radius: 50px;
+  color: white;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirm-yes:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(76, 175, 80, 0.4);
+}
+
+.btn-confirm-no {
+  padding: 12px 40px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 50px;
+  color: white;
+  font-family: var(--font-heading);
+  font-size: 1rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-confirm-no:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: white;
+}
