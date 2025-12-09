@@ -49,6 +49,23 @@
 }
 
 /* Icon Buttons */
+.ui-icon-btn {
+  background: rgba(62, 39, 35, 0.85); /* Dark brown to match stat-box */
+  border: 2px solid #8d6e63;
+  cursor: pointer;
+  width: 45px;
+  height: 45px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: all 0.3s ease;
+  padding: 8px;
+  color: #ffecb3;
+  backdrop-filter: blur(5px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
 .ui-icon-btn:hover {
   transform: scale(1.1) rotate(20deg);
   background: var(--accent-color);

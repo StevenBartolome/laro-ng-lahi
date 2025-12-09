@@ -313,6 +313,27 @@ h3 {
   50% { transform: translateY(-10px); }
 }
 
+/* Particle Effect */
+.facts-container {
+    position: relative;
+}
+
+.particle {
+    position: absolute;
+    background: radial-gradient(circle, #fff, transparent);
+    border-radius: 50%;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 4;
+    animation: particleFloat 3s linear infinite;
+}
+
+@keyframes particleFloat {
+    0% { transform: translateY(0) scale(0); opacity: 0; }
+    50% { opacity: 0.8; }
+    100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
+
 /* Modal Overlay (Game Over) */
 .modal-overlay {
   display: none;
