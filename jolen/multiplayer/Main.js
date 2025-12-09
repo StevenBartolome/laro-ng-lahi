@@ -493,6 +493,9 @@ class MultiplayerJolen {
 
         console.log('✓ Setup complete for mode:', mode, '- created', this.modeState.length, 'targets');
 
+        // Update UI immediately for host
+        this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
+
         // Sync to Firebase (this will update gameState.selectedMode)
         await this.firebaseSync.setSelectedMode(mode);
 
@@ -843,6 +846,38 @@ class MultiplayerJolen {
                 true,  // isPlayer = true
                 playerIndex  // Player index for correct marble image (0-5)
             );
+
+            // Draw player name tag above marble
+            this.ctx.save();
+            const nameTag = player.name;
+            const isCurrentUser = player.id === this.userId;
+
+            // Background for name tag
+            this.ctx.font = "bold 12px Arial";
+            const textWidth = this.ctx.measureText(nameTag).width;
+            const tagPadding = 4;
+            const tagX = marble.x - textWidth / 2 - tagPadding;
+            const tagY = marble.y - marble.radius - 20;
+
+            // Draw background pill
+            this.ctx.fillStyle = isCurrentTurnPlayer ? "rgba(76, 175, 80, 0.85)" : "rgba(62, 39, 35, 0.85)";
+            this.ctx.beginPath();
+            this.ctx.roundRect(tagX, tagY - 10, textWidth + tagPadding * 2, 16, 8);
+            this.ctx.fill();
+
+            // Draw border for current user
+            if (isCurrentUser) {
+                this.ctx.strokeStyle = "#FFD700";
+                this.ctx.lineWidth = 2;
+                this.ctx.stroke();
+            }
+
+            // Draw name text
+            this.ctx.fillStyle = "white";
+            this.ctx.textAlign = "center";
+            this.ctx.textBaseline = "middle";
+            this.ctx.fillText(nameTag, marble.x, tagY - 2);
+            this.ctx.restore();
         });
 
         // Draw drag line
