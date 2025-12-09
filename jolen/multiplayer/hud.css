@@ -50,7 +50,8 @@
 
 /* Icon Buttons */
 .ui-icon-btn {
-  background: rgba(62, 39, 35, 0.85); /* Dark brown to match stat-box */
+  background: rgba(62, 39, 35, 0.85);
+  /* Dark brown to match stat-box */
   border: 2px solid #8d6e63;
   cursor: pointer;
   width: 45px;
@@ -134,13 +135,14 @@ canvas {
 .info-fab.facts-btn {
   bottom: 100px;
   background: linear-gradient(135deg, #8d6e63, #5d4037);
-  color: white; /* Ensure consistent text/icon color */
+  color: white;
+  /* Ensure consistent text/icon color */
 }
 
 .info-fab.facts-btn img {
   width: 70%;
   height: auto;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
 }
 
 /* Floating Instructions */
@@ -185,139 +187,168 @@ canvas {
   font-size: 0.85rem;
   line-height: 1.4;
 }
+
 /* ========================================
    MULTIPLAYER-SPECIFIC HUD ELEMENTS
    ======================================== */
 
 /* Turn Indicator */
 .turn-indicator {
-    position: fixed;
-    top: 80px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(62, 39, 35, 0.9);
-    border: 2px solid var(--secondary-color);
-    color: var(--secondary-color);
-    padding: 15px 30px;
-    border-radius: 50px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    z-index: 100;
-    font-family: var(--font-heading);
-    font-size: 20px;
-    text-align: center;
-    backdrop-filter: blur(5px);
+  position: fixed;
+  top: 80px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(62, 39, 35, 0.6);
+  /* More transparent */
+  border: 2px solid var(--secondary-color);
+  color: var(--secondary-color);
+  padding: 15px 30px;
+  border-radius: 50px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  z-index: 100;
+  font-family: var(--font-heading);
+  font-size: 20px;
+  text-align: center;
+  backdrop-filter: blur(5px);
+  pointer-events: none;
+  /* Allow clicks to pass through */
 }
 
 .turn-indicator.your-turn {
-    background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
-    color: white;
-    border-color: #81c784;
-    animation: pulse 2s ease-in-out infinite;
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.7) 0%, rgba(46, 125, 50, 0.7) 100%);
+  /* More transparent */
+  color: white;
+  border-color: #81c784;
+  animation: pulse 2s ease-in-out infinite;
 }
 
 @keyframes pulse {
-    0%, 100% { transform: translateX(-50%) scale(1); }
-    50% { transform: translateX(-50%) scale(1.05); }
+
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+  }
+
+  50% {
+    transform: translateX(-50%) scale(1.05);
+  }
+}
+
+@keyframes pulse-left {
+
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.05);
+  }
 }
 
 @keyframes pulse-fast {
-    0%, 100% {
-        transform: translateX(-50%) scale(1);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-    }
-    50% {
-        transform: translateX(-50%) scale(1.08);
-        box-shadow: 0 6px 25px rgba(245, 87, 108, 0.5);
-    }
+
+  0%,
+  100% {
+    transform: translateX(-50%) scale(1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+  }
+
+  50% {
+    transform: translateX(-50%) scale(1.08);
+    box-shadow: 0 6px 25px rgba(245, 87, 108, 0.5);
+  }
 }
 
 /* Players Panel */
 .players-panel {
-    position: fixed;
-    top: 160px;
-    right: 20px;
-    background: var(--panel-bg);
-    border: var(--panel-border);
-    backdrop-filter: blur(10px);
-    border-radius: 15px;
-    padding: 20px;
-    min-width: 250px;
-    max-width: 300px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-    z-index: 90;
+  position: fixed;
+  top: 160px;
+  right: 20px;
+  background: var(--panel-bg);
+  border: var(--panel-border);
+  backdrop-filter: blur(10px);
+  border-radius: 15px;
+  padding: 20px;
+  min-width: 250px;
+  max-width: 300px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+  z-index: 90;
+  pointer-events: none;
+  /* Allow clicks to pass through */
 }
 
 .players-panel h3 {
-    margin: 0 0 15px 0;
-    font-family: var(--font-heading);
-    color: var(--secondary-color);
-    font-size: 18px;
-    text-align: center;
-    border-bottom: 1px solid rgba(255, 236, 179, 0.2);
-    padding-bottom: 10px;
+  margin: 0 0 15px 0;
+  font-family: var(--font-heading);
+  color: var(--secondary-color);
+  font-size: 18px;
+  text-align: center;
+  border-bottom: 1px solid rgba(255, 236, 179, 0.2);
+  padding-bottom: 10px;
 }
 
 .players-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .player-item {
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    padding: 12px 15px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    transition: all 0.3s ease;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 12px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s ease;
 }
 
 .player-item.active-turn {
-    background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(46, 125, 50, 0.3) 100%);
-    border: 1px solid #4CAF50;
-    transform: scale(1.02);
+  background: linear-gradient(135deg, rgba(76, 175, 80, 0.2) 0%, rgba(46, 125, 50, 0.3) 100%);
+  border: 1px solid #4CAF50;
+  transform: scale(1.02);
 }
 
 .player-item.current-user {
-    border: 2px solid #4CAF50;
+  border: 2px solid #4CAF50;
 }
 
 .player-name {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 600;
-    color: white;
-    font-size: 14px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 600;
+  color: white;
+  font-size: 14px;
 }
 
 .player-score {
-    font-family: 'Poppins', sans-serif;
-    font-weight: 800;
-    color: #FFD700;
-    font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 800;
+  color: #FFD700;
+  font-size: 16px;
 }
 
 .player-badge {
-    background: rgba(255, 215, 0, 0.3);
-    color: #FFD700;
-    padding: 2px 8px;
-    border-radius: 5px;
-    font-size: 10px;
-    font-weight: 600;
-    margin-left: 5px;
+  background: rgba(255, 215, 0, 0.3);
+  color: #FFD700;
+  padding: 2px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-left: 5px;
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-    .players-panel {
-        top: 140px;
-        right: 10px;
-        min-width: 200px;
-        padding: 15px;
-    }
+  .players-panel {
+    top: 140px;
+    right: 10px;
+    min-width: 200px;
+    padding: 15px;
+  }
 
-    .turn-indicator {
-        font-size: 16px;
-        padding: 10px 20px;
-    }
+  .turn-indicator {
+    font-size: 16px;
+    padding: 10px 20px;
+  }
 }

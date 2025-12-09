@@ -4,7 +4,7 @@
   --secondary-color: #ffecb3;
   --accent-color: #5d4037;
   --bg-gradient: linear-gradient(135deg, #3e2723 0%, #5d4037 50%, #8f6345 100%);
-  --panel-bg: rgba(62, 39, 35, 0.6);
+  --panel-bg: rgba(62, 39, 35, 0.4);
   --panel-border: 1px solid rgba(255, 236, 179, 0.2);
   --text-color: #ffffff;
   --font-heading: "Fredoka One", cursive;
@@ -128,6 +128,7 @@ body {
     opacity: 0;
     transform: translateY(10px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -135,9 +136,17 @@ body {
 }
 
 @keyframes float {
-  0% { transform: translateY(0px); }
-  50% { transform: translateY(-10px); }
-  100% { transform: translateY(0px); }
+  0% {
+    transform: translateY(0px);
+  }
+
+  50% {
+    transform: translateY(-10px);
+  }
+
+  100% {
+    transform: translateY(0px);
+  }
 }
 
 h1 {
@@ -158,22 +167,28 @@ h1 {
   text-transform: uppercase;
   color: #d7ccc8;
 }
+
 /* ========================================
    MULTIPLAYER-SPECIFIC STYLES
    ======================================== */
 
 /* Spinner Animation */
 @keyframes spin {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
 
 .spinner {
-    border: 4px solid rgba(255, 255, 255, 0.3);
-    border-top: 4px solid #fff;
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    animation: spin 1s linear infinite;
-    margin: 0 auto;
+  border: 4px solid rgba(255, 255, 255, 0.3);
+  border-top: 4px solid #fff;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto;
 }
