@@ -49,7 +49,7 @@
 }
 
 /* Floating Action Buttons */
-.info-fab, .facts-btn {
+.info-fab {
     position: fixed;
     width: 60px;
     height: 60px;
@@ -78,7 +78,7 @@
     background: linear-gradient(135deg, #9b59b6, #8e44ad);
 }
 
-.info-fab:hover, .facts-btn:hover {
+.info-fab:hover {
     transform: scale(1.1) rotate(10deg);
     box-shadow: 0 8px 25px rgba(0,0,0,0.4);
 }
