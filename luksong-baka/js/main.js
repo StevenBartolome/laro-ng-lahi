@@ -170,16 +170,19 @@ const Game = {
         // Store difficulty for later checks
         GameState.difficulty = difficulty;
         
-        // Set angle speed based on difficulty
+        // Set angle speed and speed multiplier based on difficulty
         switch (difficulty) {
             case 'easy':
-                GameState.angleSpeed = 1;
+                GameState.angleSpeed = 3.5;
+                GameState.difficultyMultiplier = 1.0;
                 break;
             case 'normal':
-                GameState.angleSpeed = 2;
+                GameState.angleSpeed = 4.5;
+                GameState.difficultyMultiplier = 1.2;
                 break;
             case 'hard':
-                GameState.angleSpeed = 4;
+                GameState.angleSpeed = 6;
+                GameState.difficultyMultiplier = 1.5;
                 break;
         }
         
