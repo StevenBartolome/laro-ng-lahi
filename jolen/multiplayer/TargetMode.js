@@ -88,25 +88,23 @@ export function update(
         const playerMarble = playerMarbles[playerId];
 
         targets.forEach((target) => {
-            // Check collision with ALL on-screen targets (hit or not)
-            // checkMarbleCollision applies physics changes
-            if (!target.offScreen && checkMarbleCollision(playerMarble, target)) {
-                // If this is the FIRST time it's hit, apply scoring
-                if (!target.hit) {
-                    target.hit = true;
-                    target.hitDelay = 15; // Keep visible for ~15 frames (0.25s) to show the bounce
+            // Only check collision with unhit, on-screen targets
+            // Once a target is hit, it becomes non-interactive (ghost-like)
+            if (target.hit || target.offScreen) {
+                return; // Skip this target
+            }
 
-                    // Only count this hit if it's the current player's marble
-                    if (playerId === currentPlayerId) {
-                        hitCount++;
-                        scoreIncrease += 10;
-                    }
-                    Sound.playHit();
-                } else {
-                    // Optional: Play a quieter sound for subsequent hits?
-                    // For now, just play the hit sound to confirm collision
-                    Sound.playHit();
+            if (checkMarbleCollision(playerMarble, target)) {
+                // Mark as hit on first collision
+                target.hit = true;
+                target.hitDelay = 5; // Keep visible for ~5 frames to show the bounce
+
+                // Only count this hit if it's the current player's marble
+                if (playerId === currentPlayerId) {
+                    hitCount++;
+                    scoreIncrease += 10;
                 }
+                Sound.playHit();
             }
         });
     });
@@ -127,12 +125,17 @@ export function update(
     }
 
     // Check collisions between targets (Target <-> Target)
+    // Only check collisions between UNHIT targets to avoid chain reactions
     for (let i = 0; i < targets.length; i++) {
         for (let j = i + 1; j < targets.length; j++) {
-            if (!targets[i].offScreen && !targets[j].offScreen) {
-                if (checkMarbleCollision(targets[i], targets[j])) {
-                    Sound.playHit();
-                }
+            // Skip if either target is hit or off-screen
+            if (targets[i].hit || targets[j].hit ||
+                targets[i].offScreen || targets[j].offScreen) {
+                continue;
+            }
+
+            if (checkMarbleCollision(targets[i], targets[j])) {
+                Sound.playHit();
             }
         }
     }
