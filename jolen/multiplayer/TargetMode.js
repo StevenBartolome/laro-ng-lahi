@@ -8,9 +8,9 @@ import {
 } from "./Common.js";
 import Sound from "../js/Sound.js";
 
-export function setup(level, canvasWidth, canvasHeight) {
+export function setup(targetCount, canvasWidth, canvasHeight) {
     const targets = [];
-    const numTargets = level + 3;
+    const numTargets = targetCount; // Use targetCount directly (6-10)
     const margin = 80;
     const usableWidth = canvasWidth - 2 * margin;
     const usableHeight = canvasHeight / 2 - margin;
@@ -49,7 +49,8 @@ export function setup(level, canvasWidth, canvasHeight) {
 }
 
 export function update(
-    playerMarble,
+    playerMarbles,
+    currentPlayerId,
     targets,
     score,
     canvasWidth,
@@ -57,6 +58,7 @@ export function update(
 ) {
     let scoreIncrease = 0;
     let anyMoving = false;
+    let hitCount = 0; // Track number of targets hit by current player this turn
 
     // Update ALL target marbles physics (including hit ones that are moving)
     targets.forEach((target) => {
@@ -74,15 +76,40 @@ export function update(
         }
     });
 
-    // Hit targets directly (Player -> Target)
-    // checkMarbleCollision automatically applies physics!
-    targets.forEach((target) => {
-        if (!target.hit && checkMarbleCollision(playerMarble, target)) {
-            target.hit = true;
-            scoreIncrease += 10;
-            Sound.playHit();
-        }
+    // Check collisions: Player Marbles -> Targets
+    // All player marbles can hit targets, but only current player gets credit
+    Object.keys(playerMarbles).forEach(playerId => {
+        const playerMarble = playerMarbles[playerId];
+
+        targets.forEach((target) => {
+            if (!target.hit && checkMarbleCollision(playerMarble, target)) {
+                target.hit = true;
+
+                // Only count this hit if it's the current player's marble
+                if (playerId === currentPlayerId) {
+                    hitCount++;
+                    scoreIncrease += 10;
+                }
+
+                Sound.playHit();
+            }
+        });
     });
+
+    // Check collisions: Player Marbles <-> Player Marbles
+    // Players' marbles bounce off each other but don't disappear
+    const playerIds = Object.keys(playerMarbles);
+    for (let i = 0; i < playerIds.length; i++) {
+        for (let j = i + 1; j < playerIds.length; j++) {
+            const marble1 = playerMarbles[playerIds[i]];
+            const marble2 = playerMarbles[playerIds[j]];
+
+            if (checkMarbleCollision(marble1, marble2)) {
+                Sound.playHit();
+                // checkMarbleCollision already applies physics, so they bounce
+            }
+        }
+    }
 
     // Check collisions between targets (Target <-> Target)
     for (let i = 0; i < targets.length; i++) {
@@ -95,13 +122,13 @@ export function update(
         }
     }
 
-    return { scoreIncrease, anyMoving };
+    return { scoreIncrease, anyMoving, hitCount };
 }
 
 export function draw(ctx, targets) {
     targets.forEach((target) => {
-        // Only draw targets that haven't moved off screen
-        if (!target.offScreen) {
+        // Only draw targets that haven't been hit
+        if (!target.hit) {
             drawMarble(ctx, target, false, false);
         }
     });

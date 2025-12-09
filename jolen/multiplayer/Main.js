@@ -48,21 +48,13 @@ class MultiplayerJolen {
         this.gameMode = "target";
         this.currentModeModule = TargetMode;
         this.modeState = null;
-        this.level = 1;
+        this.targetCount = 6; // Number of targets (6-10)
         this.scores = {};
-        this.gameState = "idle"; // idle, dragging, shooting, waiting, levelComplete, gameOver
+        this.gameState = "idle"; // idle, dragging, shooting, waiting, gameOver
 
-        // Marble
+        // Marble - now tracking all player marbles
         this.startingPosition = { x: this.canvas.width / 2, y: this.canvas.height - 100 };
-        this.playerMarble = {
-            x: this.startingPosition.x,
-            y: this.startingPosition.y,
-            radius: MARBLE_RADIUS,
-            vx: 0,
-            vy: 0,
-            color: PLAYER_COLOR,
-            isMoving: false,
-        };
+        this.playerMarbles = {}; // Object storing all players' marbles by playerId
 
         // Input
         this.isDragging = false;
@@ -75,13 +67,16 @@ class MultiplayerJolen {
         this.message = "";
         this.messageTimer = 0;
 
+        // Turn tracking
+        this.currentTurnHitCount = 0; // Track hits in current turn
+
         // Sync state
         this.lastSyncedState = null;
         this.isWaitingForSync = false;
 
         // Mode selection
         this.modeSelection = new ModeSelection();
-        this.modeSelection.onModeSelected = (mode) => this.onHostSelectMode(mode);
+        this.modeSelection.onModeSelected = (mode, targetCount) => this.onHostSelectMode(mode, targetCount);
 
         this.init();
     }
@@ -249,17 +244,46 @@ class MultiplayerJolen {
         console.log('🎯 Host initializing game...');
 
         const playerIds = this.players.map(p => p.id);
-        await this.firebaseSync.initializeGame(playerIds, this.gameMode, 'normal');
+        await this.firebaseSync.initializeGame(playerIds, this.gameMode, this.targetCount);
 
-        console.log('✓ Game initialized, setting up first level...');
+        console.log('✓ Game initialized with', this.targetCount, 'targets');
 
-        // Setup the first level immediately
-        this.modeState = this.currentModeModule.setup(this.level, this.canvas.width, this.canvas.height);
-        console.log('✓ Level 1 targets created:', this.modeState.length, 'targets');
+        // Setup targets based on targetCount
+        this.modeState = this.currentModeModule.setup(this.targetCount, this.canvas.width, this.canvas.height);
+        console.log('✓ Targets created:', this.modeState.length, 'targets');
 
-        // Sync the mode state to Firebase
+        // Initialize player marbles for all players
+        this.players.forEach((player, index) => {
+            this.playerMarbles[player.id] = {
+                x: this.startingPosition.x,
+                y: this.startingPosition.y,
+                radius: MARBLE_RADIUS,
+                vx: 0,
+                vy: 0,
+                color: PLAYER_COLOR,
+                isMoving: false
+            };
+        });
+
+        // Sync the mode state and player marbles to Firebase
         await this.firebaseSync.updateModeState(this.modeState);
-        console.log('✓ Mode state synced to Firebase');
+        await this.firebaseSync.updateAllPlayerMarbles(this.getPlayerMarblesForSync());
+        console.log('✓ Mode state and player marbles synced to Firebase');
+    }
+
+    // Helper to get player marbles data for Firebase sync (without extra properties)
+    getPlayerMarblesForSync() {
+        const syncData = {};
+        Object.keys(this.playerMarbles).forEach(playerId => {
+            const marble = this.playerMarbles[playerId];
+            syncData[playerId] = {
+                x: marble.x,
+                y: marble.y,
+                vx: marble.vx,
+                vy: marble.vy
+            };
+        });
+        return syncData;
     }
 
     setupFirebaseListeners() {
@@ -337,10 +361,10 @@ class MultiplayerJolen {
             }
         }
 
-        // Update level
-        if (gameState.level !== this.level) {
-            this.level = gameState.level;
-            this.ui.updateLevel(this.level);
+        // Update targetCount
+        if (gameState.targetCount !== this.targetCount) {
+            this.targetCount = gameState.targetCount || 6;
+            this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
         }
 
         // Update mode
@@ -365,7 +389,13 @@ class MultiplayerJolen {
             // Reset for new turn
             if (this.isMyTurn) {
                 this.gameState = "idle";
-                this.resetPlayerMarble();
+                this.currentTurnHitCount = 0; // Reset hit counter for new turn
+                // Only reset velocity for current player's marble, keep position
+                if (this.playerMarbles[this.userId]) {
+                    this.playerMarbles[this.userId].vx = 0;
+                    this.playerMarbles[this.userId].vy = 0;
+                    this.playerMarbles[this.userId].isMoving = false;
+                }
             } else {
                 this.gameState = "waiting";
             }
@@ -391,21 +421,35 @@ class MultiplayerJolen {
         }
 
         // Sync marble position and velocity
-        if (gameState.playerMarble) {
-            if (!this.isMyTurn) {
-                // Spectators receive marble updates
-                this.playerMarble.x = gameState.playerMarble.x;
-                this.playerMarble.y = gameState.playerMarble.y;
-                this.playerMarble.vx = gameState.playerMarble.vx || 0;
-                this.playerMarble.vy = gameState.playerMarble.vy || 0;
+        if (gameState.playerMarbles) {
+            // Update all player marbles from Firebase
+            Object.keys(gameState.playerMarbles).forEach(playerId => {
+                if (!this.playerMarbles[playerId]) {
+                    // Initialize if doesn't exist
+                    this.playerMarbles[playerId] = {
+                        x: 0,
+                        y: 0,
+                        radius: MARBLE_RADIUS,
+                        vx: 0,
+                        vy: 0,
+                        color: PLAYER_COLOR,
+                        isMoving: false
+                    };
+                }
 
-                // If marble has velocity, spectators should watch it move
-                const hasVelocity = Math.abs(this.playerMarble.vx) > 0.1 || Math.abs(this.playerMarble.vy) > 0.1;
-                if (hasVelocity && this.gameState !== "shooting") {
+                const fbMarble = gameState.playerMarbles[playerId];
+                this.playerMarbles[playerId].x = fbMarble.x;
+                this.playerMarbles[playerId].y = fbMarble.y;
+                this.playerMarbles[playerId].vx = fbMarble.vx || 0;
+                this.playerMarbles[playerId].vy = fbMarble.vy || 0;
+
+                // Check if any marble has velocity (for spectating)
+                const hasVelocity = Math.abs(fbMarble.vx) > 0.1 || Math.abs(fbMarble.vy) > 0.1;
+                if (hasVelocity && this.gameState !== "shooting" && !this.isMyTurn) {
                     console.log('📺 Spectating marble movement...');
                     this.gameState = "shooting";
                 }
-            }
+            });
         }
 
 
@@ -416,25 +460,21 @@ class MultiplayerJolen {
     }
 
 
-    // Host selects mode and starts game
-    async onHostSelectMode(mode) {
+    // Host selects mode and target count, then starts game
+    async onHostSelectMode(mode, targetCount) {
         if (!this.isHost) return;
 
-        console.log('🎯 Host selected mode:', mode);
+        console.log('🎯 Host selected mode:', mode, 'with', targetCount, 'targets');
 
-        // Set local game mode FIRST
+        // Set local game mode and target count FIRST
         this.gameMode = mode;
+        this.targetCount = targetCount;
         this.setGameMode(mode);
 
-        // NOW setup the level with the correct mode
-        this.modeState = this.currentModeModule.setup(this.level, this.canvas.width, this.canvas.height);
+        // NOW setup targets with the correct count
+        this.modeState = this.currentModeModule.setup(this.targetCount, this.canvas.width, this.canvas.height);
 
-        // Log based on mode state type
-        if (Array.isArray(this.modeState)) {
-            console.log('✓ Level 1 setup for mode:', mode, '- created', this.modeState.length, 'objects');
-        } else {
-            console.log('✓ Level 1 setup for mode:', mode, '- state initialized');
-        }
+        console.log('✓ Setup complete for mode:', mode, '- created', this.modeState.length, 'targets');
 
         // Sync to Firebase (this will update gameState.selectedMode)
         await this.firebaseSync.setSelectedMode(mode);
@@ -446,15 +486,15 @@ class MultiplayerJolen {
         // Hide mode selection
         this.modeSelection.hide();
 
-        // Start the game with the selected mode
-        await this.firebaseSync.startGameWithMode(mode);
+        // Start the game with the selected mode and target count
+        await this.firebaseSync.startGameWithMode(mode, targetCount);
     }
 
-    setupLevel() {
-        // Only host initializes level
+    setupTargets() {
+        // Only host initializes targets
         if (!this.isHost) return;
 
-        this.modeState = this.currentModeModule.setup(this.level, this.canvas.width, this.canvas.height);
+        this.modeState = this.currentModeModule.setup(this.targetCount, this.canvas.width, this.canvas.height);
         this.firebaseSync.updateModeState(this.modeState);
     }
 
@@ -483,11 +523,34 @@ class MultiplayerJolen {
     }
 
     resetPlayerMarble() {
-        this.playerMarble.x = this.startingPosition.x;
-        this.playerMarble.y = this.startingPosition.y;
-        this.playerMarble.vx = 0;
-        this.playerMarble.vy = 0;
-        this.playerMarble.isMoving = false;
+        // Only reset velocity for current player's marble, preserve position
+        if (this.playerMarbles[this.userId]) {
+            this.playerMarbles[this.userId].vx = 0;
+            this.playerMarbles[this.userId].vy = 0;
+            this.playerMarbles[this.userId].isMoving = false;
+        }
+    }
+
+    resetPlayerMarblePosition() {
+        // Full reset including position for current player (for level start)
+        if (this.playerMarbles[this.userId]) {
+            this.playerMarbles[this.userId].x = this.startingPosition.x;
+            this.playerMarbles[this.userId].y = this.startingPosition.y;
+            this.playerMarbles[this.userId].vx = 0;
+            this.playerMarbles[this.userId].vy = 0;
+            this.playerMarbles[this.userId].isMoving = false;
+        }
+    }
+
+    resetAllPlayerMarbles() {
+        // Reset all players' marbles to starting position (level complete)
+        Object.keys(this.playerMarbles).forEach(playerId => {
+            this.playerMarbles[playerId].x = this.startingPosition.x;
+            this.playerMarbles[playerId].y = this.startingPosition.y;
+            this.playerMarbles[playerId].vx = 0;
+            this.playerMarbles[playerId].vy = 0;
+            this.playerMarbles[playerId].isMoving = false;
+        });
     }
 
     // Input handlers
@@ -502,10 +565,14 @@ class MultiplayerJolen {
     }
 
     isMouseOnMarble(mouseX, mouseY) {
-        const dx = mouseX - this.playerMarble.x;
-        const dy = mouseY - this.playerMarble.y;
+        // Check if mouse is on current player's marble
+        if (!this.playerMarbles[this.userId]) return false;
+
+        const marble = this.playerMarbles[this.userId];
+        const dx = mouseX - marble.x;
+        const dy = mouseY - marble.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
-        return distance <= this.playerMarble.radius + 10;
+        return distance <= marble.radius + 10;
     }
 
     handleMouseDown(e) {
@@ -531,9 +598,11 @@ class MultiplayerJolen {
 
     async handleMouseUp(e) {
         if (!this.isDragging || this.gameState !== "dragging" || !this.isMyTurn) return;
+        if (!this.playerMarbles[this.userId]) return;
 
-        const dx = this.dragCurrentX - this.playerMarble.x;
-        const dy = this.dragCurrentY - this.playerMarble.y;
+        const marble = this.playerMarbles[this.userId];
+        const dx = this.dragCurrentX - marble.x;
+        const dy = this.dragCurrentY - marble.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
 
         if (distance > 5) {
@@ -541,17 +610,17 @@ class MultiplayerJolen {
             const power = clampedDistance * POWER_MULTIPLIER;
             const angle = Math.atan2(-dy, -dx);
 
-            this.playerMarble.vx = Math.cos(angle) * power;
-            this.playerMarble.vy = Math.sin(angle) * power;
-            this.playerMarble.isMoving = true;
+            marble.vx = Math.cos(angle) * power;
+            marble.vy = Math.sin(angle) * power;
+            marble.isMoving = true;
             this.gameState = "shooting";
 
             // Sync marble state
-            await this.firebaseSync.updateMarble({
-                x: this.playerMarble.x,
-                y: this.playerMarble.y,
-                vx: this.playerMarble.vx,
-                vy: this.playerMarble.vy
+            await this.firebaseSync.updatePlayerMarble(this.userId, {
+                x: marble.x,
+                y: marble.y,
+                vx: marble.vx,
+                vy: marble.vy
             });
         } else {
             this.gameState = "idle";
@@ -562,20 +631,22 @@ class MultiplayerJolen {
 
     // Game loop
     update() {
-        // Update physics for EVERYONE when marble is moving
-        // Active player controls, others spectate
+        // Update physics for ALL player marbles when in shooting state
         if (this.gameState === "shooting") {
             let anyMoving = false;
 
-            // Update player marble physics (all players see this)
-            if (updateMarble(this.playerMarble, this.canvas.width, this.canvas.height)) {
-                anyMoving = true;
-            }
+            //Update all player marbles' physics
+            Object.values(this.playerMarbles).forEach(marble => {
+                if (updateMarble(marble, this.canvas.width, this.canvas.height)) {
+                    anyMoving = true;
+                }
+            });
 
             // Update mode logic (targets, collisions, etc.)
             if (this.modeState) {
                 const result = this.currentModeModule.update(
-                    this.playerMarble,
+                    this.playerMarbles,
+                    this.currentTurnPlayerId,
                     this.modeState,
                     this.scores[this.currentTurnPlayerId] || 0,
                     this.canvas.width,
@@ -586,6 +657,11 @@ class MultiplayerJolen {
 
                 // Only active player updates scores and syncs
                 if (this.isMyTurn) {
+                    // Track hits in this turn
+                    if (result.hitCount) {
+                        this.currentTurnHitCount += result.hitCount;
+                    }
+
                     if (result.scoreIncrease) {
                         const newScore = (this.scores[this.userId] || 0) + result.scoreIncrease;
                         this.scores[this.userId] = newScore;
@@ -593,7 +669,6 @@ class MultiplayerJolen {
                     }
 
                     // Sync mode state changes (on score change OR if things are moving)
-                    // We sync periodically if moving so spectators see targets fly
                     if (result.scoreIncrease || (anyMoving && this.syncCounter % 5 === 0)) {
                         this.firebaseSync.updateModeState(this.modeState);
                     }
@@ -602,19 +677,14 @@ class MultiplayerJolen {
                     if (!this.syncCounter) this.syncCounter = 0;
                     this.syncCounter++;
                     if (this.syncCounter % 5 === 0 && anyMoving) {
-                        this.firebaseSync.updateMarble({
-                            x: this.playerMarble.x,
-                            y: this.playerMarble.y,
-                            vx: this.playerMarble.vx,
-                            vy: this.playerMarble.vy
-                        });
+                        this.firebaseSync.updateAllPlayerMarbles(this.getPlayerMarblesForSync());
                     }
                 }
             }
 
-            // Check if turn is over (only active player)
+            // Check if game is over (only active player)
             if (!anyMoving && this.isMyTurn) {
-                this.checkLevelComplete();
+                this.checkGameOver();
             }
         }
 
@@ -632,38 +702,73 @@ class MultiplayerJolen {
         requestAnimationFrame(() => this.update());
     }
 
-    async checkLevelComplete() {
+    async checkGameOver() {
         if (!this.modeState) return;
 
-        const levelComplete = this.currentModeModule.checkLevelComplete(this.modeState);
+        const allTargetsHit = this.currentModeModule.checkLevelComplete(this.modeState);
 
-        if (levelComplete) {
-            this.message = "Level Complete!";
-            this.messageTimer = 90;
+        if (allTargetsHit) {
+            // Game is over! Determine winner
+            console.log('🏆 All targets hit! Game over!');
 
             if (this.isHost) {
-                // Advance level
-                const newLevel = this.level + 1;
+                // Determine winner
+                const winner = this.determineWinner();
+                console.log('🏆 Winner:', winner.name, 'with score:', winner.score);
 
-                // Award bonus points
-                const updatedScores = { ...this.scores };
-                this.players.forEach(player => {
-                    updatedScores[player.id] = (updatedScores[player.id] || 0) + (100 * newLevel);
-                });
-
-                await this.firebaseSync.advanceLevel(newLevel, updatedScores);
-
-                // Setup new level
-                setTimeout(() => {
-                    this.setupLevel();
-                }, 1500);
+                // Set game to finished state
+                await this.firebaseSync.setGameOver();
             }
 
             this.gameState = "waiting";
+            this.currentTurnHitCount = 0;
         } else {
-            // Turn over, next player
-            await this.endTurn();
+            // Check if player hit any targets this turn
+            if (this.currentTurnHitCount > 0) {
+                // Player hit at least one target, keep their turn
+                console.log(`✓ Hit ${this.currentTurnHitCount} target(s)! Keep your turn.`);
+                this.message = `Hit ${this.currentTurnHitCount}! Shoot again!`;
+                this.messageTimer = 60;
+                this.currentTurnHitCount = 0; // Reset for next shot
+
+                // Update targets remaining display
+                this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
+
+                this.gameState = "idle"; // Allow shooting again
+            } else {
+                // Player missed all targets, end turn
+                console.log('✗ Missed! Turn over.');
+                this.message = "Missed!";
+                this.messageTimer = 60;
+                await this.endTurn();
+            }
         }
+    }
+
+    determineWinner() {
+        let maxScore = 0;
+        let winnerId = null;
+        let winnerName = "";
+
+        Object.entries(this.scores).forEach(([playerId, score]) => {
+            if (score > maxScore) {
+                maxScore = score;
+                winnerId = playerId;
+                winnerName = this.playerNames[playerId] || 'Unknown';
+            }
+        });
+
+        return {
+            id: winnerId,
+            name: winnerName,
+            score: maxScore,
+            allScores: { ...this.scores }
+        };
+    }
+
+    countRemainingTargets() {
+        if (!this.modeState || !Array.isArray(this.modeState)) return 0;
+        return this.modeState.filter(target => !target.hit).length;
     }
 
     async endTurn() {
@@ -697,17 +802,27 @@ class MultiplayerJolen {
             this.ctx.fillText("Waiting for game to start...", this.canvas.width / 2, this.canvas.height / 2);
         }
 
-        // Draw player marble (with correct color for current player)
-        const currentPlayerIndex = this.players.findIndex(p => p.id === this.currentTurnPlayerId);
-        const playerIndex = currentPlayerIndex >= 0 ? currentPlayerIndex : 0;
+        // Draw ALL player marbles (each with their own image)
+        this.players.forEach((player, playerIndex) => {
+            const marble = this.playerMarbles[player.id];
+            if (!marble) return;
 
-        drawMarble(
-            this.ctx,
-            this.playerMarble,
-            this.gameState === "idle" || this.gameState === "dragging",
-            true,
-            playerIndex  // Pass player index for correct marble color
-        );
+            // Check if this is the current turn player
+            const isCurrentTurnPlayer = player.id === this.currentTurnPlayerId;
+
+            // Glow effect for:
+            // 1. Current turn player when idle/dragging
+            // 2. Current user's marble when it's their turn and idle/dragging
+            const shouldGlow = isCurrentTurnPlayer && (this.gameState === "idle" || this.gameState === "dragging");
+
+            drawMarble(
+                this.ctx,
+                marble,
+                shouldGlow,
+                true,  // isPlayer = true
+                playerIndex  // Player index for correct marble image (0-5)
+            );
+        });
 
         // Draw drag line
         if (this.isDragging && this.gameState === "dragging") {
@@ -720,11 +835,13 @@ class MultiplayerJolen {
 
     drawDragLine() {
         if (!this.isDragging || this.gameState !== "dragging") return;
+        if (!this.playerMarbles[this.userId]) return;
 
+        const marble = this.playerMarbles[this.userId];
         this.ctx.save();
 
-        const dx = this.dragCurrentX - this.playerMarble.x;
-        const dy = this.dragCurrentY - this.playerMarble.y;
+        const dx = this.dragCurrentX - marble.x;
+        const dy = this.dragCurrentY - marble.y;
         const distance = Math.sqrt(dx * dx + dy * dy);
         const clampedDistance = Math.min(distance, MAX_DRAG_DISTANCE);
 
@@ -733,7 +850,7 @@ class MultiplayerJolen {
         this.ctx.lineWidth = 4;
         this.ctx.setLineDash([5, 5]);
         this.ctx.beginPath();
-        this.ctx.moveTo(this.playerMarble.x, this.playerMarble.y);
+        this.ctx.moveTo(marble.x, marble.y);
         this.ctx.lineTo(this.dragCurrentX, this.dragCurrentY);
         this.ctx.stroke();
         this.ctx.setLineDash([]);
@@ -741,14 +858,14 @@ class MultiplayerJolen {
         // Draw trajectory line
         const trajectoryLength = clampedDistance * 1.5;
         const shootAngle = Math.atan2(-dy, -dx);
-        const endX = this.playerMarble.x + Math.cos(shootAngle) * trajectoryLength;
-        const endY = this.playerMarble.y + Math.sin(shootAngle) * trajectoryLength;
+        const endX = marble.x + Math.cos(shootAngle) * trajectoryLength;
+        const endY = marble.y + Math.sin(shootAngle) * trajectoryLength;
 
         this.ctx.strokeStyle = "rgba(255, 200, 0, 0.8)";
         this.ctx.lineWidth = 3;
         this.ctx.setLineDash([10, 5]);
         this.ctx.beginPath();
-        this.ctx.moveTo(this.playerMarble.x, this.playerMarble.y);
+        this.ctx.moveTo(marble.x, marble.y);
         this.ctx.lineTo(endX, endY);
         this.ctx.stroke();
         this.ctx.setLineDash([]);
@@ -775,9 +892,9 @@ class MultiplayerJolen {
         this.ctx.lineWidth = 4;
         this.ctx.beginPath();
         this.ctx.arc(
-            this.playerMarble.x,
-            this.playerMarble.y,
-            this.playerMarble.radius + 5,
+            marble.x,
+            marble.y,
+            marble.radius + 5,
             0,
             Math.PI * 2
         );
@@ -790,8 +907,8 @@ class MultiplayerJolen {
         this.ctx.textAlign = "center";
         this.ctx.textBaseline = "middle";
         const powerText = `${Math.round(powerPercent)}%`;
-        this.ctx.strokeText(powerText, this.playerMarble.x, this.playerMarble.y - 30);
-        this.ctx.fillText(powerText, this.playerMarble.x, this.playerMarble.y - 30);
+        this.ctx.strokeText(powerText, marble.x, marble.y - 30);
+        this.ctx.fillText(powerText, marble.x, marble.y - 30);
 
         this.ctx.restore();
     }

@@ -2,6 +2,7 @@
 export class ModeSelection {
     constructor() {
         this.selectedMode = 'target'; // Default mode
+        this.targetCount = 6; // Default target count (6-10)
         this.onModeSelected = null; // Callback when mode is confirmed
     }
 
@@ -10,6 +11,9 @@ export class ModeSelection {
         const modeScreen = document.getElementById('modeSelectionScreen');
         const hostMessage = document.getElementById('hostSelectionMessage');
         const startBtn = document.getElementById('startGameBtn');
+        const targetCountSelector = document.getElementById('targetCountSelector');
+        const targetCountInput = document.getElementById('targetCountInput');
+        const targetCountDisplay = document.querySelector('.target-count-display');
 
         modeScreen.classList.remove('hidden');
 
@@ -26,9 +30,17 @@ export class ModeSelection {
 
             hostMessage.textContent = 'Waiting for host to select mode...';
             startBtn.style.display = 'none';
+            targetCountSelector.style.display = 'none';
         } else {
-            // Host: can select mode
+            // Host: can select mode and target count
             hostMessage.textContent = 'Select a game mode to start';
+            targetCountSelector.style.display = 'flex';
+
+            // Handle target count input
+            targetCountInput.addEventListener('input', () => {
+                this.targetCount = parseInt(targetCountInput.value);
+                targetCountDisplay.textContent = `${this.targetCount} targets`;
+            });
 
             modeButtons.forEach(btn => {
                 btn.addEventListener('click', () => {
@@ -61,7 +73,8 @@ export class ModeSelection {
             startBtn.style.display = 'block';
             startBtn.onclick = () => {
                 if (this.onModeSelected) {
-                    this.onModeSelected(this.selectedMode);
+                    // Pass both mode and targetCount to callback
+                    this.onModeSelected(this.selectedMode, this.targetCount);
                 }
             };
         }

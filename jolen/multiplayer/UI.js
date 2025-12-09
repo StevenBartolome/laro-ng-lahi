@@ -7,7 +7,7 @@ export class MultiplayerUI {
             waitingMessage: document.getElementById('waitingMessage'),
             playersPanel: document.getElementById('playersPanel'),
             playersList: document.getElementById('playersList'),
-            levelDisplay: document.getElementById('level-display'),
+            targetsDisplay: document.getElementById('targets-display'),
             modeDisplay: document.getElementById('mode-display'),
             gameOverOverlay: document.getElementById('gameOverOverlay'),
             finalScores: document.getElementById('finalScores'),
@@ -70,8 +70,10 @@ export class MultiplayerUI {
         this.elements.playersList.innerHTML = html;
     }
 
-    updateLevel(level) {
-        this.elements.levelDisplay.textContent = level;
+    updateTargetsRemaining(remaining, total) {
+        if (this.elements.targetsDisplay) {
+            this.elements.targetsDisplay.textContent = `${remaining}/${total}`;
+        }
     }
 
     updateMode(mode) {

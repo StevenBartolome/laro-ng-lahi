@@ -36,15 +36,23 @@ export class FirebaseSync {
     }
 
     // Initialize game data structure (host only)
-    async initializeGame(playerIds, gameMode = 'target', difficulty = 'normal') {
+    async initializeGame(playerIds, gameMode = 'target', targetCount = 6) {
         const initialScores = {};
         const playerStates = {};
+        const playerMarbles = {};
 
-        playerIds.forEach(id => {
+        playerIds.forEach((id, index) => {
             initialScores[id] = 0;
             playerStates[id] = {
                 isReady: false,  // Add ready state
                 score: 0
+            };
+            // Initialize each player's marble at starting position
+            playerMarbles[id] = {
+                x: 640, // Center of 1280px canvas
+                y: 620, // Bottom of 720px canvas
+                vx: 0,
+                vy: 0
             };
         });
 
@@ -52,19 +60,14 @@ export class FirebaseSync {
             currentTurnIndex: 0,
             currentTurnPlayerId: playerIds[0],
             playerOrder: playerIds,
-            level: 1,
+            targetCount: targetCount,  // Number of targets (6-10)
             gameMode: gameMode,
-            difficulty: difficulty,
+            difficulty: 'normal',
             gameState: 'waiting',  // Start in waiting state, not playing
             scores: initialScores,
             playerStates: playerStates,  // Add player states
             modeState: null, // Will be set by game logic
-            playerMarble: {
-                x: 640, // Center of 1280px canvas
-                y: 620, // Bottom of 720px canvas
-                vx: 0,
-                vy: 0
-            },
+            playerMarbles: playerMarbles, // All player marbles
             lastAction: {
                 type: 'init',
                 timestamp: Date.now()
@@ -104,10 +107,11 @@ export class FirebaseSync {
         });
     }
 
-    // Start game with selected mode (host only)
-    async startGameWithMode(mode) {
+    // Start game with selected mode and target count (host only)
+    async startGameWithMode(mode, targetCount) {
         await update(this.gameRef, {
             gameMode: mode,
+            targetCount: targetCount,
             gameState: 'playing',
             'lastAction/type': 'game_start_with_mode',
             'lastAction/timestamp': Date.now()
@@ -163,11 +167,20 @@ export class FirebaseSync {
         });
     }
 
-    // Update marble state during turn
-    async updateMarble(marbleData) {
+    // Update marble state during turn (for specific player)
+    async updatePlayerMarble(playerId, marbleData) {
         await update(this.gameRef, {
-            playerMarble: marbleData,
+            [`playerMarbles/${playerId}`]: marbleData,
             'lastAction/type': 'marble_update',
+            'lastAction/timestamp': Date.now()
+        });
+    }
+
+    // Update all player marbles at once
+    async updateAllPlayerMarbles(playerMarbles) {
+        await update(this.gameRef, {
+            playerMarbles: playerMarbles,
+            'lastAction/type': 'marbles_update',
             'lastAction/timestamp': Date.now()
         });
     }
