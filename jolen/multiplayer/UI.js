@@ -88,23 +88,55 @@ export class MultiplayerUI {
     }
 
     showGameOver(players, scores) {
-        // Sort players by score
+        // Sort players by score (highest first)
         const sortedPlayers = [...players].sort((a, b) => {
             return (scores[b.id] || 0) - (scores[a.id] || 0);
         });
 
-        const winner = sortedPlayers[0];
-        this.elements.gameOverTitle.textContent = `${winner.name} Wins! 🏆`;
+        // Find the highest score
+        const highestScore = scores[sortedPlayers[0]?.id] || 0;
+
+        // Find all players with the highest score
+        const winners = sortedPlayers.filter(p => (scores[p.id] || 0) === highestScore);
+
+        // Check if all players have the same score
+        const allSameScore = sortedPlayers.every(p => (scores[p.id] || 0) === highestScore);
+
+        // Determine title based on conditions
+        let title = '';
+        if (allSameScore) {
+            // All players have the same score = Draw
+            title = "It's a Draw! 🤝";
+        } else if (players.length === 2 && winners.length === 2) {
+            // 2 players with same score = Draw
+            title = "It's a Draw! 🤝";
+        } else if (winners.length > 1) {
+            // Multiple winners (3+ players, 2+ tied for highest)
+            const winnerNames = winners.map(w => w.name).join(' & ');
+            title = `${winnerNames} Win! 🏆`;
+        } else {
+            // Single winner
+            title = `${winners[0].name} Wins! 🏆`;
+        }
+
+        this.elements.gameOverTitle.textContent = title;
 
         let html = '';
         sortedPlayers.forEach((player, index) => {
-            const rank = index + 1;
             const score = scores[player.id] || 0;
-            const isWinner = index === 0;
+            const isWinner = score === highestScore;
             const isCurrentUser = player.id === this.currentUserId;
 
-            const rankEmojis = ['🥇', '🥈', '🥉'];
-            const rankDisplay = rank <= 3 ? rankEmojis[rank - 1] : `#${rank}`;
+            // Rank display
+            let rankDisplay;
+            if (isWinner) {
+                rankDisplay = '🥇';
+            } else {
+                // Calculate actual rank (accounting for ties)
+                const rank = sortedPlayers.filter(p => (scores[p.id] || 0) > score).length + 1;
+                const rankEmojis = ['🥇', '🥈', '🥉'];
+                rankDisplay = rank <= 3 ? rankEmojis[rank - 1] : `#${rank}`;
+            }
 
             const classes = isWinner ? 'score-item winner' : 'score-item';
             const youBadge = isCurrentUser ? ' (You)' : '';
