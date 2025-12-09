@@ -5,6 +5,7 @@ import {
     checkMarbleCollision,
     drawMarble,
     updateMarble,
+    COLLISION_ELASTICITY,
 } from "./Common.js";
 import Sound from "../js/Sound.js";
 
@@ -66,6 +67,11 @@ export function update(
             anyMoving = true;
         }
 
+        // Update hit delay timer
+        if (target.hit && target.hitDelay > 0) {
+            target.hitDelay--;
+        }
+
         // Check if hit target moved off screen
         if (target.hit && !target.offScreen) {
             const buffer = 50;
@@ -82,23 +88,25 @@ export function update(
         const playerMarble = playerMarbles[playerId];
 
         targets.forEach((target) => {
-            if (!target.hit && checkMarbleCollision(playerMarble, target)) {
-                console.log('💥 Collision! Player velocity before:', { vx: playerMarble.vx, vy: playerMarble.vy });
+            // Check collision with ALL on-screen targets (hit or not)
+            // checkMarbleCollision applies physics changes
+            if (!target.offScreen && checkMarbleCollision(playerMarble, target)) {
+                // If this is the FIRST time it's hit, apply scoring
+                if (!target.hit) {
+                    target.hit = true;
+                    target.hitDelay = 15; // Keep visible for ~15 frames (0.25s) to show the bounce
 
-                target.hit = true;
-                // Zero out target velocity after collision (like single-player)
-                target.vx = 0;
-                target.vy = 0;
-
-                console.log('💥 Player velocity after:', { vx: playerMarble.vx, vy: playerMarble.vy });
-
-                // Only count this hit if it's the current player's marble
-                if (playerId === currentPlayerId) {
-                    hitCount++;
-                    scoreIncrease += 10;
+                    // Only count this hit if it's the current player's marble
+                    if (playerId === currentPlayerId) {
+                        hitCount++;
+                        scoreIncrease += 10;
+                    }
+                    Sound.playHit();
+                } else {
+                    // Optional: Play a quieter sound for subsequent hits?
+                    // For now, just play the hit sound to confirm collision
+                    Sound.playHit();
                 }
-
-                Sound.playHit();
             }
         });
     });
@@ -134,8 +142,8 @@ export function update(
 
 export function draw(ctx, targets) {
     targets.forEach((target) => {
-        // Only draw targets that haven't been hit
-        if (!target.hit) {
+        // Only draw targets that haven't been hit OR are still in their "hit delay" phase
+        if (!target.hit || (target.hitDelay && target.hitDelay > 0)) {
             drawMarble(ctx, target, false, false);
         }
     });
@@ -150,5 +158,3 @@ export function checkLevelComplete(targets) {
 export function countRemaining(targets) {
     return targets.filter((target) => !target.hit).length;
 }
-
-

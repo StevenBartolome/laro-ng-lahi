@@ -167,7 +167,14 @@ class MultiplayerJolen {
 
     updateReadyDisplayFromGameState(playerStates) {
         const readyPlayersDisplay = document.getElementById('readyPlayersDisplay');
-        if (!readyPlayersDisplay || !playerStates) return;
+        console.log('📋 updateReadyDisplayFromGameState called');
+        console.log('  - playerStates:', playerStates);
+        console.log('  - readyPlayersDisplay element:', readyPlayersDisplay);
+
+        if (!readyPlayersDisplay || !playerStates) {
+            console.warn('⚠️ Missing element or playerStates');
+            return;
+        }
 
         let html = '';
         Object.entries(playerStates).forEach(([playerId, state]) => {
@@ -187,6 +194,7 @@ class MultiplayerJolen {
             `;
         });
 
+        console.log('✅ Setting ready display HTML:', html);
         readyPlayersDisplay.innerHTML = html;
     }
 
@@ -427,6 +435,12 @@ class MultiplayerJolen {
         if (gameState.playerMarbles) {
             // Update all player marbles from Firebase
             Object.keys(gameState.playerMarbles).forEach(playerId => {
+                // Skip updating the current player's marble if it's their turn
+                // (they are simulating physics locally, including collisions)
+                if (this.isMyTurn && playerId === this.userId) {
+                    return; // Skip this player
+                }
+
                 if (!this.playerMarbles[playerId]) {
                     // Initialize if doesn't exist
                     this.playerMarbles[playerId] = {
