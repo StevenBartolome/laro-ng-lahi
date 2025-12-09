@@ -1,0 +1,136 @@
+/* Luksong Baka - HUD Styles */
+
+/* In-Game HUD Container */
+#gameUI {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 15px; 
+    z-index: 50;
+    align-items: center;
+}
+
+.level-display {
+    background: rgba(0, 0, 0, 0.7);
+    color: #D2691E;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 18px;
+    font-family: 'Fredoka One', cursive;
+    white-space: nowrap;
+}
+
+/* Icons (Difficulty/Menu) */
+.ui-icon-btn {
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: transform 0.2s;
+    padding: 8px;
+}
+
+.ui-icon-btn img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.ui-icon-btn:hover {
+    transform: scale(1.1);
+    background: rgba(0, 0, 0, 0.9);
+}
+
+/* Floating Action Buttons */
+.info-fab {
+    position: fixed;
+    width: 60px;
+    height: 60px;
+    color: white;
+    border: 3px solid white;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 100;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.info-fab {
+    bottom: 30px;
+    right: 30px;
+    background: linear-gradient(135deg, #f1c40f, #f39c12);
+    font-size: 30px;
+}
+
+.facts-btn {
+    bottom: 110px;
+    right: 30px;
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+}
+
+.info-fab:hover {
+    transform: scale(1.1) rotate(10deg);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
+}
+
+.facts-btn img {
+    width: 80%; 
+    height: auto;
+    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+}
+
+/* Back Button (Standard) */
+.back-btn {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+}
+
+.back-btn img {
+    margin-top: 40px;
+    width: 220px;
+    height: auto;
+}
+
+.back-btn:hover {
+    transform: scale(1.1);
+}
+
+/* Lives Display */
+.lives-display {
+    display: flex;
+    gap: 8px;
+    background: rgba(0, 0, 0, 0.7);
+    padding: 8px 15px;
+    border-radius: 25px;
+}
+
+.heart {
+    width: 35px;
+    height: auto;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.heart.lost {
+    opacity: 0.3;
+    filter: grayscale(100%);
+    transform: scale(0.9);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .menu-grid {
+        grid-template-columns: 1fr;
+    }
+}

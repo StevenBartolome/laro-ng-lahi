@@ -72,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
   loadAssets().then(() => {
     console.log("Assets loaded");
     // Show menu initially, disable close button to force selection
-    UI.showMenu('both', false);
+    UI.showMenu('both', true);
     UI.highlightMode(gameMode); // Highlight default mode
   });
 

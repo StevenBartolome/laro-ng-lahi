@@ -1,6 +1,7 @@
 export const UI = {
   elements: {},
   gameStarted: false,
+  currentMenuMode: 'both',
   
   setGameStarted(val) {
       console.log('UI: Game started set to', val);
@@ -22,20 +23,27 @@ export const UI = {
 
     if (this.elements.closeOverlayBtn) {
       this.elements.closeOverlayBtn.addEventListener("click", () => {
-        this.hideMenu();
+        if (this.gameStarted) {
+          this.hideMenu();
+        } else {
+          // If viewing instructions specifically, go back to main menu
+          if (this.currentMenuMode === 'instructions') {
+             this.showMenu('both', true);
+          } else {
+             // Otherwise (e.g. 'both' or 'difficulty'), exit to game select
+             window.location.href = '../game_select.php';
+          }
+        }
       });
     }
 
-    if (this.elements.closeOverlayBtn) {
-      this.elements.closeOverlayBtn.addEventListener("click", () => {
-        this.hideMenu();
-      });
-    }
+
   },
 
 
 
   showMenu(mode = "both", showClose = true) {
+    this.currentMenuMode = mode;
     console.log('UI: showMenu', { mode, showClose, gameStarted: this.gameStarted });
     if (!this.elements.menuOverlay) return;
 
