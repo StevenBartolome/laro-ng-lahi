@@ -1,131 +1,6 @@
-/* Luksong Baka Game Styles */
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap');
+/* Luksong Baka - Overlay Styles */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Nunito', sans-serif;
-    background: #1a1a2e;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    overflow: hidden;
-}
-
-/* Sound Controls (Top Left) */
-.sound-controls {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 10px 15px;
-    border-radius: 30px;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
-}
-
-/* Music Mute Button */
-.mute-btn {
-    width: 40px;
-    height: 40px;
-    border: none;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-    font-size: 20px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.mute-btn:hover {
-    transform: scale(1.1);
-    background: rgba(255, 255, 255, 0.3);
-}
-
-.mute-btn.muted {
-    opacity: 0.5;
-}
-
-/* Volume Control */
-.volume-control {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-}
-
-.volume-label {
-    font-size: 12px;
-    font-weight: 600;
-    color: white;
-    white-space: nowrap;
-}
-
-.volume-slider {
-    width: 80px;
-    height: 6px;
-    -webkit-appearance: none;
-    appearance: none;
-    background: rgba(255, 255, 255, 0.3);
-    border-radius: 3px;
-    outline: none;
-    cursor: pointer;
-}
-
-.volume-slider::-webkit-slider-thumb {
-    -webkit-appearance: none;
-    width: 16px;
-    height: 16px;
-    background: #D2691E;
-    border-radius: 50%;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.volume-slider::-webkit-slider-thumb:hover {
-    transform: scale(1.2);
-    background: #ff8c00;
-}
-
-/* Game Container */
-.game-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 20px;
-}
-
-/* Back Button (Below Game) */
-.back-btn {
-    cursor: pointer;
-    transition: all 0.3s ease;
-    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
-}
-
-.back-btn img {
-    margin-top: 40px;
-    width: 220px;
-    height: auto;
-}
-
-.back-btn:hover {
-    transform: scale(1.1);
-}
-
-/* Game Canvas */
-#gameCanvas {
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-}
-
-/* Overlay Screens */
+/* Overlay Base */
 .overlay {
     position: fixed;
     top: 0;
@@ -152,17 +27,6 @@ body {
     animation: fadeIn 0.5s ease-out;
 }
 
-@keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
 .close-btn {
     position: absolute;
     top: 15px;
@@ -185,7 +49,7 @@ body {
     text-shadow: 0 0 15px rgba(195, 155, 211, 1);
 }
 
-/* Enhanced Overlay Layout */
+/* Enhanced Overlay (Difficulty/Menu) */
 .enhanced-overlay {
     max-width: 1100px;
     width: 90%;
@@ -229,6 +93,7 @@ body {
     margin-bottom: 1rem;
 }
 
+/* Menu Grid */
 .menu-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -256,7 +121,7 @@ body {
     font-weight: 400;
 }
 
-/* Tutorial Steps - Clean Jolen Style */
+/* Tutorial Steps */
 .instruction-item {
     display: flex;
     align-items: center;
@@ -301,7 +166,7 @@ body {
     text-align: center;
 }
 
-/* Difficulty Buttons Enhanced */
+/* Difficulty Buttons */
 .difficulty-panel {
     display: flex;
     flex-direction: column;
@@ -340,7 +205,6 @@ body {
     font-weight: 600;
 }
 
-/* Button Colors */
 .diff-btn.easy {
     background: linear-gradient(135deg, #2ecc71, #27ae60);
     color: white;
@@ -359,107 +223,10 @@ body {
     border: 2px solid #e74c3c;
 }
 
-/* Responsive */
-@media (max-width: 768px) {
-    .menu-grid {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Game UI */
-#gameUI {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    display: flex;
-    gap: 15px; /* Increased gap */
-    z-index: 50;
-    align-items: center;
-}
-
-.level-display, .round-display {
-    background: rgba(0, 0, 0, 0.7);
-    color: #D2691E;
-    padding: 10px 20px;
-    border-radius: 25px;
-    font-weight: 700;
-    font-size: 18px;
-    font-family: 'Fredoka One', cursive;
-    white-space: nowrap;
-}
-
-/* Difficulty/Settings Button */
-.ui-icon-btn {
-    background: rgba(0, 0, 0, 0.7);
-    border: none;
-    cursor: pointer;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: transform 0.2s;
-    padding: 8px;
-}
-
-.ui-icon-btn img {
-    width: 100%;
-    height: auto;
-    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
-}
-
-.ui-icon-btn:hover {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.9);
-}
-
-/* Info FAB */
-.info-fab {
-    position: fixed;
-    bottom: 30px;
-    right: 30px;
-    width: 60px;
-    height: 60px;
-    background: linear-gradient(135deg, #f1c40f, #f39c12);
-    color: white;
-    border: 3px solid white;
-    border-radius: 50%;
-    font-size: 30px;
-    cursor: pointer;
-    z-index: 100;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
-
-.info-fab:hover {
-    transform: scale(1.1) rotate(10deg);
-    box-shadow: 0 8px 25px rgba(0,0,0,0.4);
-}
-
-/* Facts Button */
-.facts-btn {
-    bottom: 110px;
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    width: 60px; /* Match info-fab size */
-    height: 60px;
-}
-
-.facts-btn img {
-    /* User said they adjusted image size, so let's allow it to be larger */
-    width: 80%; 
-    height: auto;
-    filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
-}
-
-/* Facts Overlay Content */
+/* Facts Overlay */
 .facts-content {
     max-width: 850px !important;
     padding: 20px !important;
-    /* Removed background/border as requested - just using backdrop */
     background: transparent !important;
     border: none !important;
     box-shadow: none !important;
@@ -476,18 +243,17 @@ body {
     max-width: 750px;
     height: auto;
     border-radius: 20px;
-
     cursor: pointer;
     transition: opacity 0.5s ease, transform 0.3s ease;
     border: none;
+    border-radius: 12px;
+    position: relative;
+    z-index: 5;
+    animation: boardFloat 4s ease-in-out infinite;
 }
 
 .facts-board:hover {
     transform: scale(1.01);
-}
-
-.facts-board.fade-in {
-    animation: fadeIn 0.5s forwards;
 }
 
 .facts-nav {
@@ -520,30 +286,16 @@ body {
     opacity: 0.8;
 }
 
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* Game Facts Enhancements */
-.facts-board {
-    border-radius: 12px;
-    position: relative;
-    z-index: 5;
-    animation: boardFloat 4s ease-in-out infinite;
-}
-
 @keyframes boardFloat {
     0%, 100% { transform: translateY(0); }
     50% { transform: translateY(-10px); }
 }
 
-/* Particle Container */
+/* Particle Effect */
 .facts-container {
     position: relative;
 }
 
-/* Particle Effect */
 .particle {
     position: absolute;
     background: radial-gradient(circle, #fff, transparent);
@@ -560,29 +312,7 @@ body {
     100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
 }
 
-/* Lives/Hearts Display */
-.lives-display {
-    display: flex;
-    gap: 8px;
-    background: rgba(0, 0, 0, 0.7);
-    padding: 8px 15px;
-    border-radius: 25px;
-}
-
-.heart {
-    width: 35px;
-    height: auto;
-    transition: all 0.3s ease;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.heart.lost {
-    opacity: 0.3;
-    filter: grayscale(100%);
-    transform: scale(0.9);
-}
-
-/* Message Overlay */
+/* Message Overlay (Game Over / Level Up) */
 #messageOverlay {
     position: fixed;
     top: 50%;
@@ -614,20 +344,9 @@ body {
     transform: scale(1);
 }
 
-#messageText.success {
-    color: #2ecc71;
-    border: 3px solid #2ecc71;
-}
-
-#messageText.fail {
-    color: #e74c3c;
-    border: 3px solid #e74c3c;
-}
-
-#messageText.levelup {
-    color: #D2691E;
-    border: 3px solid #D2691E;
-}
+#messageText.success { color: #2ecc71; border: 3px solid #2ecc71; }
+#messageText.fail { color: #e74c3c; border: 3px solid #e74c3c; }
+#messageText.levelup { color: #D2691E; border: 3px solid #D2691E; }
 
 /* Game Complete Backdrop */
 #messageOverlay.game-complete-backdrop {
@@ -653,27 +372,6 @@ body {
     text-align: center;
 }
 
-/* Restart Button */
-.restart-btn {
-    padding: 15px 40px;
-    font-size: 22px;
-    font-weight: 700;
-    font-family: 'Fredoka One', cursive;
-    border: none;
-    border-radius: 50px;
-    background: linear-gradient(135deg, #D2691E, #ff8c00);
-    color: white;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 20px rgba(210, 105, 30, 0.4);
-}
-
-.restart-btn:hover {
-    transform: scale(1.1) translateY(-3px);
-    box-shadow: 0 10px 30px rgba(210, 105, 30, 0.6);
-}
-
-/* Button container */
 .complete-buttons {
     display: flex;
     gap: 20px;
@@ -681,24 +379,31 @@ body {
     flex-wrap: wrap;
 }
 
-/* Back to Menu Button */
-.back-menu-btn {
+.restart-btn, .back-menu-btn {
     padding: 15px 40px;
     font-size: 22px;
     font-weight: 700;
     font-family: 'Fredoka One', cursive;
     border: none;
     border-radius: 50px;
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
     cursor: pointer;
     transition: all 0.3s ease;
-    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
     text-decoration: none;
     display: inline-block;
 }
 
-.back-menu-btn:hover {
+.restart-btn {
+    background: linear-gradient(135deg, #D2691E, #ff8c00);
+    color: white;
+    box-shadow: 0 5px 20px rgba(210, 105, 30, 0.4);
+}
+
+.back-menu-btn {
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+}
+
+.restart-btn:hover, .back-menu-btn:hover {
     transform: scale(1.1) translateY(-3px);
-    box-shadow: 0 10px 30px rgba(52, 152, 219, 0.6);
 }
