@@ -1,6 +1,23 @@
 // Common.js - Multiplayer version with corrected asset paths
 // Re-exports everything from the single-player Common.js except loadAssets and drawMarble
 
+// Import values so they are available locally in this file
+import {
+    FRICTION,
+    MARBLE_RADIUS,
+    PLAYER_COLOR,
+    TARGET_COLOR,
+    MAX_DRAG_DISTANCE,
+    POWER_MULTIPLIER,
+    COLLISION_ELASTICITY,
+    CIRCLE_RADIUS,
+    distance,
+    checkMarbleCollision,
+    updateMarble
+    // NOT importing drawMarble - we create our own below
+} from "../js/Common.js";
+
+// Re-export for other modules
 export {
     FRICTION,
     MARBLE_RADIUS,
@@ -13,8 +30,7 @@ export {
     distance,
     checkMarbleCollision,
     updateMarble
-    // NOT exporting drawMarble - we create our own below
-} from "../js/Common.js";
+};
 
 // Images object - now with 6 player marbles!
 export const images = {
@@ -78,6 +94,11 @@ export function loadAssets() {
 // Custom drawMarble function that uses our local images object
 // playerIndex: 0-5 for which player marble to use (0 = player1, 1 = player2, etc.)
 export function drawMarble(ctx, marble, glow = false, isPlayer = false, playerIndex = 0) {
+    // Validate marble data to prevent non-finite errors during mode transitions
+    if (!marble || !isFinite(marble.x) || !isFinite(marble.y) || !isFinite(marble.radius) || marble.radius <= 0) {
+        return; // Skip drawing invalid marbles
+    }
+
     ctx.save();
 
     // Draw glow effect

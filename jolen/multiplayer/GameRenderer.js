@@ -27,7 +27,13 @@ export class GameRenderer {
 
         // Draw mode specifics using the mode's draw function
         if (this.game.modeState && this.game.currentModeModule) {
-            this.game.currentModeModule.draw(this.ctx, this.game.modeState);
+            try {
+                this.game.currentModeModule.draw(this.ctx, this.game.modeState);
+            } catch (error) {
+                // Silently catch errors during mode transitions
+                // This prevents crashes when mode module is being switched
+                console.warn('⚠️ Renderer: Skipping frame during mode transition');
+            }
         } else {
             // Debug: Show waiting message
             this.ctx.fillStyle = "white";

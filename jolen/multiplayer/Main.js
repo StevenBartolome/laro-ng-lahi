@@ -388,9 +388,61 @@ class MultiplayerJolen {
 
         // Update mode
         if (gameState.gameMode !== this.gameMode) {
+            console.log(`🔄 Mode change detected: ${this.gameMode} -> ${gameState.gameMode}`);
             this.gameMode = gameState.gameMode;
             this.ui.updateMode(this.gameMode);
             this.setGameMode(this.gameMode);
+
+            // Force reset local state to match new mode
+            // This ensures all clients reset their scores and positions
+            if (gameState.scores) {
+                this.scores = { ...gameState.scores };
+            }
+
+            // Reset player marbles - critical for mode switching!
+            if (gameState.playerMarbles) {
+                console.log('✓ Resetting all marbles for new mode');
+                Object.keys(gameState.playerMarbles).forEach(playerId => {
+                    const fbMarble = gameState.playerMarbles[playerId];
+
+                    if (!this.playerMarbles[playerId]) {
+                        this.playerMarbles[playerId] = { ...fbMarble, radius: MARBLE_RADIUS, color: PLAYER_COLOR, isMoving: false };
+                    } else {
+                        // FORCE update even for my own marble on mode change
+                        this.playerMarbles[playerId].x = fbMarble.x;
+                        this.playerMarbles[playerId].y = fbMarble.y;
+                        this.playerMarbles[playerId].vx = fbMarble.vx || 0;
+                        this.playerMarbles[playerId].vy = fbMarble.vy || 0;
+                        this.playerMarbles[playerId].isMoving = false;
+                    }
+                });
+            }
+
+            // CRITICAL: Also sync modeState immediately on mode change
+            // Don't wait for the regular modeState sync which might skip based on turn
+            if (gameState.modeState) {
+                console.log('✓ Syncing mode state for new mode');
+                this.modeState = gameState.modeState;
+            }
+
+            // Force sync current turn from Firebase on mode change
+            if (gameState.currentTurnPlayerId) {
+                this.currentTurnPlayerId = gameState.currentTurnPlayerId;
+                this.isMyTurn = this.currentTurnPlayerId === this.userId;
+                const playerName = this.playerNames[this.currentTurnPlayerId] || 'Unknown';
+                this.ui.updateTurnIndicator(this.currentTurnPlayerId, playerName, this.isMyTurn);
+                console.log('✓ Turn reset to:', playerName);
+            }
+
+            // Reset game state to idle
+            this.gameState = "idle";
+            this.currentTurnHitCount = 0;
+
+            // Update UI
+            this.ui.updatePlayersList(this.players, this.scores, this.currentTurnPlayerId);
+            this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
+
+            console.log('✓ Mode switch complete. State reset.');
         }
 
         // Update scores

@@ -72,30 +72,59 @@ export function update(
     let anyMoving = false;
     let hitCount = 0; // Track holes filled by current player this turn
 
-    // Check if any player marble falls into holes
-    Object.keys(playerMarbles).forEach(playerId => {
-        const playerMarble = playerMarbles[playerId];
+    // Check if ONLY the current player's marble falls into holes
+    const currentPlayerMarble = playerMarbles[currentPlayerId];
 
+    if (currentPlayerMarble) {
         holes.forEach((hole) => {
             if (!hole.filled) {
-                const dist = distance(playerMarble.x, playerMarble.y, hole.x, hole.y);
+                const dist = distance(currentPlayerMarble.x, currentPlayerMarble.y, hole.x, hole.y);
                 if (dist < hole.radius) {
+                    // Mark hole as filled by this player
                     hole.filled = true;
-                    hole.filledBy = playerId;
-                    playerMarble.vx = 0;
-                    playerMarble.vy = 0;
-                    playerMarble.x = hole.x;
-                    playerMarble.y = hole.y;
+                    hole.filledBy = currentPlayerId;
 
-                    // Only give score to current player if they filled it
-                    if (playerId === currentPlayerId) {
-                        scoreIncrease += 20;
-                        hitCount++;
-                    }
+                    // Stop the marble at the hole position for visual effect
+                    currentPlayerMarble.x = hole.x;
+                    currentPlayerMarble.y = hole.y;
+                    currentPlayerMarble.vx = 0;
+                    currentPlayerMarble.vy = 0;
+
+                    // Score the hole
+                    scoreIncrease += 20;
+                    hitCount++;
                     Sound.playHit();
                 }
             }
         });
+    }
+
+    // SPECTATOR SYNC: Ensure all players see marbles at filled hole positions
+    // This only positions marbles that are in filled holes, doesn't prevent future shooting
+    holes.forEach((hole) => {
+        if (hole.filled && hole.filledBy && playerMarbles[hole.filledBy]) {
+            const marble = playerMarbles[hole.filledBy];
+            const dx = hole.x - marble.x;
+            const dy = hole.y - marble.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            // Check movement
+            const isMoving = Math.abs(marble.vx) > 0.1 || Math.abs(marble.vy) > 0.1;
+
+            // Vector calculation: Dot product of Velocity and Direction-To-Hole
+            // positive = moving towards hole, negative = moving away
+            const dotProduct = (marble.vx * dx) + (marble.vy * dy);
+            const movingTowards = isMoving && dotProduct > 0;
+
+            // SNAP if: Not moving OR Moving towards hole (Arrival)
+            // IGNORE if: Moving away (Shooting out)
+            if ((!isMoving || movingTowards) && dist < hole.radius * 2) {
+                marble.x = hole.x;
+                marble.y = hole.y;
+                marble.vx = 0;
+                marble.vy = 0;
+            }
+        }
     });
 
     return { scoreIncrease, anyMoving, hitCount };
