@@ -74,6 +74,12 @@ export function update(
     canvasWidth,
     canvasHeight
 ) {
+    // Validate state structure (prevent errors during mode transitions)
+    if (!targets || !Array.isArray(targets)) {
+        console.warn('LineMode.update: Invalid targets array, skipping update');
+        return { scoreIncrease: 0, anyMoving: false, hitCount: 0 };
+    }
+
     let scoreIncrease = 0;
     let anyMoving = false;
     let hitCount = 0; // Track targets hit by current player this turn
@@ -133,6 +139,11 @@ export function update(
  * @param {Array} targets - Array of target marble objects
  */
 export function draw(ctx, targets) {
+    // Validate state structure
+    if (!targets || !Array.isArray(targets)) {
+        console.warn('LineMode.draw: Invalid targets array');
+        return;
+    }
     targets.forEach((target, index) => {
         if (!target.hit) {
             // Draw target marble using drawMarble
@@ -169,5 +180,10 @@ export function checkLevelComplete(targets) {
  * @returns {number}
  */
 export function countRemaining(targets) {
+    // Validate state structure
+    if (!targets || !Array.isArray(targets)) {
+        console.warn('LineMode.countRemaining: Invalid targets array');
+        return 0;
+    }
     return targets.filter((m) => !m.hit).length;
 }

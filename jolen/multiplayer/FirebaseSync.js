@@ -229,12 +229,12 @@ export class FirebaseSync {
     }
 
     // Update game mode and reset scores (host only)
-    async updateGameMode(newMode, resetScores) {
+    async updateGameMode(newMode, resetScores, nextPlayerId) {
         await update(this.gameRef, {
             gameMode: newMode,
             scores: resetScores,
             currentTurnIndex: 0,
-            currentTurnPlayerId: null, // Will be set on next getGameState
+            currentTurnPlayerId: nextPlayerId, // Set valid player ID immediately
             'lastAction/type': 'mode_change',
             'lastAction/timestamp': Date.now()
         });

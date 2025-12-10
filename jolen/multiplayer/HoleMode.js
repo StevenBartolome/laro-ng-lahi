@@ -62,6 +62,12 @@ export function update(
     canvasWidth,
     canvasHeight
 ) {
+    // Validate state structure (prevent errors during mode transitions)
+    if (!holes || !Array.isArray(holes)) {
+        console.warn('HoleMode.update: Invalid holes array, skipping update');
+        return { scoreIncrease: 0, anyMoving: false, hitCount: 0 };
+    }
+
     let scoreIncrease = 0;
     let anyMoving = false;
     let hitCount = 0; // Track holes filled by current player this turn
@@ -101,6 +107,11 @@ export function update(
  * @param {Array} holes - Array of hole objects
  */
 export function draw(ctx, holes) {
+    // Validate state structure
+    if (!holes || !Array.isArray(holes)) {
+        console.warn('HoleMode.draw: Invalid holes array');
+        return;
+    }
     // Define player colors - different color for each player
     const playerColors = [
         { main: "rgba(33, 150, 243, 0.8)", light: "rgba(33, 150, 243, 0.3)", rim: "#2196F3" },      // Blue
@@ -183,5 +194,10 @@ export function checkLevelComplete(holes) {
  * @returns {number}
  */
 export function countRemaining(holes) {
+    // Validate state structure
+    if (!holes || !Array.isArray(holes)) {
+        console.warn('HoleMode.countRemaining: Invalid holes array');
+        return 0;
+    }
     return holes.filter((h) => !h.filled).length;
 }

@@ -435,8 +435,13 @@ class MultiplayerJolen {
                 }
                 this.modeState = gameState.modeState;
 
-                // Update target count display for non-active players
-                this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
+                // Only update target count if state structure matches current mode
+                // This prevents crashes during mode transitions
+                try {
+                    this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
+                } catch (error) {
+                    console.warn('⚠️ Skipping target count update during mode transition:', error.message);
+                }
             }
         } else {
             console.warn('⚠️ No mode state in game update');
@@ -596,9 +601,21 @@ class MultiplayerJolen {
         const confirmYesBtn = document.getElementById('confirmYesBtn');
         const confirmNoBtn = document.getElementById('confirmNoBtn');
         if (confirmYesBtn) {
-            confirmYesBtn.addEventListener('click', () => {
+            confirmYesBtn.addEventListener('click', async () => {
                 if (this.confirmCallback) {
-                    this.confirmCallback();
+                    // Disable button to prevent double-clicks
+                    confirmYesBtn.disabled = true;
+                    confirmYesBtn.textContent = 'Processing...';
+
+                    try {
+                        await this.confirmCallback();
+                    } catch (error) {
+                        console.error('Error in confirm callback:', error);
+                    } finally {
+                        // Re-enable button
+                        confirmYesBtn.disabled = false;
+                        confirmYesBtn.textContent = 'Yes';
+                    }
                 }
                 this.closeConfirmDialog();
             });
@@ -691,10 +708,14 @@ class MultiplayerJolen {
         // Reset all player marbles to starting position
         this.resetAllPlayerMarbles();
 
-        // Reset scores
+        // Reset scores to 0
         Object.keys(this.scores).forEach(playerId => {
             this.scores[playerId] = 0;
         });
+
+        // Reset game state to idle to allow playing
+        this.gameState = "idle";
+        this.currentTurnHitCount = 0;
 
         // Update UI
         this.ui.updateTargetsRemaining(this.countRemainingTargets(), this.targetCount);
@@ -703,7 +724,9 @@ class MultiplayerJolen {
 
         // Sync to Firebase
         await this.firebaseSync.updateModeState(this.modeState);
-        await this.firebaseSync.updateGameMode(newMode, this.scores);
+        // Pass the first player's ID (Host) as the next turn player
+        const nextPlayerId = this.players.length > 0 ? this.players[0].id : this.userId;
+        await this.firebaseSync.updateGameMode(newMode, this.scores, nextPlayerId);
         await this.firebaseSync.updateAllPlayerMarbles(this.getPlayerMarblesForSync());
 
         // Close settings

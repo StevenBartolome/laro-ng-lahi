@@ -57,6 +57,12 @@ export function update(
     canvasWidth,
     canvasHeight
 ) {
+    // Validate state structure (prevent errors during mode transitions)
+    if (!targets || !Array.isArray(targets)) {
+        console.warn('TargetMode.update: Invalid targets array, skipping update');
+        return { scoreIncrease: 0, anyMoving: false, hitCount: 0 };
+    }
+
     let scoreIncrease = 0;
     let anyMoving = false;
     let hitCount = 0; // Track number of targets hit by current player this turn
@@ -144,6 +150,11 @@ export function update(
 }
 
 export function draw(ctx, targets) {
+    // Validate state structure
+    if (!targets || !Array.isArray(targets)) {
+        console.warn('TargetMode.draw: Invalid targets array');
+        return;
+    }
     targets.forEach((target) => {
         // Only draw targets that haven't been hit OR are still in their "hit delay" phase
         if (!target.hit || (target.hitDelay && target.hitDelay > 0)) {
@@ -159,5 +170,10 @@ export function checkLevelComplete(targets) {
 
 
 export function countRemaining(targets) {
+    // Validate state structure
+    if (!targets || !Array.isArray(targets)) {
+        console.warn('TargetMode.countRemaining: Invalid targets array');
+        return 0;
+    }
     return targets.filter((target) => !target.hit).length;
 }

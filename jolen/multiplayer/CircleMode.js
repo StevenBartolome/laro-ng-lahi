@@ -80,6 +80,12 @@ export function update(
     canvasWidth,
     canvasHeight
 ) {
+    // Validate state structure (prevent errors during mode transitions)
+    if (!state || !state.targets || !state.circleCenter || !Array.isArray(state.targets)) {
+        console.warn('CircleMode.update: Invalid state structure, skipping update');
+        return { scoreIncrease: 0, anyMoving: false, hitCount: 0 };
+    }
+
     const { targets, circleCenter } = state;
     let scoreIncrease = 0;
     let anyMoving = false;
@@ -159,6 +165,12 @@ export function update(
  * @param {Object} state - { targets, circleCenter }
  */
 export function draw(ctx, state) {
+    // Validate state structure (prevent errors during mode transitions)
+    if (!state || !state.circleCenter || !state.targets) {
+        console.warn('CircleMode.draw: Invalid state structure, skipping render');
+        return;
+    }
+
     const { targets, circleCenter } = state;
 
     // Draw Circle boundary
@@ -208,6 +220,11 @@ export function checkLevelComplete(state) {
  * @returns {number}
  */
 export function countRemaining(state) {
+    // Validate state structure (prevent errors during mode transitions)
+    if (!state || !state.targets || !Array.isArray(state.targets)) {
+        console.warn('CircleMode.countRemaining: Invalid state structure');
+        return 0;
+    }
     return state.targets.filter((m) => !m.outOfCircle).length;
 }
 
