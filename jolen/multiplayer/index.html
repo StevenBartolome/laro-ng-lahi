@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Jolen Multiplayer - Filipino Marble Game</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;800&display=swap"
+        rel="stylesheet" />
+    <link rel="stylesheet" href="core.css" />
+    <link rel="stylesheet" href="overlays.css" />
+    <link rel="stylesheet" href="hud.css" />
+</head>
+
+<body>
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="../../assets/jolen_assets/jolen_bg_music.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="clickSound">
+        <source src="../../assets/audio/click_sound_effect.mp3" type="audio/mpeg" />
+    </audio>
+    <audio id="hitSound">
+        <source src="../../assets/jolen_assets/jolen_hit_impact.mp3" type="audio/mpeg" />
+    </audio>
+
+    <!-- Sound Controls -->
+    <div class="sound-controls">
+        <div class="volume-control">
+            <span class="volume-label">🎵 BGM</span>
+            <input type="range" id="bgmVolume" class="volume-slider" min="0" max="100" value="50" />
+        </div>
+        <div class="volume-control">
+            <span class="volume-label">🔊 SFX</span>
+            <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="70" />
+        </div>
+    </div>
+
+    <div class="app-container">
+        <!-- Loading Screen -->
+        <div id="loadingScreen" class="screen-panel overlay">
+            <div class="panel-content overlay-content">
+                <div class="header-area">
+                    <h1>JOLEN</h1>
+                    <p class="subtitle">Multiplayer Mode</p>
+                </div>
+                <div class="loading-spinner"></div>
+                <p style="text-align: center; margin-top: 20px; color: white;">
+                    Connecting to lobby...
+                </p>
+            </div>
+        </div>
+
+        <!-- Waiting/Ready Screen -->
+        <div id="waitingScreen" class="overlay hidden">
+            <div class="overlay-content">
+                <h1 class="game-title">🎯 Jolen - Multiplayer</h1>
+                <div class="waiting-message">
+                    <p>Waiting for all players to be ready...</p>
+                    <div class="spinner"></div>
+                </div>
+                <div id="readyPlayersDisplay" class="ready-players">
+                    <!-- Ready status will be shown here -->
+                </div>
+                <button id="readyBtn" class="btn-ready">I'm Ready!</button>
+            </div>
+        </div>
+
+        <!-- Mode Selection Screen -->
+        <div id="modeSelectionScreen" class="overlay hidden">
+            <div class="overlay-content">
+                <h1 class="game-title">🎯 Select Game Mode</h1>
+                <p id="hostSelectionMessage" class="host-message">Select a game mode to start</p>
+
+                <!-- Current Mode Display (for non-host) -->
+                <div id="currentModeSelectionDisplay" class="current-mode-display" style="display: none;">
+                    <span class="mode-icon">🎯</span>
+                    <span id="selectedModeText">Target</span>
+                </div>
+
+                <!-- Mode Selection Section -->
+                <div id="modeSelectionSection">
+                    <h3 id="selectModeHeader">Choose Mode <span class="host-only-badge">(Host Only)</span></h3>
+                    <div class="mode-options">
+                        <button class="mode-btn game-card" data-mode="target">
+                            <span class="card-icon">🎯</span> Target
+                        </button>
+                        <button class="mode-btn game-card" data-mode="circle">
+                            <span class="card-icon">⭕</span> Circle
+                        </button>
+                        <button class="mode-btn game-card" data-mode="hole">
+                            <span class="card-icon">🕳️</span> Hole
+                        </button>
+                        <button class="mode-btn game-card" data-mode="line">
+                            <span class="card-icon">📏</span> Line
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Target Count Selector (Host Only) -->
+                <div id="targetCountSelector" class="target-count-selector" style="display: none;">
+                    <label for="targetCountInput">Number of Targets:</label>
+                    <input type="number" id="targetCountInput" min="6" max="10" value="6" />
+                    <span class="target-count-display">6 targets</span>
+                </div>
+
+                <button id="startGameBtn" class="btn-start" style="display: none;">Start Game</button>
+            </div>
+        </div>
+
+        <!-- Game Container -->
+        <div id="game-container" style="display: none">
+            <!-- Turn Indicator -->
+            <div id="turnIndicator" class="turn-indicator">
+                <div class="turn-content">
+                    <span id="turnPlayerName">Player 1</span>'s Turn
+                </div>
+                <div id="waitingMessage" class="waiting-message" style="display: none;">
+                    Waiting for other players...
+                </div>
+            </div>
+
+            <!-- Players Panel -->
+            <div id="playersPanel" class="players-panel">
+                <h3>Players</h3>
+                <div id="playersList" class="players-list">
+                    <!-- Players will be populated here -->
+                </div>
+            </div>
+
+            <!-- Game UI -->
+            <div id="gameUI">
+                <div class="stat-box">
+                    <span class="stat-label">TARGETS</span>
+                    <span id="targets-display" class="stat-value">6/6</span>
+                </div>
+                <div class="stat-box">
+                    <span class="stat-label">MODE</span>
+                    <span id="mode-display" class="stat-value">Target</span>
+                </div>
+
+                <button id="menuBtn" class="ui-icon-btn" title="Menu">
+                    <span style="font-size: 24px">⚙️</span>
+                </button>
+            </div>
+
+            <!-- Canvas -->
+            <div class="canvas-wrapper">
+                <canvas id="gameCanvas"></canvas>
+            </div>
+
+            <!-- Back Button -->
+            <a href="../../multiplayer-menu.php" class="back-btn" title="Exit">
+                <img src="../../assets/startmenu/back_button.png" alt="Back" style="width: 150px" />
+            </a>
+        </div>
+    </div>
+
+    <!-- Settings Overlay -->
+    <div id="settingsOverlay" class="screen-panel overlay hidden">
+        <div class="panel-content overlay-content">
+            <button id="closeSettingsBtn" class="close-btn" title="Close">×</button>
+
+            <div class="header-area">
+                <h1>JOLEN</h1>
+                <p class="subtitle">Multiplayer Mode</p>
+            </div>
+
+            <div class="menu-grid">
+                <!-- Left: How to Play -->
+                <div class="instructions-panel">
+                    <h3>How to Play</h3>
+                    <div class="tutorial-step">
+                        <div class="step-icon">👆</div>
+                        <div class="step-text">
+                            <h4>Click & Hold</h4>
+                            <p>Grab your marble</p>
+                        </div>
+                    </div>
+                    <div class="tutorial-step">
+                        <div class="step-icon">🏹</div>
+                        <div class="step-text">
+                            <h4>Drag Back</h4>
+                            <p>Aim and power up</p>
+                        </div>
+                    </div>
+                    <div class="tutorial-step">
+                        <div class="step-icon">🚀</div>
+                        <div class="step-text">
+                            <h4>Release</h4>
+                            <p>Shoot the marble!</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right: Mode Selection -->
+                <div class="difficulty-panel">
+                    <h3>Current Mode</h3>
+                    <div id="currentModeDisplay" class="current-mode-display">
+                        <span class="mode-icon">🎯</span>
+                        <span id="settingsModeText">Target</span>
+                    </div>
+
+                    <h3 id="changeModeSection">Change Mode <span class="host-only-badge">(Host Only)</span></h3>
+                    <div class="mode-options">
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="target">
+                            <span class="card-icon">🎯</span> Target
+                        </button>
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="circle">
+                            <span class="card-icon">⭕</span> Circle
+                        </button>
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="hole">
+                            <span class="card-icon">🕳️</span> Hole
+                        </button>
+                        <button class="game-card mode-btn settings-mode-btn" data-mode="line">
+                            <span class="card-icon">📏</span> Line
+                        </button>
+                    </div>
+
+                    <div class="leave-lobby-section">
+                        <button id="leaveLobbyBtn" class="btn-leave-lobby">
+                            🚪 Leave Lobby
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Confirmation Dialog -->
+    <div id="confirmDialog" class="overlay hidden">
+        <div class="overlay-content confirm-content">
+            <h3 id="confirmTitle">Confirm Action</h3>
+            <p id="confirmMessage">Are you sure?</p>
+            <div class="confirm-buttons">
+                <button id="confirmYesBtn" class="btn-confirm-yes">Yes</button>
+                <button id="confirmNoBtn" class="btn-confirm-no">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Over Overlay -->
+    <div id="gameOverOverlay" class="overlay hidden">
+        <div class="overlay-content">
+            <h1 id="gameOverTitle">Game Over!</h1>
+            <div id="finalScores" class="final-scores">
+                <!-- Final scores will be populated here -->
+            </div>
+            <button id="returnToLobbyBtn" class="btn-primary">Return to Lobby</button>
+        </div>
+    </div>
+
+    <script type="module" src="Main.js"></script>
+</body>
+
+</html>

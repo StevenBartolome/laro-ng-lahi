@@ -1,0 +1,263 @@
+/* Luksong Baka Multiplayer - HUD Styles */
+
+/* In-Game HUD Container */
+#gameUI {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    display: flex;
+    gap: 15px;
+    z-index: 50;
+    align-items: center;
+}
+
+.level-display {
+    background: rgba(0, 0, 0, 0.7);
+    color: #D2691E;
+    padding: 10px 20px;
+    border-radius: 25px;
+    font-weight: 700;
+    font-size: 18px;
+    font-family: 'Fredoka One', cursive;
+    white-space: nowrap;
+}
+
+/* Lives Display - Hidden in multiplayer */
+.lives-display {
+    display: none !important;
+}
+
+/* Multiplayer Panel (Player List, Turn Info) */
+.multiplayer-panel {
+    position: fixed;
+    top: 80px;
+    right: 20px;
+    width: 280px;
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.95), rgba(52, 73, 94, 0.95));
+    border-radius: 15px;
+    padding: 20px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.panel-header {
+    margin-bottom: 15px;
+    padding-bottom: 15px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.panel-header h3 {
+    margin: 0 0 10px 0;
+    color: #fff;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.3em;
+    text-align: center;
+}
+
+.lobby-code {
+    text-align: center;
+    color: #ecf0f1;
+    font-size: 0.9em;
+    font-weight: 600;
+}
+
+.lobby-code span {
+    color: #3498db;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1em;
+    font-weight: bold;
+}
+
+/* Turn Display */
+.current-turn-display {
+    margin-bottom: 15px;
+}
+
+.turn-indicator {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.turn-label {
+    display: block;
+    color: #bdc3c7;
+    font-size: 0.85em;
+    margin-bottom: 5px;
+}
+
+.player-name-highlight {
+    display: block;
+    color: #3498db;
+    font-weight: bold;
+    font-size: 1.1em;
+}
+
+.your-turn-banner {
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    padding: 12px;
+    border-radius: 10px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 1.1em;
+    animation: pulse 1.5s ease-in-out infinite;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+}
+
+/* Players List */
+.players-list h4 {
+    color: #ecf0f1;
+    margin: 0 0 10px 0;
+    font-size: 1em;
+    font-family: 'Nunito', sans-serif;
+}
+
+.players-container {
+    max-height: 200px;
+    overflow-y: auto;
+    margin-bottom: 15px;
+}
+
+.player-item {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.3s ease;
+}
+
+.player-item.active-turn {
+    background: linear-gradient(135deg, rgba(52, 152, 219, 0.3), rgba(41, 128, 185, 0.3));
+    border: 2px solid #3498db;
+}
+
+.player-item.eliminated {
+    opacity: 0.5;
+    background: rgba(231, 76, 60, 0.2);
+}
+
+.player-item-name {
+    color: #ecf0f1;
+    font-weight: 600;
+    font-size: 0.95em;
+}
+
+.player-item-stats {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.player-stat {
+    font-size: 0.85em;
+    color: #bdc3c7;
+}
+
+.player-stat.level {
+    color: #f39c12;
+}
+
+.player-badge {
+    background: #3498db;
+    color: white;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75em;
+    font-weight: bold;
+}
+
+.player-badge.you {
+    background: #2ecc71;
+}
+
+.player-badge.host {
+    background: #9b59b6;
+}
+
+.player-badge.taya {
+    background: #e74c3c;
+}
+
+/* Leave Lobby Button */
+.btn-leave {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Nunito', sans-serif;
+    font-size: 1em;
+}
+
+.btn-leave:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(231, 76, 60, 0.4);
+}
+
+/* Scrollbar Styling */
+.players-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.players-container::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.players-container::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+}
+
+.players-container::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* Player Left Notification */
+.player-left-notification {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%) translateY(-100px);
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.95), rgba(192, 57, 43, 0.95));
+    color: white;
+    padding: 15px 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 8px 32px rgba(231, 76, 60, 0.4);
+    z-index: 9999;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+    font-size: 1em;
+    opacity: 0;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    backdrop-filter: blur(10px);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+}
+
+.player-left-notification.show {
+    transform: translateX(-50%) translateY(0);
+    opacity: 1;
+}
+
+.player-left-notification .notification-icon {
+    font-size: 1.5em;
+}
+
+.player-left-notification .notification-text {
+    white-space: nowrap;
+}

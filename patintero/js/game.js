@@ -159,13 +159,26 @@ export function startRound() {
 /**
  * Main game loop
  */
-export function gameLoop() {
+/**
+ * Main game loop
+ */
+let lastTime = 0;
+export function gameLoop(timestamp) {
     if (!gameState.gameActive) return;
+
+    if (!lastTime) lastTime = timestamp;
+    const deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+
+    // Target 60 FPS (approx 16.67ms per frame)
+    const timeScale = deltaTime / (1000 / 60);
+    // Clamp timeScale to avoid huge jumps
+    const clampedTimeScale = Math.min(timeScale, 4.0);
 
     checkBoostInput();
 
-    updateRunners();
-    updateTaggers();
+    updateRunners(clampedTimeScale);
+    updateTaggers(clampedTimeScale);
     checkCollisions();
 
     // Check if all runners are tagged

@@ -87,14 +87,16 @@ export function checkMarbleCollision(m1, m2) {
   return false;
 }
 
-export function updateMarble(marble, canvasWidth, canvasHeight) {
-  // Apply friction
-  marble.vx *= FRICTION;
-  marble.vy *= FRICTION;
+export function updateMarble(marble, canvasWidth, canvasHeight, timeScale = 1.0) {
+  // Apply friction (exponential decay based on timeScale)
+  // FRICTION is per-frame (60fps) decay
+  const frictionFactor = Math.pow(FRICTION, timeScale);
+  marble.vx *= frictionFactor;
+  marble.vy *= frictionFactor;
 
   // Update position
-  marble.x += marble.vx;
-  marble.y += marble.vy;
+  marble.x += marble.vx * timeScale;
+  marble.y += marble.vy * timeScale;
 
   // Wall collisions
   if (marble.x - marble.radius < 0) {

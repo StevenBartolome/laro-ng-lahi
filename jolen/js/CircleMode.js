@@ -37,7 +37,7 @@ export function setup(level, canvasWidth, canvasHeight) {
   return { targets, circleCenter };
 }
 
-export function update(playerMarble, state, score, canvasWidth, canvasHeight) {
+export function update(playerMarble, state, score, canvasWidth, canvasHeight, timeScale) {
   const { targets, circleCenter } = state;
   let scoreIncrease = 0;
   let anyMoving = false;
@@ -46,7 +46,7 @@ export function update(playerMarble, state, score, canvasWidth, canvasHeight) {
   targets.forEach((target) => {
     if (
       !target.outOfCircle &&
-      updateMarble(target, canvasWidth, canvasHeight)
+      updateMarble(target, canvasWidth, canvasHeight, timeScale)
     ) {
       anyMoving = true;
     }
@@ -66,7 +66,7 @@ export function update(playerMarble, state, score, canvasWidth, canvasHeight) {
     for (let j = i + 1; j < targets.length; j++) {
       if (!targets[i].outOfCircle && !targets[j].outOfCircle) {
         if (checkMarbleCollision(targets[i], targets[j])) {
-            Sound.playHit();
+          Sound.playHit();
         }
       }
     }

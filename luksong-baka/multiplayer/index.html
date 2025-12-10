@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luksong Baka - Multiplayer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/core.css">
+    <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="css/overlays.css">
+</head>
+
+<body>
+    <!-- Audio Elements -->
+    <audio id="bgMusic" loop>
+        <source src="../../assets/luksong_baka_assets/luksong_baka_bgm.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="jumpSound">
+        <source src="../../assets/luksong_baka_assets/jump_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="runSound" loop>
+        <source src="../../assets/luksong_baka_assets/running_sound.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound">
+        <source src="../../assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Sound Controls (Top Left) -->
+    <div class="sound-controls">
+        <div class="volume-control">
+            <span class="volume-label">🎵 BGM</span>
+            <input type="range" id="bgmVolume" class="volume-slider" min="0" max="100" value="50"
+                title="Background Music Volume">
+        </div>
+        <div class="volume-control">
+            <span class="volume-label">🔊 SFX</span>
+            <input type="range" id="sfxVolume" class="volume-slider" min="0" max="100" value="70"
+                title="Sound Effects Volume">
+        </div>
+    </div>
+
+    <!-- Multiplayer UI Panel -->
+    <div id="multiplayerPanel" class="multiplayer-panel">
+        <div class="panel-header">
+            <h3>🎮 Multiplayer</h3>
+            <div class="lobby-code">Lobby: <span id="lobbyCodeDisplay">------</span></div>
+        </div>
+
+        <div class="current-turn-display">
+            <div id="turnIndicator" class="turn-indicator">
+                <span class="turn-label">Current Turn:</span>
+                <span id="currentPlayerName" class="player-name-highlight">Waiting...</span>
+            </div>
+            <div id="yourTurnBanner" class="your-turn-banner hidden">
+                🎯 YOUR TURN! 🎯
+            </div>
+        </div>
+
+        <div class="players-list">
+            <h4>Players</h4>
+            <div id="playersContainer" class="players-container">
+                <!-- Players will be dynamically added here -->
+            </div>
+        </div>
+
+        <button id="leaveLobbyBtn" class="btn-leave">Leave Lobby</button>
+    </div>
+
+    <!-- Waiting Screen -->
+    <div id="waitingScreen" class="overlay">
+        <div class="overlay-content">
+            <h1 class="game-title">🐃 Luksong Baka - Multiplayer</h1>
+            <div class="waiting-message">
+                <p>Waiting for all players to be ready...</p>
+                <div class="spinner"></div>
+            </div>
+            <div id="readyPlayersDisplay" class="ready-players">
+                <!-- Ready status will be shown here -->
+            </div>
+            <button id="readyBtn" class="btn-ready">I'm Ready!</button>
+        </div>
+    </div>
+
+    <!-- Spectator Overlay (shown when not your turn) -->
+    <div id="spectatorOverlay" class="spectator-overlay hidden">
+        <div class="spectator-message">
+            <p>👀 Watching: <span id="spectatorPlayerName">Player</span></p>
+            <p class="spectator-hint">Wait for your turn...</p>
+        </div>
+    </div>
+
+    <!-- Game Container -->
+    <div class="game-container">
+        <!-- Game Canvas -->
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- Back Button (Below Game) -->
+        <a href="../../multiplayer-menu.php" class="back-btn" title="Back to Multiplayer Menu">
+            <img src="../../assets/startmenu/back_button.png" alt="Back">
+        </a>
+    </div>
+
+    <!-- Game UI Overlay -->
+    <div id="gameUI">
+        <div class="lives-display" id="livesDisplay">
+            <img src="../../assets/luksong_baka_assets/player-life.png" class="heart" id="heart1">
+            <img src="../../assets/luksong_baka_assets/player-life.png" class="heart" id="heart2">
+            <img src="../../assets/luksong_baka_assets/player-life.png" class="heart" id="heart3">
+        </div>
+        <div class="level-display">Baka Level: <span id="levelText">1</span></div>
+    </div>
+
+    <!-- Message Overlay -->
+    <div id="messageOverlay" class="hidden">
+        <div id="messageText"></div>
+    </div>
+
+    <!-- Game Over Screen -->
+    <div id="gameOverScreen" class="overlay hidden">
+        <div class="overlay-content">
+            <h1 class="game-title">Game Over!</h1>
+            <div id="finalScoresContainer" class="final-scores">
+                <!-- Final scores will be shown here -->
+            </div>
+            <button id="backToMenuBtn" class="btn-back">Back to Menu</button>
+        </div>
+    </div>
+
+    <!-- Modular JS Files (load order matters!) -->
+    <script src="../js/config.js"></script>
+    <script src="../js/state.js"></script>
+    <script src="../js/assets.js"></script>
+    <script src="../js/sound.js"></script>
+    <script src="../js/ui.js"></script>
+    <script src="../js/logic.js"></script>
+    <script src="../js/rendering.js"></script>
+
+    <!-- Multiplayer specific files -->
+    <script type="module" src="multiplayer-main.js"></script>
+</body>
+
+</html>

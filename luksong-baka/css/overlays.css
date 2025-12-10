@@ -355,55 +355,117 @@
     width: 100%;
     height: 100%;
     transform: none;
-    background: rgba(0, 0, 0, 0.85);
+    background: rgba(30, 15, 40, 0.9);
     display: flex;
     justify-content: center;
     align-items: center;
+    backdrop-filter: blur(8px);
 }
 
 .game-complete-box {
-    background: linear-gradient(135deg, #1a1a2e 0%, #2d2d44 100%) !important;
-    padding: 50px 80px !important;
-    border: 4px solid #D2691E !important;
-    box-shadow: 0 0 50px rgba(210, 105, 30, 0.3);
+    background: #2E143C !important;
+    padding: 3rem 4rem !important;
+    border: 1px solid rgba(195, 155, 211, 0.3) !important;
+    border-radius: 24px !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important;
+    min-width: 500px;
 }
 
 .game-complete-content {
-    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
+.complete-header {
+    font-size: 3.5rem;
+    font-family: 'Fredoka One', cursive;
+    background: linear-gradient(to bottom, #ffd700, #ffb300);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 0 rgba(0,0,0,0.2));
+    margin-bottom: 0.5rem;
+}
+
+.complete-header.fail {
+    background: linear-gradient(to bottom, #e74c3c, #c0392b);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.complete-sub {
+    font-size: 1.5rem;
+    color: #dcdde1;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 600;
+}
+
+.complete-score {
+    font-size: 2.5rem;
+    color: #fff;
+    font-family: 'Fredoka One', cursive;
+    background: rgba(0,0,0,0.2);
+    padding: 0.5rem 2rem;
+    border-radius: 50px;
+    margin: 1rem 0 2rem 0;
+    border: 1px solid rgba(255,255,255,0.1);
 }
 
 .complete-buttons {
     display: flex;
     gap: 20px;
     justify-content: center;
-    flex-wrap: wrap;
+    width: 100%;
 }
 
 .restart-btn, .back-menu-btn {
-    padding: 15px 40px;
-    font-size: 22px;
+    padding: 16px 32px;
+    font-size: 1.2rem;
     font-weight: 700;
-    font-family: 'Fredoka One', cursive;
+    font-family: 'Nunito', sans-serif;
     border: none;
-    border-radius: 50px;
+    border-radius: 12px;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s ease;
     text-decoration: none;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 160px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
 }
 
 .restart-btn {
-    background: linear-gradient(135deg, #D2691E, #ff8c00);
+    background: #9b59b6;
     color: white;
-    box-shadow: 0 5px 20px rgba(210, 105, 30, 0.4);
+    box-shadow: 0 4px 0 #8e44ad;
+}
+
+.restart-btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #8e44ad;
+    background: #a569bd;
+}
+
+.restart-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
 }
 
 .back-menu-btn {
-    background: linear-gradient(135deg, #3498db, #2980b9);
-    color: white;
-    box-shadow: 0 5px 20px rgba(52, 152, 219, 0.4);
+    background: transparent;
+    color: #bdc3c7;
+    border: 2px solid rgba(189, 195, 199, 0.3);
+    box-shadow: none;
 }
 
-.restart-btn:hover, .back-menu-btn:hover {
-    transform: scale(1.1) translateY(-3px);
+.back-menu-btn:hover {
+    background: rgba(255,255,255,0.05);
+    color: white;
+    border-color: rgba(255,255,255,0.5);
+    transform: translateY(-2px);
 }
