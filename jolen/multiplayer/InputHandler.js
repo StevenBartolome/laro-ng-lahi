@@ -101,12 +101,23 @@ export class InputHandler {
     }
 
     /**
+     * Handle mouse leave event - cancel drag operation
+     */
+    handleMouseLeave(e) {
+        if (this.game.isDragging && this.game.gameState === "dragging") {
+            // Cancel the drag operation without shooting
+            this.game.isDragging = false;
+            this.game.gameState = "idle";
+        }
+    }
+
+    /**
      * Setup canvas input event listeners
      */
     setupListeners() {
         this.game.canvas.addEventListener("mousedown", (e) => this.handleMouseDown(e));
         this.game.canvas.addEventListener("mousemove", (e) => this.handleMouseMove(e));
         this.game.canvas.addEventListener("mouseup", (e) => this.handleMouseUp(e));
-        this.game.canvas.addEventListener("mouseleave", (e) => this.handleMouseUp(e));
+        this.game.canvas.addEventListener("mouseleave", (e) => this.handleMouseLeave(e));
     }
 }

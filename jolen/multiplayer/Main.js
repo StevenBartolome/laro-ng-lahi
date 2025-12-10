@@ -12,11 +12,13 @@ import {
     drawMarble,
 } from "./Common.js";
 
+
 import * as TargetMode from "./TargetMode.js"; // Multiplayer version with physics
-import * as CircleMode from "../js/CircleMode.js";
+import * as CircleMode from "./CircleMode.js"; // Multiplayer version
 import * as HoleMode from "../js/HoleMode.js";
 import * as TumbangMode from "../js/TumbangMode.js";
 import * as LineMode from "../js/LineMode.js";
+
 
 import { ModeSelection } from "./ModeSelection.js";
 import { InputHandler } from "./InputHandler.js";
@@ -897,8 +899,9 @@ class MultiplayerJolen {
     }
 
     countRemainingTargets() {
-        if (!this.modeState || !Array.isArray(this.modeState)) return 0;
-        return this.modeState.filter(target => !target.hit).length;
+        if (!this.modeState) return 0;
+        // Use the mode module's countRemaining function to handle different state structures
+        return this.currentModeModule.countRemaining(this.modeState);
     }
 
     async endTurn() {

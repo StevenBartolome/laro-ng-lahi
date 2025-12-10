@@ -66,7 +66,7 @@ export function update(playerMarble, state, score, canvasWidth, canvasHeight, ti
     for (let j = i + 1; j < targets.length; j++) {
       if (!targets[i].outOfCircle && !targets[j].outOfCircle) {
         if (checkMarbleCollision(targets[i], targets[j])) {
-            Sound.playHit();
+          Sound.playHit();
         }
       }
     }
