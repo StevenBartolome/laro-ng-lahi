@@ -125,7 +125,7 @@ export function updateTaggers(timeScale = 1.0) {
         // PLAYER CONTROLLED TAGGER
         if (t.controller === 'player') {
             let dx = 0, dy = 0;
-            let speed = CONFIG.taggerSpeed * 1.5; // Slightly faster for player fun
+            let speed = CONFIG.taggerSpeed; // Removed 1.5x multiplier for equality
 
             // Apply boost multiplier if active
             if (taggerBoost.active) {
