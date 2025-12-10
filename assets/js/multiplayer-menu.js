@@ -357,17 +357,68 @@ class MultiplayerMenu {
             const maxPlayers = this.selectedGame?.maxPlayers || 4;
 
             let html = '';
+
+            // Clear list first if modifying directly, but here we build HTML string
+            // Better to use createElement for event listeners to work properly.
+            listElement.innerHTML = ''; // Clear previous content
+
             Object.entries(players).forEach(([playerId, player]) => {
-                const hostBadge = player.isHost ? '<span class="host-badge">HOST</span>' : '';
-                html += `
-                    <div class="player-item">
-                        <span class="player-name">${player.name}</span>
-                        ${hostBadge}
-                    </div>
-                `;
+                const li = document.createElement('div');
+                li.className = 'player-item';
+
+                // Host Badge
+                const hostBadge = player.isHost ? '<span class="host-badge" style="background: #ffd700; color: #000; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px; font-weight: bold;">HOST</span>' : '';
+                const botBadge = player.isBot ? '<span class="bot-badge" style="background: #4ecdc4; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; margin-left: 8px; font-weight: bold;">BOT</span>' : '';
+
+                // Kick Button
+                let kickButtonHtml = '';
+                if (this.isHost && playerId !== this.userId) {
+                    // We serve the button as a separate element to attach listener
+                }
+
+                const nameSpan = document.createElement('span');
+                nameSpan.className = 'player-name';
+                nameSpan.innerHTML = `${player.name} ${hostBadge} ${botBadge}`;
+
+                li.appendChild(nameSpan);
+
+                if (this.isHost && playerId !== this.userId) {
+                    const kickBtn = document.createElement('button');
+                    kickBtn.textContent = '×';
+                    kickBtn.className = 'kick-btn';
+                    kickBtn.style.cssText = `
+                        background: #ff4444; 
+                        color: white; 
+                        border: none; 
+                        border-radius: 50%; 
+                        width: 24px; 
+                        height: 24px; 
+                        margin-left: auto; 
+                        cursor: pointer; 
+                        font-weight: bold;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        font-size: 18px;
+                        margin-left: 10px;
+                    `;
+                    kickBtn.title = 'Kick Player';
+                    kickBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        this.kickPlayer(playerId, player.name);
+                    };
+                    li.appendChild(kickBtn);
+                }
+
+                listElement.appendChild(li);
             });
 
-            listElement.innerHTML = html;
+            // Check if I was kicked (logic: I am not host, I have a lobby ID, but my ID is not in users list)
+            if (this.currentLobbyId && !this.isHost && !players[this.userId]) {
+                alert('You have been kicked from the lobby.');
+                this.leaveLobby();
+                return;
+            }
 
             // Update player count display
             const countDisplay = listElementId === 'playersList' ?
@@ -449,6 +500,21 @@ class MultiplayerMenu {
         } catch (error) {
             console.error('Error adding bot:', error);
             alert('Failed to add bot.');
+        }
+    }
+
+    async kickPlayer(playerId, playerName) {
+        if (!this.currentLobbyId || !this.isHost) return;
+
+        if (confirm(`Are you sure you want to kick ${playerName}?`)) {
+            try {
+                const playerRef = ref(database, `lobbies/${this.currentLobbyId}/players/${playerId}`);
+                await remove(playerRef);
+                // The onValue listener will update the list automatically
+            } catch (error) {
+                console.error('Error kicking player:', error);
+                alert('Failed to kick player.');
+            }
         }
     }
 
