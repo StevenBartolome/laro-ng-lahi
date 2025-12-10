@@ -1,7 +1,7 @@
 import {
     gameState, CONFIG, DIFFICULTY,
     boost, taggerBoost,
-    runners, taggers
+    runners, taggers, keys
 } from './config.js';
 import { createRunner, createTagger } from './entities.js';
 import { updateBoostUI } from './boost.js';
@@ -13,6 +13,11 @@ import {
 } from './ui.js';
 import { updateCharacterPanel } from './character-switch.js';
 import { checkBoostInput } from './input.js';
+import {
+    uploadFullGameState, uploadPlayerPosition,
+    initGameStateSync, initPlayerInputSync,
+    isHostClient
+} from './sync.js';
 
 import { database } from '../../../config/firebase.js';
 import { ref, onValue, set, update, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
@@ -23,8 +28,12 @@ let lastTime = 0;
  * Start the multiplayer game
  */
 export function startGame(difficulty) {
-    if (!window.multiplayerState.lobbyId) return;
+    // This function is now deprecated in favor of hostStartGame (which calls this internally via listener)
+    // But for safety if UI calls it directly:
+    hostStartGame(difficulty);
+}
 
+export function resetLocalState() {
     // Reset local state
     if (gameState.animationFrameId) {
         cancelAnimationFrame(gameState.animationFrameId);
@@ -36,77 +45,200 @@ export function startGame(difficulty) {
         gameState.timerInterval = null;
     }
     gameState.gameActive = false;
+    gameState.starting = false;
+}
 
-
-    // Hide difficulty screen and wait for host to start signal
-    document.getElementById('difficultyScreen').classList.add('hidden');
-
-    // If host, update lobby status to 'starting' or 'playing'
-    if (window.multiplayerState.isHost) {
-        // Logic to determine roles, for now simplified:
-        // Host = Tagger 1 (Vertical), Others = Runners?
-        // Or implement Coin Flip Sync.
-
-        // For this iteration, let's start round directly.
-        // In full implementation, we sync the "Coin Flip" phase here.
-    }
+export function initializeGameListeners() {
+    if (!window.multiplayerState.lobbyId) return;
 
     // Listen for Game Start / State Changes
+    console.log('[GAME] Listening for lobby updates on:', window.multiplayerState.lobbyId);
     const lobbyRef = ref(database, `lobbies/${window.multiplayerState.lobbyId}`);
     onValue(lobbyRef, (snapshot) => {
         const data = snapshot.val();
+        console.log('[GAME] Lobby update received:', data);
         if (data && data.status === 'playing') {
+            console.log('[GAME] Status is playing. Local Active:', gameState.gameActive, 'Starting:', gameState.starting);
+
+            // CRITICAL FIX: The Lobby Menu sets status='playing' before redirection.
+            // We must NOT start until the Host has actually generated the teams in this game.
+            // If team1 is missing, it means we are in the "premature" state.
+            if (!data.team1 && !data.team1AreRunners) {
+                console.log('[GAME] Status is playing BUT teams are missing. Waiting for Host to select difficulty...');
+                return;
+            }
+
             if (!gameState.gameActive && !gameState.starting) {
-                gameState.starting = true; // Prevent double start
-                document.getElementById('coinFlipScreen').classList.remove('hidden');
-                // Simulate coin flip for everyone (visual only for now, logic determines roles)
-                setTimeout(() => {
-                    // TODO: Read assigned role from Firebase
-                    // For now, random locally for testing, effectively making it "Single Player" logic but online
-                    performCoinFlip();
-                }, 500);
+                // Determine difficulty from data
+                const difficulty = data.difficulty || 'medium'; // Default to medium if missing
+
+                // IMPORTANT: The Difficulty and other configs should be set LOCALLY here
+                // We'll pass data to handleGameStart to process it
+                console.log('[GAME] Triggering handleGameStart with difficulty:', difficulty);
+                handleGameStart(difficulty, data);
             }
         }
     });
+
+    // TODO: Implement entity usage listener for bot control locking
+    // const usageRef = ref(database, `lobbies/${window.multiplayerState.lobbyId}/entityUsage`);
+    // onValue(usageRef, (snapshot) => {
+    //     window.multiplayerState.entityUsage = snapshot.val() || {};
+    //     // Update UI to show locks
+    // });
 }
+
+/**
+ * Triggered by Host via UI
+ */
+export async function hostStartGame(difficulty) {
+    // If host, update lobby status to 'playing', set difficulty, and assign teams ATOMICALLY
+    if (window.multiplayerState.isHost) {
+
+        // Fetch players directly to ensure we have them
+        const playerRef = ref(database, `lobbies/${window.multiplayerState.lobbyId}/players`);
+        const snapshot = await get(playerRef);
+        const playersMap = snapshot.val() || {}; // Fallback to window.state not needed if we fetch
+
+        // Generate Teams
+        const playersListWithId = Object.entries(playersMap)
+            .map(([id, p]) => ({ ...p, id }))
+            .sort((a, b) => a.joinedAt - b.joinedAt);
+
+        // Randomly shuffle players into teams
+        const shuffled = [...playersListWithId].sort(() => Math.random() - 0.5);
+        const midPoint = Math.ceil(shuffled.length / 2);
+        const team1Ids = shuffled.slice(0, midPoint).map(p => p.id);
+        const team2Ids = shuffled.slice(midPoint).map(p => p.id);
+
+        // Randomly decide which team are runners
+        const team1AreRunners = Math.random() < 0.5;
+
+        console.log('[HOST] Generating Teams:');
+        console.log(' - Players Map:', playersMap);
+        console.log(' - Team 1 IDs:', team1Ids);
+        console.log(' - Team 2 IDs:', team2Ids);
+        console.log(' - Team 1 is Runners?:', team1AreRunners);
+
+        // Atomic update to Firebase
+        update(ref(database, `lobbies/${window.multiplayerState.lobbyId}`), {
+            status: 'playing',
+            difficulty: difficulty,
+            team1: team1Ids,
+            team2: team2Ids,
+            team1AreRunners: team1AreRunners
+        }).then(() => {
+            console.log('[HOST] Update successful!');
+        }).catch(err => {
+            console.error('[HOST] Update failed:', err);
+        });
+
+        console.log('Host: Started game with random team assignments');
+    }
+}
+
+/**
+ * Local Game Start Sequence (triggered by listener)
+ */
+function handleGameStart(difficulty, lobbyData) {
+    gameState.starting = true; // Prevent double start
+
+    // Remove waiting message immediately
+    document.getElementById('waitingForHost')?.remove();
+
+    // Initialize sync listeners based on role
+    initGameStateSync(); // All clients listen for game state
+    if (isHostClient()) {
+        initPlayerInputSync(); // Host listens for player inputs
+    }
+
+    // Update Config based on difficulty
+    // This is repeated in startRound, but good to have if needed earlier
+    // For now effectively syncs the visual UI state
+    document.getElementById('difficultyScreen').classList.add('hidden');
+    document.getElementById('coinFlipScreen').classList.remove('hidden');
+
+    // Simulate coin flip for everyone
+    setTimeout(() => {
+        performCoinFlip(lobbyData);
+    }, 500);
+}
+
+
 
 
 /**
  * Perform coin flip to determine starting role
  */
-export function performCoinFlip() {
+export function performCoinFlip(providedData = null) {
     const coin = document.getElementById('coin');
     const resultText = document.getElementById('coinResult');
+    const lobbyId = window.multiplayerState.lobbyId;
+    const myId = window.multiplayerState.playerId;
 
-    // Determine random role
-    const isRunner = Math.random() < 0.5;
-    gameState.initialRole = isRunner ? 'runner' : 'tagger';
-    gameState.currentRole = gameState.initialRole;
+    // Define processing logic
+    const processLobbyData = (lobbyData) => {
+        const team1 = lobbyData.team1 || [];
+        const team2 = lobbyData.team2 || [];
+        const team1AreRunners = lobbyData.team1AreRunners;
 
-    // Determine which side to show based on role
-    const rotations = isRunner ? 0 : 180; // 0 = heads (runner), 180 = tails (tagger)
+        console.log('[COIN] Processing Role. MyID:', myId);
+        console.log('[COIN] Team 1:', team1);
+        console.log('[COIN] Team 2:', team2);
+        console.log('[COIN] Team 1 is Runners?:', team1AreRunners);
 
-    // Animate coin flip
-    coin.style.animation = 'none';
-    setTimeout(() => {
-        // Apply rotation based on result
-        coin.style.transform = `rotateY(${rotations + 720}deg)`; // Add 720 for spinning effect
-        coin.style.transition = 'transform 2s ease-out';
+        // Determine my role based on random team assignment
+        const amInTeam1 = team1.includes(myId);
+        console.log('[COIN] Am I in Team 1?:', amInTeam1);
 
-        // Show result after animation
+        let isRunner;
+
+        if (team1AreRunners) {
+            isRunner = amInTeam1; // Team 1 = Runners
+        } else {
+            isRunner = !amInTeam1; // Team 2 = Runners
+        }
+
+        gameState.initialRole = isRunner ? 'runner' : 'tagger';
+        gameState.currentRole = gameState.initialRole;
+
+        console.log(`My role: ${gameState.currentRole} (randomly assigned)`);
+
+        // Determine rotation for animation (visual only)
+        const rotations = isRunner ? 0 : 180;
+
+        // Animate coin flip
+        coin.style.animation = 'none';
         setTimeout(() => {
-            resultText.textContent = `You will start as: ${gameState.initialRole.toUpperCase()}!`;
-            resultText.style.color = gameState.initialRole === 'runner' ? '#4CAF50' : '#f44336';
+            coin.style.transform = `rotateY(${rotations + 720}deg)`;
+            coin.style.transition = 'transform 2s ease-out';
 
-            // Start game after showing result
             setTimeout(() => {
-                document.getElementById('coinFlipScreen').classList.add('hidden');
-                document.getElementById('gameArea').classList.add('active');
-                document.getElementById('boostMeter').classList.add('active');
-                startRound();
+                resultText.textContent = `You will start as: ${gameState.initialRole.toUpperCase()}!`;
+                resultText.style.color = gameState.initialRole === 'runner' ? '#4CAF50' : '#f44336';
+
+                setTimeout(() => {
+                    document.getElementById('coinFlipScreen').classList.add('hidden');
+                    document.getElementById('gameArea').classList.add('active');
+                    document.getElementById('boostMeter').classList.add('active');
+
+                    // Remove waiting message if exists
+                    document.getElementById('waitingForHost')?.remove();
+
+                    startRound();
+                }, 2000);
             }, 2000);
-        }, 2000);
-    }, 50);
+        }, 50);
+    };
+
+    if (providedData) {
+        processLobbyData(providedData);
+    } else {
+        const lobbyRef = ref(database, `lobbies/${lobbyId}`);
+        get(lobbyRef).then((snapshot) => {
+            processLobbyData(snapshot.val());
+        });
+    }
 }
 
 /**
@@ -272,40 +404,121 @@ export function startRound() {
 
     runnerTeam.forEach((p, index) => {
         const startX = runnerSegmentWidth * (index + 1);
-        const spawnType = (p.id === myId) ? 'player' : 'bot'; // Remote players as bots for now
+        // Determine spawn type: player (self), remote (other humans), or bot
+        let spawnType;
+        if (p.id === myId) {
+            spawnType = 'player';
+        } else if (p.isBot) {
+            spawnType = 'bot';
+        } else {
+            spawnType = 'remote'; // Other human players
+        }
 
-        createRunner(spawnType, startX, 50, p.headIndex);
+        createRunner(spawnType, startX, 50, p.headIndex, p.name, p.id);
     });
 
     // 4. Spawn Taggers
     taggerTeam.forEach((p, index) => {
-        const spawnType = (p.id === myId) ? 'player' : 'bot';
+        // Determine spawn type: player (self), remote (other humans), or bot
+        let spawnType;
+        if (p.id === myId) {
+            spawnType = 'player';
+        } else if (p.isBot) {
+            spawnType = 'bot';
+        } else {
+            spawnType = 'remote'; // Other human players
+        }
 
         if (index === 0) {
             // First tagger is Vertical (Patotot) - Always Center
-            createTagger(1, 'vertical', 0, diff, spawnType, p.headIndex);
+            createTagger(1, 'vertical', 0, diff, spawnType, p.headIndex, p.name, p.id);
         } else {
             // Remaining taggers are Horizontal (Patotot)
-            // Assign to lines in order, wrapping if necessary
-            // (Though with dynamic field, lines should match taggers usually)
-
-            // If we enforced numHorizontalLines = numTaggers - 1, it matches perfectly.
-            // But if numTaggers=1 (1v1), we have 1 horiz line but no 2nd tagger.
-            // That's fine, the line exists as an obstacle/visual, just no tagger on it.
-
             const lineIndex = (index - 1) % linePositions.length;
             if (linePositions.length > 0) {
                 const yPos = linePositions[lineIndex];
-                createTagger(index + 1, 'horizontal', yPos, diff, spawnType, p.headIndex);
+                createTagger(index + 1, 'horizontal', yPos, diff, spawnType, p.headIndex, p.name, p.id);
             } else {
-                // Fallback if no horizontal lines (shouldn't happen with min 1)
-                createTagger(index + 1, 'horizontal', fh / 2, diff, spawnType, p.headIndex);
+                // Fallback if no horizontal lines
+                createTagger(index + 1, 'horizontal', fh / 2, diff, spawnType, p.headIndex, p.name, p.id);
             }
         }
     });
 
     gameState.gameActive = true;
     gameState.animationFrameId = requestAnimationFrame(gameLoop);
+}
+
+/**
+ * NON-HOST: Update only the local player's movement
+ * Non-hosts don't run bot AI or other game logic - they receive synced state
+ */
+function updatePlayerOnly(timeScale) {
+    const field = document.getElementById('field');
+    const fw = field.offsetWidth;
+    const fh = field.offsetHeight;
+
+    // keys is already imported from config.js at top of file
+
+    // Update player runner
+    if (gameState.currentRole === 'runner' && gameState.playerControlledRunner !== null) {
+        const r = runners[gameState.playerControlledRunner];
+        if (r && r.active && r.type === 'player') {
+            let dx = 0, dy = 0;
+            let speed = CONFIG.runnerSpeed;
+            if (boost.active) speed *= boost.multiplier;
+            const scaledSpeed = speed * timeScale;
+
+            if (keys.ArrowUp || keys.w) dy -= scaledSpeed;
+            if (keys.ArrowDown || keys.s) dy += scaledSpeed;
+            if (keys.ArrowLeft || keys.a) dx -= scaledSpeed;
+            if (keys.ArrowRight || keys.d) dx += scaledSpeed;
+
+            r.x += dx;
+            r.y += dy;
+
+            // Bounds
+            if (r.x < 20) r.x = 20; if (r.x > fw - 20) r.x = fw - 20;
+            if (r.y < 20) r.y = 20; if (r.y > fh - 20) r.y = fh - 20;
+
+            // Visual update
+            r.el.style.left = `${r.x}px`;
+            r.el.style.top = `${r.y}px`;
+        }
+    }
+
+    // Update player tagger
+    if (gameState.currentRole === 'tagger' && gameState.playerControlledTagger !== null) {
+        const t = taggers[gameState.playerControlledTagger];
+        if (t && t.controller === 'player') {
+            let dx = 0, dy = 0;
+            let speed = CONFIG.taggerSpeed;
+            if (taggerBoost.active) speed *= taggerBoost.multiplier;
+            const scaledSpeed = speed * timeScale;
+
+            if (keys.ArrowUp || keys.w) dy -= scaledSpeed;
+            if (keys.ArrowDown || keys.s) dy += scaledSpeed;
+            if (keys.ArrowLeft || keys.a) dx -= scaledSpeed;
+            if (keys.ArrowRight || keys.d) dx += scaledSpeed;
+
+            t.x += dx;
+            t.y += dy;
+
+            // Apply movement constraints based on tagger type
+            if (t.type === 'vertical') {
+                t.x = fw / 2;
+                if (t.y < fh * 0.2) t.y = fh * 0.2;
+                if (t.y > fh - 20) t.y = fh - 20;
+            } else if (t.type === 'horizontal') {
+                t.y = t.fixedPos;
+                if (t.x < 20) t.x = 20;
+                if (t.x > fw - 20) t.x = fw - 20;
+            }
+
+            t.el.style.left = `${t.x}px`;
+            t.el.style.top = `${t.y}px`;
+        }
+    }
 }
 
 /**
@@ -322,11 +535,19 @@ export function gameLoop(timestamp) {
     const timeScale = deltaTime / (1000 / 60);
     const clampedTimeScale = Math.min(timeScale, 4.0);
 
-    checkBoostInput();
-
-    updateRunners(clampedTimeScale);
-    updateTaggers(clampedTimeScale);
-    checkCollisions();
+    // HOST: runs full game logic and broadcasts state
+    if (isHostClient()) {
+        checkBoostInput();
+        updateRunners(clampedTimeScale);
+        updateTaggers(clampedTimeScale);
+        checkCollisions();
+        uploadFullGameState();
+    } else {
+        // NON-HOST: only update own player movement, then upload position
+        checkBoostInput();
+        updatePlayerOnly(clampedTimeScale); // New function for non-host
+        uploadPlayerPosition();
+    }
 
     // Check if all runners are tagged
     const allRunnersTagged = runners.every(r => !r.active);

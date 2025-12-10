@@ -63,3 +63,7 @@ export const keys = {
     ArrowUp: false, ArrowDown: false, ArrowLeft: false, ArrowRight: false,
     w: false, a: false, s: false, d: false, ' ': false
 };
+
+// Remote player positions (synced from Firebase)
+// Format: { playerId: { x, y, role, reachedBottom, timestamp } }
+export const remotePlayerPositions = {};

@@ -44,11 +44,24 @@ export function createEntity(className, labelText, x, y, entityType, specificHea
 
 /**
  * Create a runner entity
+ * @param {string} type - 'player', 'bot', or 'remote'
+ * @param {number} x - Starting X position
+ * @param {number} y - Starting Y position
+ * @param {number|null} headIndex - Character head variant
+ * @param {string|null} playerName - Display name
+ * @param {string|null} playerId - Firebase player ID (for remote sync)
  */
-export function createRunner(type, x, y, headIndex = null) {
+export function createRunner(type, x, y, headIndex = null, playerName = null, playerId = null) {
     const field = document.getElementById('field');
     const runnerIndex = runners.length;
-    const label = type === 'player' ? `R${runnerIndex + 1} (YOU)` : `R${runnerIndex + 1}`;
+
+    // Use player name if provided (for multiplayer), otherwise default labels
+    let label;
+    if (playerName) {
+        label = type === 'player' ? `${playerName} (YOU)` : playerName;
+    } else {
+        label = type === 'player' ? `R${runnerIndex + 1} (YOU)` : `R${runnerIndex + 1}`;
+    }
 
     const runner = {
         id: runnerIndex,
@@ -57,7 +70,8 @@ export function createRunner(type, x, y, headIndex = null) {
         y: y,
         active: true,
         reachedBottom: false,
-        el: createEntity(type === 'player' ? 'entity runner' : 'entity runner bot', label, x, y, 'runner', headIndex)
+        remotePlayerId: playerId, // For syncing remote players
+        el: createEntity(type === 'player' ? 'entity runner' : (type === 'remote' ? 'entity runner remote-player' : 'entity runner bot'), label, x, y, 'runner', headIndex)
     };
 
     if (type === 'player') {
@@ -70,13 +84,18 @@ export function createRunner(type, x, y, headIndex = null) {
         runner.el.appendChild(indicator);
 
         gameState.playerControlledRunner = runnerIndex;
+    } else if (type === 'remote') {
+        // Remote player (synced from Firebase)
+        runner.el.classList.add('remote-entity');
+        // Visual indicator for remote players
+        const indicator = document.createElement('div');
+        indicator.className = 'remote-indicator';
+        runner.el.appendChild(indicator);
     } else {
-        // If not player, check if enemy team
-        const isEnemy = gameState.currentRole === 'tagger'; // If I am tagger, runners are enemies
+        // Bot entity
+        const isEnemy = gameState.currentRole === 'tagger';
         if (isEnemy) {
             runner.el.classList.add('enemy-entity');
-
-            // Add enemy indicator
             const indicator = document.createElement('div');
             indicator.className = 'enemy-indicator';
             runner.el.appendChild(indicator);
@@ -89,17 +108,32 @@ export function createRunner(type, x, y, headIndex = null) {
 
 /**
  * Create a tagger entity
+ * @param {number} id - Tagger ID
+ * @param {string} type - 'vertical' or 'horizontal'
+ * @param {number} fixedPos - Fixed position for horizontal taggers
+ * @param {object} diff - Difficulty settings
+ * @param {string} controller - 'player', 'bot', or 'remote'
+ * @param {number|null} headIndex - Character head variant
+ * @param {string|null} playerName - Display name
+ * @param {string|null} playerId - Firebase player ID (for remote sync)
  */
-export function createTagger(id, type, fixedPos, diff, controller, headIndex = null) {
+export function createTagger(id, type, fixedPos, diff, controller, headIndex = null, playerName = null, playerId = null) {
     const field = document.getElementById('field');
     const x = field.offsetWidth / 2;
     const y = type === 'vertical' ? field.offsetHeight / 2 : fixedPos;
-    const label = controller === 'player' ? `T${id} (YOU)` : `T${id}`;
+
+    // Use player name if provided (for multiplayer), otherwise default labels
+    let label;
+    if (playerName) {
+        label = controller === 'player' ? `${playerName} (YOU)` : playerName;
+    } else {
+        label = controller === 'player' ? `T${id} (YOU)` : `T${id}`;
+    }
 
     const taggerObj = {
         id: id,
         type: type,
-        controller: controller, // 'player' or 'bot'
+        controller: controller, // 'player', 'bot', or 'remote'
         x: x,
         y: y,
         speed: diff.speed,
@@ -107,7 +141,8 @@ export function createTagger(id, type, fixedPos, diff, controller, headIndex = n
         direction: Math.random() < 0.5 ? 1 : -1,
         fixedPos: fixedPos,
         resp: diff.resp,
-        speedMult: diff.speedMult
+        speedMult: diff.speedMult,
+        remotePlayerId: playerId // For syncing remote players
     };
 
     // Visual distinction for Player Tagger if needed
@@ -124,13 +159,17 @@ export function createTagger(id, type, fixedPos, diff, controller, headIndex = n
         taggerObj.el.appendChild(indicator);
 
         gameState.playerControlledTagger = taggers.length; // Set index before pushing
+    } else if (controller === 'remote') {
+        // Remote player (synced from Firebase)
+        taggerObj.el.classList.add('remote-entity');
+        const indicator = document.createElement('div');
+        indicator.className = 'remote-indicator';
+        taggerObj.el.appendChild(indicator);
     } else {
-        // If not player, check if enemy team
-        const isEnemy = gameState.currentRole === 'runner'; // If I am runner, taggers are enemies
+        // Bot entity
+        const isEnemy = gameState.currentRole === 'runner';
         if (isEnemy) {
             taggerObj.el.classList.add('enemy-entity');
-
-            // Add enemy indicator
             const indicator = document.createElement('div');
             indicator.className = 'enemy-indicator';
             taggerObj.el.appendChild(indicator);

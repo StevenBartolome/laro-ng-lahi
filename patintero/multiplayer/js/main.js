@@ -5,7 +5,7 @@
 import { database, auth } from '../../../config/firebase.js';
 import { ref, get, set, onValue, onDisconnect, update } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 import { initInputHandlers } from './input.js';
-import { startGame, resetGame } from './game.js';
+import { hostStartGame, resetGame, initializeGameListeners } from './game.js';
 import { showDifficultyScreen, hideDifficultyScreen, handleCloseOverlay } from './ui.js';
 
 // Global Game State for Multiplayer
@@ -18,7 +18,7 @@ window.multiplayerState = {
 };
 
 // Expose functions to window
-window.startGame = startGame;
+window.startGame = hostStartGame;
 window.resetGame = resetGame;
 window.showDifficultyScreen = showDifficultyScreen;
 window.hideDifficultyScreen = hideDifficultyScreen;
@@ -80,15 +80,49 @@ async function initMultiplayer() {
         console.log('Updated Players List:', players);
     });
 
-    // 4. Initialize Game UI (waiting mode)
-    // For now, we reuse the existing start screen but update the title
+    // 3.8 Initialize Game Listeners (For start signal)
+    initializeGameListeners();
+
+    // 4. Initialize Game UI
     const title = document.querySelector('.game-title');
     if (title) title.textContent = `Lobby: ${lobbyId}`;
 
     // 5. Initialize Inputs
     initInputHandlers();
 
-    console.log('Multiplayer initialized ready.');
+    // 6. Show Difficulty Screen (Host Only)
+    if (window.multiplayerState.isHost) {
+        showDifficultyScreen();
+        console.log('Host: Showing difficulty selection screen');
+    } else {
+        // Non-host: Wait for host to select difficulty and start
+        console.log('Non-host: Waiting for host to start game');
+        document.getElementById('difficultyScreen')?.classList.add('hidden');
+
+        // Show waiting message
+        const waitingMsg = document.createElement('div');
+        waitingMsg.id = 'waitingForHost';
+        waitingMsg.style.cssText = `
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0, 0, 0, 0.9);
+            color: white;
+            padding: 30px 50px;
+            border-radius: 15px;
+            font-size: 24px;
+            text-align: center;
+            z-index: 10000;
+        `;
+        waitingMsg.innerHTML = `
+            <div style="font-size: 32px; margin-bottom: 15px;">⏳</div>
+            <div>Waiting for host to start the game...</div>
+        `;
+        document.body.appendChild(waitingMsg);
+    }
+
+    console.log('Multiplayer initialized and ready.');
 }
 
 // Start

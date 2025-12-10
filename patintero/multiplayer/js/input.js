@@ -1,6 +1,6 @@
 import { keys, gameState } from './config.js';
 import { activateBoost } from './boost.js';
-import { switchToRunner, switchToTagger } from './character-switch.js';
+import { attemptSwitchToRunner, attemptSwitchToTagger } from './character-switch.js';
 
 /**
  * Initialize input handlers
@@ -20,9 +20,9 @@ export function initInputHandlers() {
             const num = parseInt(e.key);
             if (!isNaN(num) && num >= 1 && num <= 5) {
                 if (gameState.currentRole === 'runner') {
-                    switchToRunner(num - 1);
+                    attemptSwitchToRunner(num - 1);
                 } else if (gameState.currentRole === 'tagger') {
-                    switchToTagger(num - 1);
+                    attemptSwitchToTagger(num - 1);
                 }
             }
         }
