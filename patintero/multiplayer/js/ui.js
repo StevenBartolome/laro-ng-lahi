@@ -104,9 +104,12 @@ export function updateTimer() {
 
         if (gameState.roundsCompleted === 1) {
             // First round complete - switch roles for second round
+            const myScore = gameState.myTeamId === 1 ? gameState.team1Score : gameState.team2Score;
+            const enemyScore = gameState.myTeamId === 1 ? gameState.team2Score : gameState.team1Score;
+
             showRoundModal(
                 "TIME'S UP!",
-                `Round 1 Complete! ${gameState.currentRole === 'runner' ? 'My Team' : 'Enemy Team'} scored ${gameState.currentRole === 'runner' ? gameState.playerTeamScore : gameState.enemyTeamScore} points!\n\nSwitching roles...`,
+                `Round 1 Complete!\nMy Team: ${myScore}\nEnemy Team: ${enemyScore}\n\nSwitching roles...`,
                 () => {
                     if (switchRolesAfterTagFn) switchRolesAfterTagFn();
                 }
@@ -168,7 +171,7 @@ export function showDifficultyScreen(mode = 'both') {
     const difficultyPanel = difficultyScreen.querySelector('.difficulty-panel');
     const overlayContent = difficultyScreen.querySelector('.overlay-content');
     const menuGrid = difficultyScreen.querySelector('.menu-grid');
-    
+
     // Reset layout based on mode
     if (mode === 'both') {
         overlayContent.style.maxWidth = '900px';
@@ -186,7 +189,7 @@ export function showDifficultyScreen(mode = 'both') {
         instructionsPanel.style.display = 'none';
         difficultyPanel.style.display = 'flex';
     }
-    
+
     difficultyScreen.classList.remove('hidden');
 }
 

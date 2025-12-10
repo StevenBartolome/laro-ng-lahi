@@ -26,8 +26,12 @@ export const gameState = {
     gamePhase: 'first-round',
     playerScore: 0,
     roundsCompleted: 0,
-    playerTeamScore: 0,
-    enemyTeamScore: 0,
+    playerTeamScore: 0, // Deprecated, but kept for safety
+    enemyTeamScore: 0,  // Deprecated, but kept for safety
+    team1Score: 0,
+    team2Score: 0,
+    runnerTeamId: 1,    // 1 or 2
+    myTeamId: null,     // 1 or 2
     playerControlledRunner: null,
     playerControlledTagger: null
 };

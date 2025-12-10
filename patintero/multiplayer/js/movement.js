@@ -88,18 +88,35 @@ export function updateRunners(timeScale = 1.0) {
         }
 
         // Scoring (host only - state is synced to all)
+        // Scoring (host only - state is synced to all)
         if (r.reachedBottom && r.y < 50) {
-            if (gameState.currentRole === 'runner') {
-                gameState.playerTeamScore++;
-                document.getElementById('myTeamScore').textContent = gameState.playerTeamScore;
+            // Determine which team scored
+            // r.reachedBottom implies a Runner made it. The Runner Team scores.
+            if (gameState.runnerTeamId === 1) {
+                gameState.team1Score++;
+            } else {
+                gameState.team2Score++;
+            }
+
+            // Check if WE (local player) are the ones who scored (or our team)
+            const myTeamIsRunner = gameState.myTeamId === gameState.runnerTeamId;
+
+            // Update UI
+            // Note: This UI update is only for HOST (since updateRunners only runs on host).
+            // Non-hosts get updates via Sync.
+            const myScore = gameState.myTeamId === 1 ? gameState.team1Score : gameState.team2Score;
+            const enemyScore = gameState.myTeamId === 1 ? gameState.team2Score : gameState.team1Score;
+
+            document.getElementById('myTeamScore').textContent = myScore;
+            document.getElementById('enemyTeamScore').textContent = enemyScore;
+
+            if (myTeamIsRunner) {
                 if (r.type === 'player') {
                     showPointNotification("+1 POINT FOR MY TEAM!");
                 } else {
-                    showPointNotification("+1 POINT (Bot Runner)", 'team');
+                    showPointNotification("+1 POINT (Teammate)", 'team');
                 }
             } else {
-                gameState.enemyTeamScore++;
-                document.getElementById('enemyTeamScore').textContent = gameState.enemyTeamScore;
                 showPointNotification("+1 POINT FOR ENEMY TEAM!", 'enemy');
             }
 

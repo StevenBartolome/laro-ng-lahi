@@ -9,6 +9,8 @@ import { database } from '../../../config/firebase.js';
 import { ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 import { runners, taggers, gameState } from './config.js';
 
+import { switchRolesAfterTag, endGame } from './game.js';
+
 let lastUploadTime = 0;
 const UPLOAD_INTERVAL = 50; // ms (~20 updates per second)
 
@@ -34,7 +36,7 @@ export function uploadFullGameState() {
     lastUploadTime = now;
 
     const lobbyId = window.multiplayerState?.lobbyId;
-    if (!lobbyId || !gameState.gameActive) return;
+    if (!lobbyId) return; // Removed gameActive check to allow final state sync
 
     // Collect all runner data
     const runnersData = runners.map((r, idx) => ({
@@ -61,11 +63,13 @@ export function uploadFullGameState() {
         runners: runnersData,
         taggers: taggersData,
         scores: {
-            playerTeam: gameState.playerTeamScore,
-            enemyTeam: gameState.enemyTeamScore
+            team1: gameState.team1Score,
+            team2: gameState.team2Score
         },
+        roundsCompleted: gameState.roundsCompleted,
         timer: gameState.gameTimer,
-        timestamp: now
+        timestamp: now,
+        isGameOver: !gameState.gameActive && gameState.roundsCompleted >= 2
     }).catch(err => {
         // Silently fail to avoid console spam
     });
@@ -188,15 +192,34 @@ function applyPlayerInputToEntity(playerId, input) {
 function applyReceivedGameState(data) {
     const myId = window.multiplayerState?.playerId;
 
+    // Check for Round Swapping logic
+    if (data.roundsCompleted !== undefined && data.roundsCompleted > gameState.roundsCompleted) {
+        console.log('[SYNC] Round Change Detected! Host says:', data.roundsCompleted, 'Local:', gameState.roundsCompleted);
+        gameState.roundsCompleted = data.roundsCompleted;
+        // Trigger role switch logic locally
+        switchRolesAfterTag();
+        // Since switchRolesAfterTag resets timer and spawns, we should respect that.
+    }
+
+    // Check for Game Over
+    if (data.isGameOver) {
+        if (gameState.gameActive) {
+            endGame();
+        }
+    }
+
     // Apply runner positions
     if (data.runners) {
+        // Ensure strictly matched array length if possible, or ignore extras
         data.runners.forEach((rData, idx) => {
-            const runner = runners[idx];
-            if (!runner) return;
+            if (!runners[idx]) return;
+            // Note: If startRound hasn't run yet or mismatched, this might be issue.
+            // But switchRolesAfterTag calls startRound which repopulates runners.
 
-            // Skip applying position to player's own character (they control it locally)
+            const runner = runners[idx];
+
+            // Skip applying position to player's own character
             if (runner.remotePlayerId === myId || runner.type === 'player') {
-                // Only sync active/reachedBottom status
                 if (rData.active !== undefined && !rData.active && runner.active) {
                     runner.active = false;
                     runner.el.style.opacity = '0.3';
@@ -212,7 +235,6 @@ function applyReceivedGameState(data) {
             runner.active = rData.active;
             runner.reachedBottom = rData.reachedBottom;
 
-            // Update DOM
             runner.el.style.left = `${runner.x}px`;
             runner.el.style.top = `${runner.y}px`;
 
@@ -232,8 +254,8 @@ function applyReceivedGameState(data) {
     // Apply tagger positions
     if (data.taggers) {
         data.taggers.forEach((tData, idx) => {
+            if (!taggers[idx]) return;
             const tagger = taggers[idx];
-            if (!tagger) return;
 
             // Skip applying position to player's own character
             if (tagger.remotePlayerId === myId || tagger.controller === 'player') {
@@ -245,7 +267,6 @@ function applyReceivedGameState(data) {
             tagger.x = tagger.x + (tData.x - tagger.x) * lerpFactor;
             tagger.y = tagger.y + (tData.y - tagger.y) * lerpFactor;
 
-            // Update DOM
             tagger.el.style.left = `${tagger.x}px`;
             tagger.el.style.top = `${tagger.y}px`;
         });
@@ -253,16 +274,19 @@ function applyReceivedGameState(data) {
 
     // Apply scores
     if (data.scores) {
-        gameState.playerTeamScore = data.scores.playerTeam;
-        gameState.enemyTeamScore = data.scores.enemyTeam;
-        document.getElementById('myTeamScore').textContent = gameState.playerTeamScore;
-        document.getElementById('enemyTeamScore').textContent = gameState.enemyTeamScore;
+        if (data.scores.team1 !== undefined) gameState.team1Score = data.scores.team1;
+        if (data.scores.team2 !== undefined) gameState.team2Score = data.scores.team2;
+
+        const myScore = gameState.myTeamId === 1 ? gameState.team1Score : gameState.team2Score;
+        const enemyScore = gameState.myTeamId === 1 ? gameState.team2Score : gameState.team1Score;
+
+        document.getElementById('myTeamScore').textContent = myScore;
+        document.getElementById('enemyTeamScore').textContent = enemyScore;
     }
 
     // Apply timer
     if (data.timer !== undefined) {
         gameState.gameTimer = data.timer;
-        // Timer display is handled by UI module
     }
 }
 

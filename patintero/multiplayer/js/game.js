@@ -199,6 +199,8 @@ export function performCoinFlip(providedData = null) {
             isRunner = !amInTeam1; // Team 2 = Runners
         }
 
+        gameState.myTeamId = amInTeam1 ? 1 : 2;
+
         gameState.initialRole = isRunner ? 'runner' : 'tagger';
         gameState.currentRole = gameState.initialRole;
 
@@ -345,7 +347,15 @@ export function startRound() {
             runnerTeam = team2Ids;
             taggerTeam = team1Ids;
         }
-        updateStatus("ROLE: RUNNER - Complete runs to earn points!");
+        // Determine Runner Team ID for scoring
+        // Host logic:
+        if (gameState.currentRole === 'runner') {
+            gameState.runnerTeamId = gameState.myTeamId;
+        } else {
+            gameState.runnerTeamId = gameState.myTeamId === 1 ? 2 : 1;
+        }
+
+        updateStatus(gameState.currentRole === 'runner' ? "ROLE: RUNNER - Complete runs to earn points!" : "ROLE: TAGGER - Stop them all!");
     } else { // I am Tagger
         if (amInTeam1WithId) {
             taggerTeam = team1Ids;
@@ -354,7 +364,15 @@ export function startRound() {
             taggerTeam = team2Ids;
             runnerTeam = team1Ids;
         }
-        updateStatus("ROLE: TAGGER - Stop them all!");
+
+        // Determine Runner Team ID for scoring
+        if (gameState.currentRole === 'runner') {
+            gameState.runnerTeamId = gameState.myTeamId;
+        } else {
+            gameState.runnerTeamId = gameState.myTeamId === 1 ? 2 : 1;
+        }
+
+        updateStatus(gameState.currentRole === 'runner' ? "ROLE: RUNNER - Complete runs to earn points!" : "ROLE: TAGGER - Stop them all!");
     }
 
     // --- DYNAMIC FIELD RESIZING & SPAWNING ---
@@ -557,9 +575,12 @@ export function gameLoop(timestamp) {
         gameState.roundsCompleted++;
 
         if (gameState.roundsCompleted === 1) {
+            const myScore = gameState.myTeamId === 1 ? gameState.team1Score : gameState.team2Score;
+            const enemyScore = gameState.myTeamId === 1 ? gameState.team2Score : gameState.team1Score;
+
             showRoundModal(
                 "ROUND 1 COMPLETE!",
-                `${gameState.currentRole === 'runner' ? 'My Team' : 'Enemy Team'} scored ${gameState.currentRole === 'runner' ? gameState.playerTeamScore : gameState.enemyTeamScore} points!\n\nSwitching roles...`,
+                `Scores after Round 1:\nMy Team: ${myScore}\nEnemy Team: ${enemyScore}\n\nSwitching roles...`,
                 () => {
                     switchRolesAfterTag();
                 }
@@ -602,16 +623,19 @@ export function endGame() {
 
     title.textContent = "GAME OVER!";
 
-    const winner = gameState.playerTeamScore > gameState.enemyTeamScore ? 'My Team' :
-        gameState.playerTeamScore < gameState.enemyTeamScore ? 'Enemy Team' : 'Tie';
-    const winnerColor = gameState.playerTeamScore > gameState.enemyTeamScore ? '#4CAF50' :
-        gameState.playerTeamScore < gameState.enemyTeamScore ? '#f44336' : '#FFA500';
+    const myScore = gameState.myTeamId === 1 ? gameState.team1Score : gameState.team2Score;
+    const enemyScore = gameState.myTeamId === 1 ? gameState.team2Score : gameState.team1Score;
+
+    const winner = myScore > enemyScore ? 'My Team' :
+        myScore < enemyScore ? 'Enemy Team' : 'Tie';
+    const winnerColor = myScore > enemyScore ? '#4CAF50' :
+        myScore < enemyScore ? '#f44336' : '#FFA500';
 
     msg.innerHTML = `
         <div style="font-size: 1.5em; margin: 20px 0;">
             <div style="margin-bottom: 15px;">
-                My Team: <span style="color: #4CAF50; font-size: 1.2em;">${gameState.playerTeamScore}</span> | 
-                Enemy Team: <span style="color: #f44336; font-size: 1.2em;">${gameState.enemyTeamScore}</span>
+                My Team: <span style="color: #4CAF50; font-size: 1.2em;">${myScore}</span> | 
+                Enemy Team: <span style="color: #f44336; font-size: 1.2em;">${enemyScore}</span>
             </div>
             <div style="color: ${winnerColor}; font-size: 1.4em; font-weight: bold;">
                 ${winner === 'Tie' ? "IT'S A TIE!" : winner + " WINS!"}
