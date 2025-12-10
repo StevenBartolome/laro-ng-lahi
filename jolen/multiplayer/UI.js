@@ -81,7 +81,6 @@ export class MultiplayerUI {
             'target': 'Target',
             'circle': 'Circle',
             'hole': 'Hole',
-            'tumbang': 'Tumbang',
             'line': 'Line'
         };
         this.elements.modeDisplay.textContent = modeNames[mode] || mode;

@@ -14,25 +14,26 @@ export class ModeSelection {
         const targetCountSelector = document.getElementById('targetCountSelector');
         const targetCountInput = document.getElementById('targetCountInput');
         const targetCountDisplay = document.querySelector('.target-count-display');
+        const modeSelectionSection = document.getElementById('modeSelectionSection');
+        const currentModeDisplay = document.getElementById('currentModeSelectionDisplay');
+        const selectModeHeader = document.getElementById('selectModeHeader');
 
         modeScreen.classList.remove('hidden');
 
         // Setup mode buttons
-        const modeButtons = document.querySelectorAll('.mode-btn');
+        const modeButtons = document.querySelectorAll('#modeSelectionScreen .mode-btn');
 
         if (!isHost) {
-            // Non-host: disable all buttons and show waiting message
-            modeButtons.forEach(btn => {
-                btn.disabled = true;
-                btn.style.cursor = 'not-allowed';
-                btn.style.opacity = '0.6';
-            });
-
+            // Non-host: show current mode display, hide selection section
+            currentModeDisplay.style.display = 'flex';
+            modeSelectionSection.style.display = 'none';
             hostMessage.textContent = 'Waiting for host to select mode...';
             startBtn.style.display = 'none';
             targetCountSelector.style.display = 'none';
         } else {
-            // Host: can select mode and target count
+            // Host: show selection section, hide current mode display
+            currentModeDisplay.style.display = 'none';
+            modeSelectionSection.style.display = 'block';
             hostMessage.textContent = 'Select a game mode to start';
             targetCountSelector.style.display = 'flex';
 
@@ -88,7 +89,7 @@ export class ModeSelection {
 
     // Update display for non-host when host selects mode
     showSelectedMode(mode) {
-        const modeButtons = document.querySelectorAll('.mode-btn');
+        const modeButtons = document.querySelectorAll('#modeSelectionScreen .mode-btn');
         modeButtons.forEach(btn => {
             btn.classList.remove('selected');
             if (btn.dataset.mode === mode) {
@@ -96,13 +97,35 @@ export class ModeSelection {
             }
         });
 
+        // Update current mode display for non-host
+        const currentModeDisplay = document.getElementById('currentModeSelectionDisplay');
+        const selectedModeText = document.getElementById('selectedModeText');
+        const modeIcon = currentModeDisplay.querySelector('.mode-icon');
+
+        if (currentModeDisplay && selectedModeText && modeIcon) {
+            const modeNames = {
+                'target': 'Target',
+                'circle': 'Circle',
+                'hole': 'Hole',
+                'line': 'Line'
+            };
+            const modeIcons = {
+                'target': '🎯',
+                'circle': '⭕',
+                'hole': '🕳️',
+                'line': '📏'
+            };
+
+            selectedModeText.textContent = modeNames[mode];
+            modeIcon.textContent = modeIcons[mode];
+        }
+
         const hostMessage = document.getElementById('hostSelectionMessage');
         if (hostMessage) {
             const modeNames = {
                 'target': 'Target',
                 'circle': 'Circle',
                 'hole': 'Hole',
-                'tumbang': 'Tumbang',
                 'line': 'Line'
             };
             hostMessage.textContent = `Host selected: ${modeNames[mode]}. Starting game...`;

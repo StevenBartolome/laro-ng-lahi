@@ -14,11 +14,12 @@ import {
 
 
 
+
 import * as TargetMode from "./TargetMode.js"; // Multiplayer version with physics
 import * as CircleMode from "./CircleMode.js"; // Multiplayer version
 import * as HoleMode from "./HoleMode.js"; // Multiplayer version
-import * as TumbangMode from "../js/TumbangMode.js";
-import * as LineMode from "../js/LineMode.js";
+import * as LineMode from "./LineMode.js"; // Multiplayer version
+
 
 
 
@@ -533,7 +534,6 @@ class MultiplayerJolen {
             case "target": this.currentModeModule = TargetMode; break;
             case "circle": this.currentModeModule = CircleMode; break;
             case "hole": this.currentModeModule = HoleMode; break;
-            case "tumbang": this.currentModeModule = TumbangMode; break;
             case "line": this.currentModeModule = LineMode; break;
         }
     }
@@ -647,7 +647,6 @@ class MultiplayerJolen {
             'target': 'Target',
             'circle': 'Circle',
             'hole': 'Hole',
-            'tumbang': 'Tumbang',
             'line': 'Line'
         };
         return names[mode] || mode;
@@ -658,7 +657,6 @@ class MultiplayerJolen {
             'target': '🎯',
             'circle': '⭕',
             'hole': '🕳️',
-            'tumbang': '🥫',
             'line': '📏'
         };
         return icons[mode] || '🎮';
