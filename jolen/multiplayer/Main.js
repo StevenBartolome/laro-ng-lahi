@@ -259,6 +259,32 @@ class MultiplayerJolen {
         this.ui.init(this.userId, this.playerNames);
     }
 
+    updatePlayersFromLobby(lobby) {
+        if (!lobby || !lobby.players) return;
+
+        this.players = [];
+        this.playerNames = {};
+
+        Object.entries(lobby.players).forEach(([playerId, playerData]) => {
+            this.players.push({
+                id: playerId,
+                name: playerData.name,
+                isHost: playerData.isHost
+            });
+            this.playerNames[playerId] = playerData.name;
+        });
+
+        // Sort: Host first, then by join time/ID
+        this.players.sort((a, b) => {
+            if (a.isHost) return -1;
+            if (b.isHost) return 1;
+            return 0; // Keep original order if possible, or sort by name if needed
+        });
+
+        // Update UI list immediately
+        this.ui.updatePlayersList(this.players, this.scores, this.currentTurnPlayerId);
+    }
+
     async initializeGame() {
         console.log('🎯 Host initializing game...');
 
@@ -311,13 +337,134 @@ class MultiplayerJolen {
             this.onGameStateUpdate(gameState);
         });
 
-        // Listen to lobby changes (for disconnects)
+        // Listen to lobby changes (for disconnects and player updates)
         this.firebaseSync.listenToLobby((lobby) => {
             if (!lobby) {
                 alert('Lobby closed. Returning to menu...');
                 window.location.href = '../../multiplayer-menu.php';
+                return;
             }
+
+            // 1. Host Leave Check
+            // Check if the original host is still in the players list
+            if (lobby.players && !lobby.players[lobby.hostId]) {
+                alert('Host left the game. Lobby is closing...');
+                window.location.href = '../../multiplayer-menu.php';
+                return;
+            }
+
+            // 2. Player Leave Check & Notification
+            if (lobby.players) {
+                const currentIds = Object.keys(lobby.players);
+                // Find players who left by filtering (matches Luksong Baka pattern)
+                if (this.players && this.players.length > 0) {
+                    const previousIds = this.players.map(p => p.id);
+                    const leftPlayers = previousIds.filter(id => !currentIds.includes(id));
+
+                    // Show notification for each player who left
+                    leftPlayers.forEach(prevId => {
+                        const leftPlayerName = this.playerNames[prevId] || 'A player';
+                        console.log(`👋 ${leftPlayerName} left the game`);
+                        this.showNotification(`${leftPlayerName} left the game`);
+
+                        // HOST LOGIC: Clean up game state for this player (non-blocking)
+                        if (this.isHost && this.firebaseSync && typeof this.firebaseSync.removePlayerFromGame === 'function') {
+                            console.log('👑 Host cleaning up left player:', prevId);
+                            // Don't await - let it happen in background to avoid stack overflow
+                            this.firebaseSync.removePlayerFromGame(prevId).catch(error => {
+                                console.error('Error removing player from game:', error);
+                            });
+                        }
+                    });
+                }
+
+                // 3. Minimum Player Check (check during playing state)
+                const remainingPlayerCount = currentIds.length;
+                const gamePhase = this.gameState; // Use local game state
+
+                if (remainingPlayerCount < 2 && (gamePhase === 'playing' || gamePhase === 'shooting' || gamePhase === 'dragging')) {
+                    console.log('⚠️ Not enough players to continue. Returning to lobby...');
+
+                    // Show styled notification (matches Luksong Baka style)
+                    const notification = document.createElement('div');
+                    notification.className = 'player-left-notification';
+                    notification.style.cssText = `
+                        position: fixed;
+                        top: 50%;
+                        left: 50%;
+                        transform: translate(-50%, -50%);
+                        background: linear-gradient(135deg, rgba(241, 196, 15, 0.95), rgba(243, 156, 18, 0.95));
+                        padding: 20px 40px;
+                        border-radius: 15px;
+                        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.4);
+                        z-index: 10000;
+                        display: flex;
+                        align-items: center;
+                        gap: 15px;
+                        font-family: 'Poppins', sans-serif;
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: white;
+                        opacity: 0;
+                        transition: opacity 0.3s ease;
+                    `;
+                    notification.innerHTML = `
+                        <span class="notification-icon" style="font-size: 24px;">⚠️</span>
+                        <span class="notification-text">Not enough players. Returning to lobby...</span>
+                    `;
+                    document.body.appendChild(notification);
+
+                    // Force a reflow to ensure the initial state is rendered
+                    notification.offsetHeight; // This triggers a reflow
+
+                    // Trigger animation
+                    setTimeout(() => {
+                        notification.style.opacity = '1';
+                    }, 10);
+
+                    // Redirect to lobby after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '../../multiplayer-menu.php';
+                    }, 2000);
+
+                    return; // Don't update player list if redirecting
+                }
+            }
+
+            // Update local player list from the new lobby data
+            this.updatePlayersFromLobby(lobby);
         });
+    }
+
+    // Helper for showing temporary notifications
+    showNotification(message) {
+        let notif = document.getElementById('game-notification');
+        if (!notif) {
+            notif = document.createElement('div');
+            notif.id = 'game-notification';
+            notif.style.position = 'fixed';
+            notif.style.top = '20px';
+            notif.style.left = '50%';
+            notif.style.transform = 'translateX(-50%)';
+            notif.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+            notif.style.color = 'white';
+            notif.style.padding = '10px 20px';
+            notif.style.borderRadius = '20px';
+            notif.style.zIndex = '1000';
+            notif.style.transition = 'opacity 0.3s';
+            document.body.appendChild(notif);
+        }
+
+        notif.textContent = message;
+        notif.style.opacity = '1';
+        notif.style.display = 'block';
+
+        setTimeout(() => {
+            notif.style.opacity = '0';
+            setTimeout(() => {
+                notif.style.display = 'none';
+            }, 300);
+        }, 3000);
     }
 
     onGameStateUpdate(gameState) {

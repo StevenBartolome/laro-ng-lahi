@@ -268,4 +268,17 @@ export class FirebaseSync {
             console.error('Error leaving game:', error);
         }
     }
+
+    // Host: Remove a specific player from game state
+    async removePlayerFromGame(playerId) {
+        // Remove from playerStates, marbels, scores
+        const updates = {};
+        updates[`playerStates/${playerId}`] = null;
+        updates[`playerMarbles/${playerId}`] = null;
+        updates[`scores/${playerId}`] = null;
+        updates['lastAction/type'] = 'player_removed';
+        updates['lastAction/timestamp'] = Date.now();
+
+        await update(this.gameRef, updates);
+    }
 }
