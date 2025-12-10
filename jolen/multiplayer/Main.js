@@ -19,6 +19,8 @@ import * as TumbangMode from "../js/TumbangMode.js";
 import * as LineMode from "../js/LineMode.js";
 
 import { ModeSelection } from "./ModeSelection.js";
+import { InputHandler } from "./InputHandler.js";
+import { GameRenderer } from "./GameRenderer.js";
 import Sound from "../js/Sound.js";
 import { FirebaseSync } from "./FirebaseSync.js";
 import { MultiplayerUI } from "./UI.js";
@@ -77,6 +79,10 @@ class MultiplayerJolen {
         // Mode selection
         this.modeSelection = new ModeSelection();
         this.modeSelection.onModeSelected = (mode, targetCount) => this.onHostSelectMode(mode, targetCount);
+
+        // Initialize modules
+        this.inputHandler = new InputHandler(this);
+        this.renderer = new GameRenderer(this);
 
         this.init();
     }
@@ -529,9 +535,8 @@ class MultiplayerJolen {
     }
 
     setupInputListeners() {
-        this.canvas.addEventListener("mousedown", (e) => this.handleMouseDown(e));
-        window.addEventListener("mousemove", (e) => this.handleMouseMove(e));
-        window.addEventListener("mouseup", (e) => this.handleMouseUp(e));
+        // Use InputHandler for mouse events
+        this.inputHandler.setupListeners();
 
         // Return to lobby button
         const returnBtn = document.getElementById('returnToLobbyBtn');
@@ -750,81 +755,7 @@ class MultiplayerJolen {
         return marblesForSync;
     }
 
-    // Input handlers
-    getMousePos(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-        return {
-            x: (e.clientX - rect.left) * scaleX,
-            y: (e.clientY - rect.top) * scaleY,
-        };
-    }
-
-    isMouseOnMarble(mouseX, mouseY) {
-        // Check if mouse is on current player's marble
-        if (!this.playerMarbles[this.userId]) return false;
-
-        const marble = this.playerMarbles[this.userId];
-        const dx = mouseX - marble.x;
-        const dy = mouseY - marble.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        return distance <= marble.radius + 10;
-    }
-
-    handleMouseDown(e) {
-        if (!this.isMyTurn || this.gameState !== "idle") return;
-
-        const pos = this.getMousePos(e);
-        if (this.isMouseOnMarble(pos.x, pos.y)) {
-            this.isDragging = true;
-            this.dragStartX = pos.x;
-            this.dragStartY = pos.y;
-            this.dragCurrentX = pos.x;
-            this.dragCurrentY = pos.y;
-            this.gameState = "dragging";
-        }
-    }
-
-    handleMouseMove(e) {
-        if (!this.isDragging || this.gameState !== "dragging") return;
-        const pos = this.getMousePos(e);
-        this.dragCurrentX = pos.x;
-        this.dragCurrentY = pos.y;
-    }
-
-    async handleMouseUp(e) {
-        if (!this.isDragging || this.gameState !== "dragging" || !this.isMyTurn) return;
-        if (!this.playerMarbles[this.userId]) return;
-
-        const marble = this.playerMarbles[this.userId];
-        const dx = this.dragCurrentX - marble.x;
-        const dy = this.dragCurrentY - marble.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-
-        if (distance > 5) {
-            const clampedDistance = Math.min(distance, MAX_DRAG_DISTANCE);
-            const power = clampedDistance * POWER_MULTIPLIER;
-            const angle = Math.atan2(-dy, -dx);
-
-            marble.vx = Math.cos(angle) * power;
-            marble.vy = Math.sin(angle) * power;
-            marble.isMoving = true;
-            this.gameState = "shooting";
-
-            // Sync marble state
-            await this.firebaseSync.updatePlayerMarble(this.userId, {
-                x: marble.x,
-                y: marble.y,
-                vx: marble.vx,
-                vy: marble.vy
-            });
-        } else {
-            this.gameState = "idle";
-        }
-
-        this.isDragging = false;
-    }
+    // Note: Input handling methods are in InputHandler.js
 
     // Game loop
     update() {
@@ -885,8 +816,8 @@ class MultiplayerJolen {
             }
         }
 
-        // Draw everything
-        this.draw();
+        // Draw everything using GameRenderer
+        this.renderer.draw();
 
         // Update message timer
         if (this.messageTimer > 0) {
@@ -908,15 +839,13 @@ class MultiplayerJolen {
             // Game is over! Determine winner
             console.log('🏆 All targets hit! Game over!');
 
-            if (this.isHost) {
-                // Determine winner
-                const winner = this.determineWinner();
-                console.log('🏆 Winner:', winner.name, 'with score:', winner.score);
+            // Determine winner
+            const winner = this.determineWinner();
+            console.log('🏆 Winner:', winner.name, 'with score:', winner.score);
 
-                // Set game to finished state in Firebase
-                await this.firebaseSync.setGameOver();
-                console.log('✓ Game over state set in Firebase');
-            }
+            // Set game to finished state in Firebase (any player can do this)
+            await this.firebaseSync.setGameOver();
+            console.log('✓ Game over state set in Firebase');
 
             // Show game over immediately for all players
             console.log('🎉 Showing game over screen...');
@@ -983,179 +912,7 @@ class MultiplayerJolen {
         this.gameState = "waiting";
     }
 
-    draw() {
-        // Clear canvas
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-
-        // Draw background
-        if (images.background.complete && images.background.naturalWidth > 0) {
-            this.ctx.drawImage(images.background, 0, 0, this.canvas.width, this.canvas.height);
-        }
-
-        // Draw mode specifics using the mode's draw function
-        if (this.modeState && this.currentModeModule) {
-            this.currentModeModule.draw(this.ctx, this.modeState);
-        } else {
-            // Debug: Show waiting message
-            this.ctx.fillStyle = "white";
-            this.ctx.font = "bold 24px Arial";
-            this.ctx.textAlign = "center";
-            this.ctx.fillText("Waiting for game to start...", this.canvas.width / 2, this.canvas.height / 2);
-        }
-
-        // Draw ALL player marbles (each with their own image)
-        this.players.forEach((player, playerIndex) => {
-            const marble = this.playerMarbles[player.id];
-            if (!marble) return;
-
-            // Check if this is the current turn player
-            const isCurrentTurnPlayer = player.id === this.currentTurnPlayerId;
-
-            // Glow effect for:
-            // 1. Current turn player when idle/dragging
-            // 2. Current user's marble when it's their turn and idle/dragging
-            const shouldGlow = isCurrentTurnPlayer && (this.gameState === "idle" || this.gameState === "dragging");
-
-            drawMarble(
-                this.ctx,
-                marble,
-                shouldGlow,
-                true,  // isPlayer = true
-                playerIndex  // Player index for correct marble image (0-5)
-            );
-
-            // Draw player name tag above marble
-            this.ctx.save();
-            const nameTag = player.name;
-            const isCurrentUser = player.id === this.userId;
-
-            // Background for name tag
-            this.ctx.font = "bold 12px Arial";
-            const textWidth = this.ctx.measureText(nameTag).width;
-            const tagPadding = 4;
-            const tagX = marble.x - textWidth / 2 - tagPadding;
-            const tagY = marble.y - marble.radius - 20;
-
-            // Draw background pill
-            this.ctx.fillStyle = isCurrentTurnPlayer ? "rgba(76, 175, 80, 0.85)" : "rgba(62, 39, 35, 0.85)";
-            this.ctx.beginPath();
-            this.ctx.roundRect(tagX, tagY - 10, textWidth + tagPadding * 2, 16, 8);
-            this.ctx.fill();
-
-            // Draw border for current user
-            if (isCurrentUser) {
-                this.ctx.strokeStyle = "#FFD700";
-                this.ctx.lineWidth = 2;
-                this.ctx.stroke();
-            }
-
-            // Draw name text
-            this.ctx.fillStyle = "white";
-            this.ctx.textAlign = "center";
-            this.ctx.textBaseline = "middle";
-            this.ctx.fillText(nameTag, marble.x, tagY - 2);
-            this.ctx.restore();
-        });
-
-        // Draw drag line
-        if (this.isDragging && this.gameState === "dragging") {
-            this.drawDragLine();
-        }
-
-        // Draw message
-        this.drawMessage();
-    }
-
-    drawDragLine() {
-        if (!this.isDragging || this.gameState !== "dragging") return;
-        if (!this.playerMarbles[this.userId]) return;
-
-        const marble = this.playerMarbles[this.userId];
-        this.ctx.save();
-
-        const dx = this.dragCurrentX - marble.x;
-        const dy = this.dragCurrentY - marble.y;
-        const distance = Math.sqrt(dx * dx + dy * dy);
-        const clampedDistance = Math.min(distance, MAX_DRAG_DISTANCE);
-
-        // Draw drag line
-        this.ctx.strokeStyle = "rgba(255, 255, 255, 0.6)";
-        this.ctx.lineWidth = 4;
-        this.ctx.setLineDash([5, 5]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(marble.x, marble.y);
-        this.ctx.lineTo(this.dragCurrentX, this.dragCurrentY);
-        this.ctx.stroke();
-        this.ctx.setLineDash([]);
-
-        // Draw trajectory line
-        const trajectoryLength = clampedDistance * 1.5;
-        const shootAngle = Math.atan2(-dy, -dx);
-        const endX = marble.x + Math.cos(shootAngle) * trajectoryLength;
-        const endY = marble.y + Math.sin(shootAngle) * trajectoryLength;
-
-        this.ctx.strokeStyle = "rgba(255, 200, 0, 0.8)";
-        this.ctx.lineWidth = 3;
-        this.ctx.setLineDash([10, 5]);
-        this.ctx.beginPath();
-        this.ctx.moveTo(marble.x, marble.y);
-        this.ctx.lineTo(endX, endY);
-        this.ctx.stroke();
-        this.ctx.setLineDash([]);
-
-        // Draw arrow head
-        this.ctx.fillStyle = "rgba(255, 200, 0, 0.8)";
-        this.ctx.beginPath();
-        this.ctx.moveTo(endX, endY);
-        this.ctx.lineTo(
-            endX - 15 * Math.cos(shootAngle - Math.PI / 6),
-            endY - 15 * Math.sin(shootAngle - Math.PI / 6)
-        );
-        this.ctx.lineTo(
-            endX - 15 * Math.cos(shootAngle + Math.PI / 6),
-            endY - 15 * Math.sin(shootAngle + Math.PI / 6)
-        );
-        this.ctx.closePath();
-        this.ctx.fill();
-
-        // Power UI
-        const powerPercent = (clampedDistance / MAX_DRAG_DISTANCE) * 100;
-        this.ctx.strokeStyle =
-            powerPercent > 75 ? "#f44336" : powerPercent > 50 ? "#FF9800" : "#4CAF50";
-        this.ctx.lineWidth = 4;
-        this.ctx.beginPath();
-        this.ctx.arc(
-            marble.x,
-            marble.y,
-            marble.radius + 5,
-            0,
-            Math.PI * 2
-        );
-        this.ctx.stroke();
-
-        this.ctx.fillStyle = "white";
-        this.ctx.strokeStyle = "black";
-        this.ctx.lineWidth = 3;
-        this.ctx.font = "bold 18px Arial";
-        this.ctx.textAlign = "center";
-        this.ctx.textBaseline = "middle";
-        const powerText = `${Math.round(powerPercent)}%`;
-        this.ctx.strokeText(powerText, marble.x, marble.y - 30);
-        this.ctx.fillText(powerText, marble.x, marble.y - 30);
-
-        this.ctx.restore();
-    }
-
-    drawMessage() {
-        if (this.messageTimer > 0) {
-            this.ctx.fillStyle = "rgba(0, 0, 0, 0.7)";
-            this.ctx.fillRect(0, this.canvas.height / 2 - 50, this.canvas.width, 100);
-            this.ctx.fillStyle = "white";
-            this.ctx.font = "bold 36px Arial";
-            this.ctx.textAlign = "center";
-            this.ctx.fillText(this.message, this.canvas.width / 2, this.canvas.height / 2 + 10);
-        }
-    }
+    // Note: Draw methods have been moved to GameRenderer.js
 
     showGameOver() {
         console.log('🎊 showGameOver() called');
