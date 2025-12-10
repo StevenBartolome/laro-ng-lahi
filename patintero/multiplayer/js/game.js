@@ -225,47 +225,83 @@ export function startRound() {
         updateStatus("ROLE: TAGGER - Stop them all!");
     }
 
-    // Spawn Runners
-    // Spread them out distinct starting X positions
-    const runnerSegmentWidth = fw / (runnerTeam.length + 1);
+    // --- DYNAMIC FIELD RESIZING & SPAWNING ---
+
+    // 1. Calculate Field Height
+    const numTaggers = taggerTeam.length;
+    // Standard: 1 Vertical + (N-1) Horizontal
+    // If 1 Tagger (1v1), we enforce at least 1 Horizontal line? Or just Vertical?
+    // Let's assume minimum 1 horizontal line for playability unless purely vertical.
+    // If numTaggers=1, Horiz=0. But 1v1 on big field is boring.
+    const numHorizontalLines = Math.max(1, numTaggers - 1);
+
+    // Height Calculation: Base 144px per line + buffers
+    // 2 players (1 tagger) -> 0 horiz lines -> 1 line min -> Small field
+    let newHeight = 144 * (numHorizontalLines + 1);
+    if (newHeight < 400) newHeight = 400; // Min height
+    if (newHeight > 720) newHeight = 720; // Max height
+
+    // Apply Height
+    field.style.height = `${newHeight}px`;
+    const fh = field.offsetHeight; // Get new height
+    // Note: fw (width) usually stays fixed, but good to refresh if responsive
+    const fw_current = field.offsetWidth;
+
+    // 2. Regenerate Grid Lines
+    const existingLines = field.querySelectorAll('.horizontal-line');
+    existingLines.forEach(l => l.remove());
+
+    const linePositions = [];
+    for (let i = 0; i < numHorizontalLines; i++) {
+        // Distribute lines evenly within the height
+        // e.g. 1 line -> 50%
+        // e.g. 2 lines -> 33%, 66%
+        const percent = (i + 1) / (numHorizontalLines + 1);
+        const topPosPercent = percent * 100;
+
+        const line = document.createElement('div');
+        line.className = 'line horizontal-line';
+        line.style.top = `${topPosPercent}%`;
+        field.appendChild(line);
+
+        linePositions.push(percent * fh); // Store pixel position for spawning
+    }
+
+    // 3. Spawn Runners
+    const runnerSegmentWidth = fw_current / (runnerTeam.length + 1);
 
     runnerTeam.forEach((p, index) => {
         const startX = runnerSegmentWidth * (index + 1);
-        const type = (p.id === myId) ? 'player' : (p.isBot ? 'bot' : 'bot'); // Treated as bot for now if remote
-        // NOTE: We treat remote players as 'bot' type for visual rendering (using createRunner logic),
-        // but if we want them stationary until sync, we might need 'remote'.
-        // For now, let's stick to 'bot' if it's a bot, and 'player' (but remote?)
-        // Actually, createRunner('bot') enables AI. createRunner('player') enables Input.
-        // Remote players should NOT have AI or Input. 
-        // We really need a 'remote' type. But for now, let's hack it:
-        // Use 'bot' for actual Bots.
-        // Use 'bot' for Remote Players BUT disable their AI update in movement.js? 
-        // Or just let them be AI for now as requested "count also the bot".
-
-        // Since sync isn't ready, let's spawn Remote Players as Bots so they do something.
-        const spawnType = (p.id === myId) ? 'player' : 'bot';
+        const spawnType = (p.id === myId) ? 'player' : 'bot'; // Remote players as bots for now
 
         createRunner(spawnType, startX, 50, p.headIndex);
     });
 
-    // Spawn Taggers
-    // Lines: 0 (Vertical), 0.2, 0.4, 0.6, 0.8
-    // If more than 5 taggers, we wrap around or double up?
-    // Typical Patintero is 5 lines.
-    const taggerPositions = [
-        { type: 'vertical', pos: 0 },
-        { type: 'horizontal', pos: field.offsetHeight * 0.2 },
-        { type: 'horizontal', pos: field.offsetHeight * 0.4 },
-        { type: 'horizontal', pos: field.offsetHeight * 0.6 },
-        { type: 'horizontal', pos: field.offsetHeight * 0.8 }
-    ];
-
+    // 4. Spawn Taggers
     taggerTeam.forEach((p, index) => {
-        const posIndex = index % taggerPositions.length;
-        const config = taggerPositions[posIndex];
         const spawnType = (p.id === myId) ? 'player' : 'bot';
 
-        createTagger(index + 1, config.type, config.pos, diff, spawnType, p.headIndex);
+        if (index === 0) {
+            // First tagger is Vertical (Patotot) - Always Center
+            createTagger(1, 'vertical', 0, diff, spawnType, p.headIndex);
+        } else {
+            // Remaining taggers are Horizontal (Patotot)
+            // Assign to lines in order, wrapping if necessary
+            // (Though with dynamic field, lines should match taggers usually)
+
+            // If we enforced numHorizontalLines = numTaggers - 1, it matches perfectly.
+            // But if numTaggers=1 (1v1), we have 1 horiz line but no 2nd tagger.
+            // That's fine, the line exists as an obstacle/visual, just no tagger on it.
+
+            const lineIndex = (index - 1) % linePositions.length;
+            if (linePositions.length > 0) {
+                const yPos = linePositions[lineIndex];
+                createTagger(index + 1, 'horizontal', yPos, diff, spawnType, p.headIndex);
+            } else {
+                // Fallback if no horizontal lines (shouldn't happen with min 1)
+                createTagger(index + 1, 'horizontal', fh / 2, diff, spawnType, p.headIndex);
+            }
+        }
     });
 
     gameState.gameActive = true;
