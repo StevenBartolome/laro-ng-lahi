@@ -1,0 +1,278 @@
+/* Luksong Baka Multiplayer - Overlay Styles */
+
+/* Base Overlay Structure */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(10px);
+}
+
+.overlay-content {
+    background: linear-gradient(135deg, rgba(44, 62, 80, 0.98), rgba(52, 73, 94, 0.98));
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    max-width: 600px;
+    width: 90%;
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.game-title {
+    color: #D2691E;
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.5em;
+    text-align: center;
+    margin-bottom: 20px;
+    text-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Message Overlay */
+#messageOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+    pointer-events: none;
+    background: transparent;
+}
+
+#messageText {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2em;
+    padding: 20px 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+    animation: fadeIn 0.3s ease-out;
+    backdrop-filter: blur(10px);
+}
+
+#messageText.success {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.95), rgba(39, 174, 96, 0.95));
+    color: white;
+}
+
+#messageText.fail {
+    background: linear-gradient(135deg, rgba(231, 76, 60, 0.95), rgba(192, 57, 43, 0.95));
+    color: white;
+}
+
+/* Waiting Screen */
+.waiting-message {
+    text-align: center;
+    margin: 30px 0;
+}
+
+.waiting-message p {
+    color: #ecf0f1;
+    font-size: 1.2em;
+    margin-bottom: 20px;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid rgba(255, 255, 255, 0.2);
+    border-top-color: #3498db;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+}
+
+/* Ready Players Display */
+.ready-players {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.ready-player-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin-bottom: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.ready-player-item.ready {
+    background: rgba(46, 204, 113, 0.2);
+    border-left: 4px solid #2ecc71;
+}
+
+.ready-status {
+    color: #95a5a6;
+    font-size: 0.9em;
+}
+
+.ready-status.ready {
+    color: #2ecc71;
+    font-weight: bold;
+}
+
+.btn-ready {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #2ecc71, #27ae60);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-ready:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.4);
+}
+
+.btn-ready:disabled {
+    background: #95a5a6;
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+/* Spectator Overlay */
+.spectator-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 90;
+    backdrop-filter: blur(5px);
+    transition: all 0.5s ease;
+}
+
+.spectator-overlay.taya-mode {
+    background: rgba(0, 0, 0, 0.1);
+    backdrop-filter: none;
+    align-items: flex-end;
+    padding-bottom: 50px;
+}
+
+.spectator-message {
+    background: linear-gradient(135deg, rgba(52, 73, 94, 0.95), rgba(44, 62, 80, 0.95));
+    padding: 40px;
+    border-radius: 20px;
+    text-align: center;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.spectator-message.taya-view {
+    padding: 15px 30px;
+    background: rgba(44, 62, 80, 0.8);
+    transform: scale(0.9);
+}
+
+.spectator-message.taya-view h2 {
+    font-size: 1.2em;
+    margin: 0;
+}
+
+.spectator-message.taya-view p {
+    font-size: 1em;
+    margin: 5px 0 0 0;
+}
+
+.spectator-message p {
+    color: #ecf0f1;
+    font-size: 1.5em;
+    margin: 10px 0;
+    font-weight: 600;
+}
+
+.spectator-message span {
+    color: #3498db;
+    font-weight: bold;
+}
+
+.spectator-hint {
+    font-size: 1.1em !important;
+    color: #bdc3c7 !important;
+    font-style: italic;
+}
+
+/* Game Over Screen */
+.final-scores {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 20px;
+    border-radius: 10px;
+    margin: 20px 0;
+}
+
+.score-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    margin-bottom: 10px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+}
+
+.score-item.winner {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.3), rgba(39, 174, 96, 0.3));
+    border: 2px solid #2ecc71;
+}
+
+.score-rank {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #f39c12;
+    margin-right: 15px;
+}
+
+.score-name {
+    flex: 1;
+    color: #ecf0f1;
+    font-weight: 600;
+    font-size: 1.1em;
+}
+
+.score-value {
+    color: #3498db;
+    font-weight: bold;
+    font-size: 1.2em;
+}
+
+.btn-back {
+    width: 100%;
+    padding: 15px;
+    background: linear-gradient(135deg, #3498db, #2980b9);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Nunito', sans-serif;
+}
+
+.btn-back:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(52, 152, 219, 0.4);
+}
