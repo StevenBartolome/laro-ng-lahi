@@ -71,6 +71,7 @@ $displayname = $_SESSION['displayname'] ?? $_SESSION['username'];
             </div>
 
             <button id="copyBtn" class="btn btn-secondary">Copy Code</button>
+            <button id="addBotBtn" class="btn btn-secondary" style="display: none;">Add Bot</button>
 
             <!-- Players List -->
             <div class="players-container">

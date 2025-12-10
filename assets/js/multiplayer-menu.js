@@ -115,6 +115,7 @@ class MultiplayerMenu {
         document.getElementById('copyBtn').addEventListener('click', () => this.copyCode());
         document.getElementById('startGameBtn').addEventListener('click', () => this.startGame());
         document.getElementById('backFromLobby').addEventListener('click', () => this.leaveLobby());
+        document.getElementById('addBotBtn').addEventListener('click', () => this.addBot());
 
         // Join screen buttons
         document.getElementById('joinBtn').addEventListener('click', () => this.joinLobby());
@@ -386,13 +387,38 @@ class MultiplayerMenu {
 
             // Enable start button only if player count is within valid range
             if (this.isHost) {
-                const canStart = playerCount >= minPlayers && playerCount <= maxPlayers;
+                // Check if Patintero (ID 1 or name 'patintero')
+                const isPatintero = this.selectedGame?.id === '1' || this.selectedGame?.name?.toLowerCase().includes('patintero');
+                const addBotBtn = document.getElementById('addBotBtn');
+
+                // Show/Hide Add Bot Button
+                if (isPatintero) {
+                    addBotBtn.style.display = 'inline-block';
+                } else {
+                    addBotBtn.style.display = 'none';
+                }
+
+                let canStart = playerCount >= minPlayers && playerCount <= maxPlayers;
+                let errorMsg = '';
+
+                // Patintero specific check: Must be even number of players
+                if (isPatintero && playerCount % 2 !== 0) {
+                    canStart = false;
+                    errorMsg = ' (Need even players)';
+                }
+
                 document.getElementById('startGameBtn').disabled = !canStart;
 
                 const statusMsg = document.getElementById('lobbyStatusMessage');
                 if (statusMsg) {
                     if (playerCount < minPlayers) {
-                        statusMsg.textContent = `Need at least ${minPlayers} players to start`;
+                        statusMsg.textContent = `Need at least ${minPlayers} players to start` + errorMsg;
+                        statusMsg.style.color = '#ff6b6b';
+                    } else if (playerCount > maxPlayers) {
+                        statusMsg.textContent = `Too many players` + errorMsg;
+                        statusMsg.style.color = '#ff6b6b';
+                    } else if (isPatintero && playerCount % 2 !== 0) {
+                        statusMsg.textContent = `Patintero requires an equal number of players (even number)`;
                         statusMsg.style.color = '#ff6b6b';
                     } else {
                         statusMsg.textContent = 'Ready to start!';
@@ -401,6 +427,29 @@ class MultiplayerMenu {
                 }
             }
         });
+    }
+
+    async addBot() {
+        if (!this.currentLobbyId || !this.isHost) return;
+
+        try {
+            const botId = 'bot_' + Date.now() + Math.floor(Math.random() * 1000);
+            const playerRef = ref(database, `lobbies/${this.currentLobbyId}/players/${botId}`);
+
+            // Random bot name
+            const botNum = Math.floor(Math.random() * 1000);
+
+            await set(playerRef, {
+                name: 'Bot ' + botNum,
+                isHost: false,
+                isBot: true,
+                joinedAt: Date.now()
+            });
+
+        } catch (error) {
+            console.error('Error adding bot:', error);
+            alert('Failed to add bot.');
+        }
     }
 
     listenToLobbyStatus(lobbyId) {
@@ -434,7 +483,7 @@ class MultiplayerMenu {
                     console.log('🎮 Game Info:', lobby.game);
 
                     const gameRoutes = {
-                        '1': 'patintero/index.html',
+                        '1': 'patintero/multiplayer/index.html',
                         '2': 'luksong-baka/multiplayer/index.html',
                         '3': 'jolen/multiplayer/index.html'
                     };
@@ -443,7 +492,7 @@ class MultiplayerMenu {
                     const gameNameRoutes = {
                         'jolen': 'jolen/multiplayer/index.html',
                         'luksong baka': 'luksong-baka/multiplayer/index.html',
-                        'patintero': 'patintero/index.html'
+                        'patintero': 'patintero/multiplayer/index.html'
                     };
 
                     let gameUrl = gameRoutes[lobby.game.id];
@@ -476,7 +525,7 @@ class MultiplayerMenu {
 
             // Route to the correct game based on game_id
             const gameRoutes = {
-                '1': 'patintero/index.html',          // Multiplayer version for jolen
+                '1': 'patintero/multiplayer/index.html',          // Multiplayer version for jolen
                 '2': 'luksong-baka/multiplayer/index.html',   // Multiplayer version for luksong-baka
                 '3': 'jolen/multiplayer/index.html'                   // Assuming game_id 3 is patintero
             };
