@@ -52,16 +52,34 @@ export function showRoundModal(titleText, msgText, callback) {
 
     title.textContent = titleText;
     msg.textContent = msgText;
-    btn.textContent = "Start Next Round";
 
-    // Override button click
-    const newBtn = btn.cloneNode(true);
-    btn.parentNode.replaceChild(newBtn, btn);
+    const isHost = window.multiplayerState && window.multiplayerState.isHost;
 
-    newBtn.onclick = () => {
-        modal.style.display = 'none';
-        callback();
-    };
+    if (isHost) {
+        btn.textContent = "Start Next Round";
+        btn.disabled = false;
+        btn.style.display = 'inline-block';
+
+        // Override button click
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+
+        newBtn.onclick = () => {
+            modal.style.display = 'none';
+            callback();
+        };
+    } else {
+        btn.textContent = "Waiting for Host...";
+        btn.disabled = true;
+        // Keep it visible but disabled so they know what's happening
+        btn.style.display = 'inline-block';
+        btn.style.opacity = '0.7';
+        btn.style.cursor = 'wait';
+
+        // Clone to remove old listeners just in case
+        const newBtn = btn.cloneNode(true);
+        btn.parentNode.replaceChild(newBtn, btn);
+    }
 
     modal.style.display = 'block';
 }

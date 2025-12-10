@@ -24,62 +24,63 @@ export function updateRunners(timeScale = 1.0) {
         if (!r.active) return;
 
         // Remote players - apply their synced position (host receives from playerInputs)
-        if (r.type === 'remote') return;
+        // Skip MOVEMENT logic for remotes, but proceed to SCORING logic if Host
+        if (r.type !== 'remote') {
+            let dx = 0, dy = 0;
+            let speed = CONFIG.runnerSpeed;
+            if (r.type === 'bot') speed = CONFIG.botSpeed;
 
-        let dx = 0, dy = 0;
-        let speed = CONFIG.runnerSpeed;
-        if (r.type === 'bot') speed = CONFIG.botSpeed;
+            if (r.type === 'player') {
+                // Player Movement
+                if (boost.active) speed *= boost.multiplier;
+                const scaledSpeed = speed * timeScale;
 
-        if (r.type === 'player') {
-            // Player Movement
-            if (boost.active) speed *= boost.multiplier;
-            const scaledSpeed = speed * timeScale;
+                if (keys.ArrowUp || keys.w) dy -= scaledSpeed;
+                if (keys.ArrowDown || keys.s) dy += scaledSpeed;
+                if (keys.ArrowLeft || keys.a) dx -= scaledSpeed;
+                if (keys.ArrowRight || keys.d) dx += scaledSpeed;
+            } else {
+                // Bot AI Logic
+                const scaledSpeed = speed * timeScale;
+                let targetY = r.reachedBottom ? 20 : fh - 40;
 
-            if (keys.ArrowUp || keys.w) dy -= scaledSpeed;
-            if (keys.ArrowDown || keys.s) dy += scaledSpeed;
-            if (keys.ArrowLeft || keys.a) dx -= scaledSpeed;
-            if (keys.ArrowRight || keys.d) dx += scaledSpeed;
-        } else {
-            // Bot AI Logic
-            const scaledSpeed = speed * timeScale;
-            let targetY = r.reachedBottom ? 20 : fh - 40;
+                if (r.y < targetY) dy += scaledSpeed * 0.6;
+                else if (r.y > targetY) dy -= scaledSpeed * 0.6;
 
-            if (r.y < targetY) dy += scaledSpeed * 0.6;
-            else if (r.y > targetY) dy -= scaledSpeed * 0.6;
+                // Evasion Logic
+                let nearestTagger = null;
+                let minDist = 100;
+                taggers.forEach(t => {
+                    const dist = Math.sqrt((r.x - t.x) ** 2 + (r.y - t.y) ** 2);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearestTagger = t;
+                    }
+                });
 
-            // Evasion Logic
-            let nearestTagger = null;
-            let minDist = 100;
-            taggers.forEach(t => {
-                const dist = Math.sqrt((r.x - t.x) ** 2 + (r.y - t.y) ** 2);
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearestTagger = t;
+                if (nearestTagger) {
+                    if (nearestTagger.x < r.x) dx += scaledSpeed * 0.5;
+                    else dx -= scaledSpeed * 0.5;
+
+                    if (Math.abs(nearestTagger.y - r.y) < 60 && Math.abs(nearestTagger.x - r.x) < 50) {
+                        dy = 0;
+                        if (r.x < 40) dx += scaledSpeed * 0.7;
+                        else if (r.x > fw - 40) dx -= scaledSpeed * 0.7;
+                        else if (Math.abs(r.x - fw / 2) < 20) dx += (Math.random() < 0.5 ? 1 : -1) * scaledSpeed * 0.7;
+                        else dx += (r.x < fw / 2 ? -1 : 1) * scaledSpeed * 0.7;
+                    }
                 }
-            });
 
-            if (nearestTagger) {
-                if (nearestTagger.x < r.x) dx += scaledSpeed * 0.5;
-                else dx -= scaledSpeed * 0.5;
-
-                if (Math.abs(nearestTagger.y - r.y) < 60 && Math.abs(nearestTagger.x - r.x) < 50) {
-                    dy = 0;
-                    if (r.x < 40) dx += scaledSpeed * 0.7;
-                    else if (r.x > fw - 40) dx -= scaledSpeed * 0.7;
-                    else if (Math.abs(r.x - fw / 2) < 20) dx += (Math.random() < 0.5 ? 1 : -1) * scaledSpeed * 0.7;
-                    else dx += (r.x < fw / 2 ? -1 : 1) * scaledSpeed * 0.7;
-                }
+                if (Math.random() < 0.05 * timeScale) dx += (Math.random() - 0.5) * 10 * timeScale;
             }
 
-            if (Math.random() < 0.05 * timeScale) dx += (Math.random() - 0.5) * 10 * timeScale;
+            r.x += dx;
+            r.y += dy;
+
+            // Bounds
+            if (r.x < 20) r.x = 20; if (r.x > fw - 20) r.x = fw - 20;
+            if (r.y < 20) r.y = 20; if (r.y > fh - 20) r.y = fh - 20;
         }
-
-        r.x += dx;
-        r.y += dy;
-
-        // Bounds
-        if (r.x < 20) r.x = 20; if (r.x > fw - 20) r.x = fw - 20;
-        if (r.y < 20) r.y = 20; if (r.y > fh - 20) r.y = fh - 20;
 
         // Check Round Trip
         if (!r.reachedBottom && r.y > fh - 50) {
@@ -87,7 +88,6 @@ export function updateRunners(timeScale = 1.0) {
             r.el.style.border = '3px solid #00FF00';
         }
 
-        // Scoring (host only - state is synced to all)
         // Scoring (host only - state is synced to all)
         if (r.reachedBottom && r.y < 50) {
             // Determine which team scored

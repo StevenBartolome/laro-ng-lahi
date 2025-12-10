@@ -161,6 +161,84 @@ export function initPlayerInputSync() {
 }
 
 /**
+ * ALL: Initialize listener for entity usage to update visuals
+ */
+export function initEntityUsageSync() {
+    const lobbyId = window.multiplayerState?.lobbyId;
+    if (!lobbyId) return;
+
+    const usageRef = ref(database, `lobbies/${lobbyId}/entityUsage`);
+    onValue(usageRef, (snapshot) => {
+        const usage = snapshot.val() || {};
+        window.multiplayerState.entityUsage = usage;
+
+        // Update Runner Visuals
+        runners.forEach((r, idx) => {
+            const entityId = `runner_${idx}`;
+            const controllerId = usage[entityId];
+
+            // If I control it, character-switch.js handles my visuals
+            if (controllerId === window.multiplayerState.playerId) return;
+
+            if (controllerId) {
+                // Controlled by someone else
+                r.type = 'remote'; // Treat as remote player
+                r.remotePlayerId = controllerId;
+
+                r.el.classList.add('player-controlled');
+                r.el.style.filter = 'none';
+
+                // Update Label
+                const label = r.el.querySelector('.entity-label');
+                // ideally fetch name, but ID helper for now
+                if (label) label.textContent = `P${idx + 1}`;
+            } else {
+                // Bot / Free
+                if (r.type === 'remote') {
+                    // Was remote, now free -> bot
+                    r.type = 'bot';
+                    r.remotePlayerId = null;
+                    r.el.classList.remove('player-controlled');
+                    r.el.style.filter = 'hue-rotate(180deg)'; // Bot Color
+
+                    const label = r.el.querySelector('.entity-label');
+                    if (label) label.textContent = `R${idx + 1}`;
+                }
+            }
+        });
+
+        // Update Tagger Visuals
+        taggers.forEach((t, idx) => {
+            const entityId = `tagger_${idx}`;
+            const controllerId = usage[entityId];
+
+            if (controllerId === window.multiplayerState.playerId) return;
+
+            if (controllerId) {
+                t.controller = 'remote';
+                t.remotePlayerId = controllerId;
+                t.el.classList.add('player-tagger');
+
+                const label = t.el.querySelector('.entity-label');
+                if (label) label.textContent = `T${t.id}`;
+            } else {
+                if (t.controller === 'remote') {
+                    t.controller = 'bot';
+                    t.remotePlayerId = null;
+                    t.el.classList.remove('player-tagger');
+
+                    const label = t.el.querySelector('.entity-label');
+                    if (label) label.textContent = `T${t.id}`;
+                }
+            }
+        });
+
+        // Also update the panel UI if open
+        import('./character-switch.js').then(m => m.updateCharacterPanel());
+    });
+}
+
+/**
  * HOST: Apply a remote player's input to their entity
  */
 function applyPlayerInputToEntity(playerId, input) {

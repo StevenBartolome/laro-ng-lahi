@@ -16,6 +16,7 @@ import { checkBoostInput } from './input.js';
 import {
     uploadFullGameState, uploadPlayerPosition,
     initGameStateSync, initPlayerInputSync,
+    initEntityUsageSync,
     isHostClient
 } from './sync.js';
 
@@ -148,6 +149,7 @@ function handleGameStart(difficulty, lobbyData) {
 
     // Initialize sync listeners based on role
     initGameStateSync(); // All clients listen for game state
+    initEntityUsageSync(); // All clients listen for character usage
     if (isHostClient()) {
         initPlayerInputSync(); // Host listens for player inputs
     }
