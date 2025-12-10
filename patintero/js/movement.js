@@ -58,7 +58,25 @@ export function updateRunners(timeScale = 1.0) {
 
                 // Wait behavior if tagger is directly ahead
                 if (Math.abs(nearestTagger.y - r.y) < 60 && Math.abs(nearestTagger.x - r.x) < 50) {
-                    dy = 0; // Stop and wait
+                    dy = 0; // Stop forward movement
+                    
+                    // Anti-Stuck: Smart Evasion
+                    // If stuck at Left Wall (< 40px), forced to engage Right
+                    if (r.x < 40) {
+                        dx += scaledSpeed * 0.7;
+                    } 
+                    // If stuck at Right Wall (> fw - 40px), forced to engage Left
+                    else if (r.x > fw - 40) {
+                         dx -= scaledSpeed * 0.7;
+                    }
+                    // If stuck at Center (Danger Zone), random break
+                    else if (Math.abs(r.x - fw / 2) < 20) {
+                         dx += (Math.random() < 0.5 ? 1 : -1) * scaledSpeed * 0.7;
+                    } 
+                    // Otherwise (Open Field), move AWAY from center to flank
+                    else {
+                        dx += (r.x < fw / 2 ? -1 : 1) * scaledSpeed * 0.7;
+                    }
                 }
             }
 
@@ -125,7 +143,7 @@ export function updateTaggers(timeScale = 1.0) {
         // PLAYER CONTROLLED TAGGER
         if (t.controller === 'player') {
             let dx = 0, dy = 0;
-            let speed = CONFIG.taggerSpeed * 1.5; // Slightly faster for player fun
+            let speed = CONFIG.taggerSpeed; // Removed 1.5x multiplier for equality
 
             // Apply boost multiplier if active
             if (taggerBoost.active) {

@@ -1,14 +1,15 @@
 // Game Configuration
+// Game Configuration
 export const CONFIG = {
-    runnerSpeed: 4,
-    taggerSpeed: 2.5,
+    runnerSpeed: 10,      // Significantly increased
+    taggerSpeed: 10,       // Increased to match pace
     fieldWidth: 100,
-    botSpeed: 3.5
+    botSpeed: 10          // Equal to runnerSpeed
 };
 
 // Difficulty presets
 export const DIFFICULTY = {
-    easy: { resp: 0.02, speed: 1, speedMult: 0.8 },
+    easy: { resp: 0.04, speed: 1, speedMult: 0.8 },
     medium: { resp: 0.05, speed: 3, speedMult: 1.0 },
     hard: { resp: 0.1, speed: 5, speedMult: 1.2 }
 };
