@@ -105,7 +105,7 @@ export function update(
 
                     // Only give score to current player if they hit it
                     if (playerId === currentPlayerId) {
-                        scoreIncrease += 15 * (target.hitOrder + 1); // Increasing points for later targets
+                        scoreIncrease += (target.hitOrder + 1); // Score = target number (1, 2, 3, etc.)
                         hitCount++;
                     }
                 }
