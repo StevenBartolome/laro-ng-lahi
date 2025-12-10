@@ -13,11 +13,13 @@ import {
 } from "./Common.js";
 
 
+
 import * as TargetMode from "./TargetMode.js"; // Multiplayer version with physics
 import * as CircleMode from "./CircleMode.js"; // Multiplayer version
-import * as HoleMode from "../js/HoleMode.js";
+import * as HoleMode from "./HoleMode.js"; // Multiplayer version
 import * as TumbangMode from "../js/TumbangMode.js";
 import * as LineMode from "../js/LineMode.js";
+
 
 
 import { ModeSelection } from "./ModeSelection.js";
