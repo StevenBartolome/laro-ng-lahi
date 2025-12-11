@@ -1,15 +1,15 @@
-import { 
-    gameState, CONFIG, DIFFICULTY, 
-    boost, taggerBoost, 
-    runners, taggers 
+import {
+    gameState, CONFIG, DIFFICULTY,
+    boost, taggerBoost,
+    runners, taggers
 } from './config.js';
 import { createRunner, createTagger } from './entities.js';
 import { updateBoostUI } from './boost.js';
 import { updateRunners, updateTaggers } from './movement.js';
 import { checkCollisions } from './collision.js';
-import { 
-    updateStatus, showRoundModal, updateTimerDisplay, 
-    updateTimer, setGameFlowFunctions 
+import {
+    updateStatus, showRoundModal, updateTimerDisplay,
+    updateTimer, setGameFlowFunctions
 } from './ui.js';
 import { updateCharacterPanel } from './character-switch.js';
 import { checkBoostInput } from './input.js';
@@ -28,7 +28,7 @@ export function startGame(difficulty) {
         gameState.animationFrameId = null;
     }
     lastTime = 0; // Reset time tracker
-    
+
     if (gameState.timerInterval) {
         clearInterval(gameState.timerInterval);
         gameState.timerInterval = null;
@@ -94,7 +94,7 @@ export function startRound() {
     const field = document.getElementById('field');
     const fw = field.offsetWidth;
     const diff = DIFFICULTY[gameState.selectedDifficulty];
-    
+
     // Equalize speeds based on difficulty multiplier (Base speed 10)
     const baseSpeed = 10;
     CONFIG.runnerSpeed = baseSpeed * diff.speedMult;
@@ -175,7 +175,7 @@ export function startRound() {
  */
 export function gameLoop(timestamp) {
     if (!gameState.gameActive) return;
-    
+
     // Safety check for timestamp
     if (!timestamp) timestamp = performance.now();
 
