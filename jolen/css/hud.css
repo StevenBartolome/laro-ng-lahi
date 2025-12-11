@@ -50,7 +50,8 @@
 
 /* Icon Buttons */
 .ui-icon-btn {
-  background: rgba(62, 39, 35, 0.85); /* Dark brown to match stat-box */
+  background: rgba(62, 39, 35, 0.85);
+  /* Dark brown to match stat-box */
   border: 2px solid #8d6e63;
   cursor: pointer;
   width: 45px;
@@ -90,19 +91,23 @@ canvas {
 
 /* Back Button */
 .back-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   cursor: pointer;
   transition: all 0.3s ease;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+  z-index: 100;
 }
 
 .back-btn img {
-  margin-top: 40px;
-  width: 150px;
+  width: 220px;
   height: auto;
 }
 
 .back-btn:hover {
-  transform: scale(1.1);
+  transform: translateX(-50%) scale(1.1);
 }
 
 /* Floating Action Buttons (FABs) */
@@ -134,13 +139,14 @@ canvas {
 .info-fab.facts-btn {
   bottom: 100px;
   background: linear-gradient(135deg, #8d6e63, #5d4037);
-  color: white; /* Ensure consistent text/icon color */
+  color: white;
+  /* Ensure consistent text/icon color */
 }
 
 .info-fab.facts-btn img {
   width: 70%;
   height: auto;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
 }
 
 /* Floating Instructions */
@@ -232,8 +238,15 @@ canvas {
 }
 
 @keyframes float {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-10px); }
+
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-10px);
+  }
 }
 
 /* Message Overlay */
@@ -340,7 +353,8 @@ canvas {
   justify-content: center;
 }
 
-.restart-btn, .back-menu-btn {
+.restart-btn,
+.back-menu-btn {
   padding: 15px 35px;
   font-size: 1.1rem;
   font-weight: 700;

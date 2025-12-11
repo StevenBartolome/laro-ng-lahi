@@ -59,18 +59,25 @@ export function checkMarbleCollision(m1, m2) {
     const sin = Math.sin(angle);
     const cos = Math.cos(angle);
 
-    // Rotate velocities
+    // Rotate velocities to collision axis
     const vx1 = m1.vx * cos + m1.vy * sin;
     const vy1 = m1.vy * cos - m1.vx * sin;
     const vx2 = m2.vx * cos + m2.vy * sin;
     const vy2 = m2.vy * cos - m2.vx * sin;
 
-    // Exchange velocities with elasticity
+    // Calculate relative velocity magnitude for dynamic elasticity
+    const relativeSpeed = Math.abs(vx1 - vx2);
+
+    // Dynamic elasticity: higher speed = more bounce (0.7 to 1.0)
+    // More power in the shot = more dramatic collision
+    const dynamicElasticity = Math.min(0.7 + (relativeSpeed * 0.02), 1.0);
+
+    // Exchange velocities with dynamic elasticity
     const temp = vx1;
-    m1.vx = vx2 * COLLISION_ELASTICITY * cos - vy1 * sin;
-    m1.vy = vy1 * cos + vx2 * COLLISION_ELASTICITY * sin;
-    m2.vx = temp * COLLISION_ELASTICITY * cos - vy2 * sin;
-    m2.vy = vy2 * cos + temp * COLLISION_ELASTICITY * sin;
+    m1.vx = vx2 * dynamicElasticity * cos - vy1 * sin;
+    m1.vy = vy1 * cos + vx2 * dynamicElasticity * sin;
+    m2.vx = temp * dynamicElasticity * cos - vy2 * sin;
+    m2.vy = vy2 * cos + temp * dynamicElasticity * sin;
 
     // Separate marbles
     const overlap = (m1.radius + m2.radius - dist) / 2;
