@@ -208,5 +208,38 @@ export function drawMarble(ctx, marble, glow = false, isPlayer = false) {
     ctx.stroke();
   }
 
+  // Draw player indicator
+  if (isPlayer) {
+    ctx.save();
+
+    // Floating animation offset
+    const floatOffset = Math.sin(Date.now() / 200) * 3;
+
+    // Draw "YOU" text
+    ctx.font = "bold 14px 'Fredoka One', sans-serif";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "bottom";
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillStyle = "#FFD700"; // Gold
+
+    const textY = marble.y - marble.radius - 15 + floatOffset;
+
+    ctx.strokeText("YOU", marble.x, textY);
+    ctx.fillText("YOU", marble.x, textY);
+
+    // Draw arrow triangle pointing down
+    ctx.beginPath();
+    ctx.moveTo(marble.x, marble.y - marble.radius - 5 + floatOffset);
+    ctx.lineTo(marble.x - 6, marble.y - marble.radius - 13 + floatOffset);
+    ctx.lineTo(marble.x + 6, marble.y - marble.radius - 13 + floatOffset);
+    ctx.closePath();
+    ctx.fillStyle = "#FFD700";
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.restore();
+  }
+
   ctx.restore();
 }
