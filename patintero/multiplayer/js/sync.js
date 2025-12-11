@@ -7,7 +7,10 @@
 
 import { database } from '../../../config/firebase.js';
 import { ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
-import { runners, taggers, gameState } from './config.js';
+import { runners, taggers, gameState, boost, taggerBoost } from './config.js';
+import { updateTimerDisplay } from './ui.js';
+import { updateBoostUI } from './boost.js';
+import { addPositionUpdate } from './interpolation.js';
 
 import { switchRolesAfterTag, endGame } from './game.js';
 
@@ -57,6 +60,11 @@ export function uploadFullGameState() {
         remotePlayerId: t.remotePlayerId || null
     }));
 
+    // DEBUG: Log what we're uploading
+    console.log('[UPLOAD] 📤 Uploading game state:');
+    console.log('[UPLOAD] - Runners:', runnersData.length, runnersData.map((r, i) => `R${i}:(${r.x},${r.y})`));
+    console.log('[UPLOAD] - Taggers:', taggersData.length, taggersData.map((t, i) => `T${i}:(${t.x},${t.y})`));
+
     // Upload complete state
     const stateRef = ref(database, `lobbies/${lobbyId}/gameState`);
     set(stateRef, {
@@ -68,10 +76,19 @@ export function uploadFullGameState() {
         },
         roundsCompleted: gameState.roundsCompleted,
         timer: gameState.gameTimer,
+        boost: {
+            active: boost.active,
+            ready: boost.ready,
+            currentCharges: boost.currentCharges
+        },
+        taggerBoost: {
+            active: taggerBoost.active,
+            ready: taggerBoost.ready
+        },
         timestamp: now,
         isGameOver: !gameState.gameActive && gameState.roundsCompleted >= 2
     }).catch(err => {
-        // Silently fail to avoid console spam
+        console.error('[UPLOAD] ❌ Failed to upload state:', err);
     });
 }
 
@@ -122,18 +139,31 @@ export function initGameStateSync() {
     const lobbyId = window.multiplayerState?.lobbyId;
     if (!lobbyId) return;
 
-    console.log('[SYNC] Initializing game state listener');
+    console.log('[SYNC] Initializing game state listener for lobby:', lobbyId);
+    console.log('[SYNC] Is Host?:', isHost());
 
     const stateRef = ref(database, `lobbies/${lobbyId}/gameState`);
     onValue(stateRef, (snapshot) => {
         const data = snapshot.val();
-        if (!data) return;
+        console.log('[SYNC] 📡 Received game state update:', data ? 'Data exists' : 'No data');
+
+        if (!data) {
+            console.warn('[SYNC] ⚠️ No game state data received');
+            return;
+        }
 
         receivedGameState = data;
 
         // Non-hosts: Apply the received state
         if (!isHost()) {
+            console.log('[SYNC] 🎮 Non-host applying received state...');
+            console.log('[SYNC] - Runners count:', data.runners?.length || 0);
+            console.log('[SYNC] - Taggers count:', data.taggers?.length || 0);
+            console.log('[SYNC] - Timer:', data.timer);
+            console.log('[SYNC] - Scores:', data.scores);
             applyReceivedGameState(data);
+        } else {
+            console.log('[SYNC] 👑 Host received own state (ignoring)');
         }
     });
 }
@@ -268,7 +298,9 @@ function applyPlayerInputToEntity(playerId, input) {
  * NON-HOST: Apply the complete game state received from host
  */
 function applyReceivedGameState(data) {
+    console.log('[SYNC-APPLY] 🔄 Starting to apply received game state');
     const myId = window.multiplayerState?.playerId;
+    console.log('[SYNC-APPLY] My Player ID:', myId);
 
     // Check for Round Swapping logic
     if (data.roundsCompleted !== undefined && data.roundsCompleted > gameState.roundsCompleted) {
@@ -286,46 +318,67 @@ function applyReceivedGameState(data) {
         }
     }
 
-    // Apply runner positions
+    // Apply runner positions and states
     if (data.runners) {
-        // Ensure strictly matched array length if possible, or ignore extras
+        console.log('[SYNC-APPLY] Applying runner states. Total runners:', data.runners.length);
+
         data.runners.forEach((rData, idx) => {
-            if (!runners[idx]) return;
-            // Note: If startRound hasn't run yet or mismatched, this might be issue.
-            // But switchRolesAfterTag calls startRound which repopulates runners.
-
-            const runner = runners[idx];
-
-            // Skip applying position to player's own character
-            if (runner.remotePlayerId === myId || runner.type === 'player') {
-                if (rData.active !== undefined && !rData.active && runner.active) {
-                    runner.active = false;
-                    runner.el.style.opacity = '0.3';
-                    runner.el.style.filter = 'grayscale(100%)';
-                }
+            if (!runners[idx]) {
+                console.warn('[SYNC-APPLY] No local runner at index:', idx);
                 return;
             }
 
-            // Smooth interpolation for other entities
-            const lerpFactor = 0.4;
-            runner.x = runner.x + (rData.x - runner.x) * lerpFactor;
-            runner.y = runner.y + (rData.y - runner.y) * lerpFactor;
-            runner.active = rData.active;
-            runner.reachedBottom = rData.reachedBottom;
+            const runner = runners[idx];
+            const isMyRunner = (runner.remotePlayerId === myId || runner.type === 'player');
 
-            runner.el.style.left = `${runner.x}px`;
-            runner.el.style.top = `${runner.y}px`;
+            console.log(`[SYNC-APPLY] Runner ${idx}:`, {
+                isMyRunner,
+                remoteActive: rData.active,
+                localActive: runner.active,
+                remoteReachedBottom: rData.reachedBottom
+            });
 
+            // CRITICAL: Apply active and reachedBottom status for ALL runners
+            // This ensures tagged runners show as tagged on all clients
+            if (rData.active !== undefined) {
+                runner.active = rData.active;
+            }
+            if (rData.reachedBottom !== undefined) {
+                runner.reachedBottom = rData.reachedBottom;
+            }
+
+            // Apply visual indicators for active status (all runners)
             if (!runner.active) {
                 runner.el.style.opacity = '0.3';
                 runner.el.style.filter = 'grayscale(100%)';
+                console.log('[SYNC-APPLY] ❌ Runner', idx, 'marked as INACTIVE/TAGGED');
+            } else {
+                runner.el.style.opacity = '1';
+                runner.el.style.filter = 'none';
             }
 
+            // Apply visual indicator for reached bottom (all runners)
             if (runner.reachedBottom) {
                 runner.el.style.border = '3px solid #00FF00';
+                console.log('[SYNC-APPLY] ✓ Runner', idx, 'reached bottom');
             } else {
                 runner.el.style.border = '3px solid #fff';
             }
+
+            // Skip position buffering ONLY for my own character
+            // (I control my own position locally)
+            if (isMyRunner) {
+                console.log('[SYNC-APPLY] Skipping position update for my runner');
+                return;
+            }
+
+            // Update internal coordinates (for fallback when buffer is empty)
+            runner.x = rData.x;
+            runner.y = rData.y;
+
+            // Add position to buffer for interpolation (smooth rendering happens in game loop)
+            addPositionUpdate(runner, rData.x, rData.y, data.timestamp);
+            console.log('[SYNC-APPLY] Added position to buffer for runner', idx, ':', rData.x, rData.y);
         });
     }
 
@@ -340,13 +393,12 @@ function applyReceivedGameState(data) {
                 return;
             }
 
-            // Smooth interpolation
-            const lerpFactor = 0.4;
-            tagger.x = tagger.x + (tData.x - tagger.x) * lerpFactor;
-            tagger.y = tagger.y + (tData.y - tagger.y) * lerpFactor;
+            // Update internal coordinates (for fallback when buffer is empty)
+            tagger.x = tData.x;
+            tagger.y = tData.y;
 
-            tagger.el.style.left = `${tagger.x}px`;
-            tagger.el.style.top = `${tagger.y}px`;
+            // Add position to buffer for interpolation (smooth rendering happens in game loop)
+            addPositionUpdate(tagger, tData.x, tData.y, data.timestamp);
         });
     }
 
@@ -362,9 +414,30 @@ function applyReceivedGameState(data) {
         document.getElementById('enemyTeamScore').textContent = enemyScore;
     }
 
-    // Apply timer
+    // Apply timer and update display
     if (data.timer !== undefined) {
         gameState.gameTimer = data.timer;
+        // Update timer display to ensure visual sync for non-hosts
+        updateTimerDisplay();
+    }
+
+    // Apply boost states for runners
+    if (data.boost) {
+        if (data.boost.active !== undefined) boost.active = data.boost.active;
+        if (data.boost.ready !== undefined) boost.ready = data.boost.ready;
+        if (data.boost.currentCharges !== undefined) boost.currentCharges = data.boost.currentCharges;
+
+        // Update boost UI to reflect synced state
+        updateBoostUI();
+    }
+
+    // Apply boost states for taggers
+    if (data.taggerBoost) {
+        if (data.taggerBoost.active !== undefined) taggerBoost.active = data.taggerBoost.active;
+        if (data.taggerBoost.ready !== undefined) taggerBoost.ready = data.taggerBoost.ready;
+
+        // Update boost UI (same function handles both)
+        updateBoostUI();
     }
 }
 

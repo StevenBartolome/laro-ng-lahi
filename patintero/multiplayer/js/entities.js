@@ -71,6 +71,7 @@ export function createRunner(type, x, y, headIndex = null, playerName = null, pl
         active: true,
         reachedBottom: false,
         remotePlayerId: playerId, // For syncing remote players
+        positionBuffer: [], // For client-side interpolation
         el: createEntity(type === 'player' ? 'entity runner' : (type === 'remote' ? 'entity runner remote-player' : 'entity runner bot'), label, x, y, 'runner', headIndex)
     };
 
@@ -142,7 +143,8 @@ export function createTagger(id, type, fixedPos, diff, controller, headIndex = n
         fixedPos: fixedPos,
         resp: diff.resp,
         speedMult: diff.speedMult,
-        remotePlayerId: playerId // For syncing remote players
+        remotePlayerId: playerId, // For syncing remote players
+        positionBuffer: [] // For client-side interpolation
     };
 
     // Visual distinction for Player Tagger if needed

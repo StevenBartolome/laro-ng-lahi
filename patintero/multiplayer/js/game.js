@@ -19,6 +19,7 @@ import {
     initEntityUsageSync,
     isHostClient
 } from './sync.js';
+import { getInterpolatedPosition, clearPositionBuffer, INTERPOLATION_DELAY } from './interpolation.js';
 
 import { database } from '../../../config/firebase.js';
 import { ref, onValue, set, update, get } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
@@ -55,11 +56,15 @@ export function initializeGameListeners() {
     // Listen for Game Start / State Changes
     console.log('[GAME] Listening for lobby updates on:', window.multiplayerState.lobbyId);
     const lobbyRef = ref(database, `lobbies/${window.multiplayerState.lobbyId}`);
+
+    // Track if we've already initialized to prevent infinite loops
+    let hasInitialized = false;
+
     onValue(lobbyRef, (snapshot) => {
         const data = snapshot.val();
         console.log('[GAME] Lobby update received:', data);
         if (data && data.status === 'playing') {
-            console.log('[GAME] Status is playing. Local Active:', gameState.gameActive, 'Starting:', gameState.starting);
+            console.log('[GAME] Status is playing. Local Active:', gameState.gameActive, 'Starting:', gameState.starting, 'HasInitialized:', hasInitialized);
 
             // CRITICAL FIX: The Lobby Menu sets status='playing' before redirection.
             // We must NOT start until the Host has actually generated the teams in this game.
@@ -69,7 +74,10 @@ export function initializeGameListeners() {
                 return;
             }
 
-            if (!gameState.gameActive && !gameState.starting) {
+            // CRITICAL FIX: Only trigger once to prevent infinite loop
+            if (!gameState.gameActive && !gameState.starting && !hasInitialized) {
+                hasInitialized = true; // Mark as initialized immediately
+
                 // Determine difficulty from data
                 const difficulty = data.difficulty || 'medium'; // Default to medium if missing
 
@@ -447,6 +455,10 @@ export async function startRound() {
         }
     });
 
+    // Clear position buffers for all entities at round start
+    runners.forEach(r => clearPositionBuffer(r));
+    taggers.forEach(t => clearPositionBuffer(t));
+
     gameState.gameActive = true;
     gameState.animationFrameId = requestAnimationFrame(gameLoop);
 }
@@ -549,6 +561,45 @@ export function gameLoop(timestamp) {
         checkBoostInput();
         updatePlayerOnly(clampedTimeScale); // New function for non-host
         uploadPlayerPosition();
+
+        // Render interpolated positions for remote players
+        const renderTime = Date.now() - INTERPOLATION_DELAY;
+
+        runners.forEach(runner => {
+            // Only interpolate remote players
+            if (runner.type === 'remote' || (runner.remotePlayerId && runner.type !== 'player')) {
+                const pos = getInterpolatedPosition(runner, renderTime);
+                if (pos) {
+                    // Update both internal coordinates and DOM
+                    runner.x = pos.x;
+                    runner.y = pos.y;
+                    runner.el.style.left = `${pos.x}px`;
+                    runner.el.style.top = `${pos.y}px`;
+                } else {
+                    // Fallback: use current coordinates if buffer is empty
+                    runner.el.style.left = `${runner.x}px`;
+                    runner.el.style.top = `${runner.y}px`;
+                }
+            }
+        });
+
+        taggers.forEach(tagger => {
+            // Only interpolate remote players
+            if (tagger.controller === 'remote' || (tagger.remotePlayerId && tagger.controller !== 'player')) {
+                const pos = getInterpolatedPosition(tagger, renderTime);
+                if (pos) {
+                    // Update both internal coordinates and DOM
+                    tagger.x = pos.x;
+                    tagger.y = pos.y;
+                    tagger.el.style.left = `${pos.x}px`;
+                    tagger.el.style.top = `${pos.y}px`;
+                } else {
+                    // Fallback: use current coordinates if buffer is empty
+                    tagger.el.style.left = `${tagger.x}px`;
+                    tagger.el.style.top = `${tagger.y}px`;
+                }
+            }
+        });
     }
 
     // Check if all runners are tagged
