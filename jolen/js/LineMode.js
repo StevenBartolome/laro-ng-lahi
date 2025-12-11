@@ -53,14 +53,15 @@ export function update(
   targets,
   score,
   canvasWidth,
-  canvasHeight
+  canvasHeight,
+  timeScale
 ) {
   let scoreIncrease = 0;
   let anyMoving = false;
 
   // Update target marbles physics
   targets.forEach((target) => {
-    if (!target.hit && updateMarble(target, canvasWidth, canvasHeight)) {
+    if (!target.hit && updateMarble(target, canvasWidth, canvasHeight, timeScale)) {
       anyMoving = true;
     }
   });

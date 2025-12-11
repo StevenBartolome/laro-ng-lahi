@@ -4,7 +4,10 @@ import { showPointNotification } from './ui.js';
 /**
  * Update all runners (player and bot movement)
  */
-export function updateRunners() {
+/**
+ * Update all runners (player and bot movement)
+ */
+export function updateRunners(timeScale = 1.0) {
     const field = document.getElementById('field');
     const fw = field.offsetWidth;
     const fh = field.offsetHeight;
@@ -19,18 +22,23 @@ export function updateRunners() {
         if (r.type === 'player') {
             // Player Movement
             if (boost.active) speed *= boost.multiplier;
-            if (keys.ArrowUp || keys.w) dy -= speed;
-            if (keys.ArrowDown || keys.s) dy += speed;
-            if (keys.ArrowLeft || keys.a) dx -= speed;
-            if (keys.ArrowRight || keys.d) dx += speed;
+            
+            // Scale speed by timeScale for frame independence
+            const scaledSpeed = speed * timeScale;
+
+            if (keys.ArrowUp || keys.w) dy -= scaledSpeed;
+            if (keys.ArrowDown || keys.s) dy += scaledSpeed;
+            if (keys.ArrowLeft || keys.a) dx -= scaledSpeed;
+            if (keys.ArrowRight || keys.d) dx += scaledSpeed;
         } else {
             // Bot AI Logic
+            const scaledSpeed = speed * timeScale;
             // Target: Bottom (if not reached) or Top (if reached)
             let targetY = r.reachedBottom ? 20 : fh - 40;
 
             // Basic Pathfinding
-            if (r.y < targetY) dy += speed * 0.6;
-            else if (r.y > targetY) dy -= speed * 0.6;
+            if (r.y < targetY) dy += scaledSpeed * 0.6;
+            else if (r.y > targetY) dy -= scaledSpeed * 0.6;
 
             // Evasion Logic: Run away from nearest tagger
             let nearestTagger = null;
@@ -45,17 +53,35 @@ export function updateRunners() {
 
             if (nearestTagger) {
                 // Simple flee behavior
-                if (nearestTagger.x < r.x) dx += speed * 0.5;
-                else dx -= speed * 0.5;
+                if (nearestTagger.x < r.x) dx += scaledSpeed * 0.5;
+                else dx -= scaledSpeed * 0.5;
 
                 // Wait behavior if tagger is directly ahead
                 if (Math.abs(nearestTagger.y - r.y) < 60 && Math.abs(nearestTagger.x - r.x) < 50) {
-                    dy = 0; // Stop and wait
+                    dy = 0; // Stop forward movement
+                    
+                    // Anti-Stuck: Smart Evasion
+                    // If stuck at Left Wall (< 40px), forced to engage Right
+                    if (r.x < 40) {
+                        dx += scaledSpeed * 0.7;
+                    } 
+                    // If stuck at Right Wall (> fw - 40px), forced to engage Left
+                    else if (r.x > fw - 40) {
+                         dx -= scaledSpeed * 0.7;
+                    }
+                    // If stuck at Center (Danger Zone), random break
+                    else if (Math.abs(r.x - fw / 2) < 20) {
+                         dx += (Math.random() < 0.5 ? 1 : -1) * scaledSpeed * 0.7;
+                    } 
+                    // Otherwise (Open Field), move AWAY from center to flank
+                    else {
+                        dx += (r.x < fw / 2 ? -1 : 1) * scaledSpeed * 0.7;
+                    }
                 }
             }
 
             // Random Jitter
-            if (Math.random() < 0.05) dx += (Math.random() - 0.5) * 10;
+            if (Math.random() < 0.05 * timeScale) dx += (Math.random() - 0.5) * 10 * timeScale;
         }
 
         r.x += dx;
@@ -104,7 +130,10 @@ export function updateRunners() {
 /**
  * Update all taggers (player and bot AI movement)
  */
-export function updateTaggers() {
+/**
+ * Update all taggers (player and bot AI movement)
+ */
+export function updateTaggers(timeScale = 1.0) {
     const field = document.getElementById('field');
     const fw = field.offsetWidth;
     const fh = field.offsetHeight;
@@ -114,17 +143,20 @@ export function updateTaggers() {
         // PLAYER CONTROLLED TAGGER
         if (t.controller === 'player') {
             let dx = 0, dy = 0;
-            let speed = CONFIG.taggerSpeed * 1.5; // Slightly faster for player fun
+            let speed = CONFIG.taggerSpeed; // Removed 1.5x multiplier for equality
 
             // Apply boost multiplier if active
             if (taggerBoost.active) {
                 speed *= taggerBoost.multiplier;
             }
 
-            if (keys.ArrowUp || keys.w) dy -= speed;
-            if (keys.ArrowDown || keys.s) dy += speed;
-            if (keys.ArrowLeft || keys.a) dx -= speed;
-            if (keys.ArrowRight || keys.d) dx += speed;
+            // Scale for time
+            const scaledSpeed = speed * timeScale;
+
+            if (keys.ArrowUp || keys.w) dy -= scaledSpeed;
+            if (keys.ArrowDown || keys.s) dy += scaledSpeed;
+            if (keys.ArrowLeft || keys.a) dx -= scaledSpeed;
+            if (keys.ArrowRight || keys.d) dx += scaledSpeed;
 
             t.x += dx;
             t.y += dy;
@@ -196,12 +228,14 @@ export function updateTaggers() {
                     scaledResp *= 1.5; // 50% faster when chasing edge runners
                 }
 
-                t.x += (desiredX - t.x) * scaledResp;
+                // Apply time scaling to interpolation speed
+                // Approximate time scaling for lerp: factor * timeScale
+                t.x += (desiredX - t.x) * scaledResp * timeScale;
             } else {
                 // Instead of returning to center, move toward nearest runner's X position
                 // This helps cover the field better and prevents side exploits
                 desiredX = target.x;
-                t.x += (desiredX - t.x) * 0.02; // Slow positioning toward runner
+                t.x += (desiredX - t.x) * 0.02 * timeScale; // Slow positioning toward runner
             }
             // Clamp
             if (t.x < 20) t.x = 20;
@@ -228,7 +262,7 @@ export function updateTaggers() {
             const distanceRatio = Math.min(distanceToTarget / maxDistance, 1);
             const scaledResp = t.resp * (1 - distanceRatio * 0.9) + minResponsiveness;
 
-            t.y += (desiredY - t.y) * scaledResp;
+            t.y += (desiredY - t.y) * scaledResp * timeScale;
 
             // Constraints
             const safeZoneY = fh * 0.2;
