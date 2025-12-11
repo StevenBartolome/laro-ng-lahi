@@ -29,14 +29,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const canvas = document.getElementById("gameCanvas");
   const ctx = canvas.getContext("2d");
-  
+
   // Input Listeners (Global)
   canvas.addEventListener("mousedown", handleMouseDown);
   window.addEventListener("mousemove", handleMouseMove);
   window.addEventListener("mouseup", handleMouseUp);
-  
+
   const instructionPrompt = document.getElementById("instruction-prompt");
-  
+
   canvas.width = 1280;
   canvas.height = 720;
 
@@ -48,6 +48,8 @@ document.addEventListener("DOMContentLoaded", () => {
   let gameState = "idle"; // idle, dragging, shooting, success, gameOver
   let level = 1;
   let score = 0;
+  let lives = 3;
+  let shotScore = 0; // Track score gained in current shot to detect misses
   let message = "";
   let messageTimer = 0;
   let isDragging = false;
@@ -98,10 +100,12 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       level = 1;
       score = 0;
+      lives = 3;
     }
 
     UI.updateLevel(level);
     UI.updateScore(score);
+    UI.updateLives(lives);
     resetPlayerMarble();
 
     // Initialize Mode State
@@ -249,6 +253,7 @@ document.addEventListener("DOMContentLoaded", () => {
       if (result.anyMoving) anyMoving = true;
       if (result.scoreIncrease) {
         score += result.scoreIncrease;
+        shotScore += result.scoreIncrease; // Track score gained in this shot
         UI.updateScore(score);
         updateTargetsLeft();
       }
@@ -261,11 +266,31 @@ document.addEventListener("DOMContentLoaded", () => {
           gameState = "success";
           message = "Level Complete!";
           messageTimer = 90;
+        } else if (shotScore === 0) {
+          // Player missed (didn't hit any targets) - deduct a life
+          lives--;
+          UI.updateLives(lives);
+
+          if (lives <= 0) {
+            // Game Over - show game over screen
+            gameState = "gameOver";
+            UI.showGameOver(score);
+          } else {
+            // Still has lives - show miss notification
+            UI.showMessage(`Miss! ${lives} ❤️ left`, 'fail');
+            gameState = "idle";
+            stopPlayerMarble();
+            if (instructionPrompt) instructionPrompt.style.display = "flex";
+          }
         } else {
+          // Hit target(s) but didn't complete level - just continue playing
           gameState = "idle";
           stopPlayerMarble();
           if (instructionPrompt) instructionPrompt.style.display = "flex";
         }
+
+        // Reset shot score for next shot
+        shotScore = 0;
       }
     }
 
@@ -384,7 +409,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function selectMode(mode) {
     gameMode = mode;
     UI.highlightMode(mode);
-    
+
     switch (mode) {
       case "target": currentModeModule = TargetMode; break;
       case "circle": currentModeModule = CircleMode; break;
@@ -396,43 +421,43 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Bind Buttons ---
-  
+
   // Global button click sound
   document.querySelectorAll('button, a').forEach(btn => {
-      btn.addEventListener('click', () => {
-          Sound.playClick();
-      });
+    btn.addEventListener('click', () => {
+      Sound.playClick();
+    });
   });
 
   if (UI.elements.modeBtns) {
-      UI.elements.modeBtns.forEach(btn => {
-          btn.addEventListener('click', (e) => {
-              // Sound.playClick(); // Handled globally above, but specific logic below
-              const modeParts = btn.id.split('-'); // mode-target
-              const mode = modeParts[1];
-              selectMode(mode);
-          });
+    UI.elements.modeBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Sound.playClick(); // Handled globally above, but specific logic below
+        const modeParts = btn.id.split('-'); // mode-target
+        const mode = modeParts[1];
+        selectMode(mode);
       });
+    });
   }
 
   if (UI.elements.diffBtns) {
-      UI.elements.diffBtns.forEach(btn => {
-          btn.addEventListener('click', (e) => {
-               // Sound.playClick(); 
-               const diffParts = btn.id.split('-'); // diff-easy
-               const diff = diffParts[1];
-               startGame(diff);
-          });
+    UI.elements.diffBtns.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Sound.playClick(); 
+        const diffParts = btn.id.split('-'); // diff-easy
+        const diff = diffParts[1];
+        startGame(diff);
       });
+    });
   }
 
   const menuBtn = document.getElementById('menuBtn');
-  if(menuBtn) menuBtn.addEventListener('click', () => {
-       UI.showMenu('both', true);
+  if (menuBtn) menuBtn.addEventListener('click', () => {
+    UI.showMenu('both', true);
   });
 
   const infoBtn = document.getElementById('infoBtn');
-  if(infoBtn) infoBtn.addEventListener('click', () => {
-       UI.showMenu('instructions', true);
+  if (infoBtn) infoBtn.addEventListener('click', () => {
+    UI.showMenu('instructions', true);
   });
 });

@@ -135,6 +135,11 @@
           <span class="stat-label">SCORE</span>
           <span id="score-display" class="stat-value">0</span>
         </div>
+        <div class="lives-display" id="livesDisplay">
+          <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart1">
+          <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart2">
+          <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart3">
+        </div>
 
         <button id="menuBtn" class="ui-icon-btn" title="Menu">
           <span style="font-size: 24px">⚙️</span>
@@ -144,6 +149,17 @@
       <!-- Canvas -->
       <div class="canvas-wrapper">
         <canvas id="gameCanvas"></canvas>
+
+        <!-- Instruction Prompt -->
+        <div id="instruction-prompt" class="instruction-prompt" style="display: none;">
+          <span class="mouse-icon">🖱️</span>
+          <span>Click and drag your marble to shoot!</span>
+        </div>
+      </div>
+
+      <!-- Message Overlay -->
+      <div id="messageOverlay" class="message-overlay hidden">
+        <div id="messageText"></div>
       </div>
 
       <!-- Back Button -->
