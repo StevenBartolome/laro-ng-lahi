@@ -248,7 +248,7 @@ export function performCoinFlip(providedData = null) {
 /**
  * Start a round
  */
-export function startRound() {
+export async function startRound() {
     const field = document.getElementById('field');
     const fw = field.offsetWidth;
     // Default difficulty for multiplayer
@@ -286,96 +286,78 @@ export function startRound() {
     runners.length = 0;
     taggers.length = 0;
 
-    // --- SETUP BASED ON ROLE ---
-    // In true multiplayer, we would iterate through `window.multiplayerState.players`
-    // and spawn entities for each.
-    // For now, we spawn Local Player + Bots to maintain loop functionality while testing assets.
+    // --- FETCH TEAM ASSIGNMENTS FROM FIREBASE ---
+    // CRITICAL: Use the actual team data from Firebase instead of recalculating locally
+    const lobbyId = window.multiplayerState.lobbyId;
+    const lobbyRef = ref(database, `lobbies/${lobbyId}`);
+    const lobbySnapshot = await get(lobbyRef);
+    const lobbyData = lobbySnapshot.val();
 
-    // Retrieve my head index (assigned in main.js)
-    let myHeadIndex = null;
-    // We would fetch this from firebase, but we can't await here easily without refactoring.
-    // Let's rely on simple random for now or fetch it async if needed.
-    // Ideally update `window.multiplayerState` to include `headIndex`
+    if (!lobbyData) {
+        console.error('[GAME] No lobby data found!');
+        return;
+    }
 
-    // Check if we have local head index stored
-    // For now, allow random.
+    const team1Ids = lobbyData.team1 || [];
+    const team2Ids = lobbyData.team2 || [];
+    const team1AreRunners = lobbyData.team1AreRunners;
 
-    // --- DYNAMIC MULTIPLAYER SPAWNING ---
+    console.log('[GAME] Starting round with Firebase team data:');
+    console.log(' - Team 1 IDs:', team1Ids);
+    console.log(' - Team 2 IDs:', team2Ids);
+    console.log(' - Team 1 are Runners?:', team1AreRunners);
+
     // Retrieve latest player list (should be synced by main.js)
     const playersMap = window.multiplayerState.players || {};
-    const playersList = Object.values(playersMap);
 
-    // Sort players deterministically (e.g., by joinedAt) so everyone agrees on order
-    playersList.sort((a, b) => a.joinedAt - b.joinedAt);
-
-    // Split into two teams
-    const totalPlayers = playersList.length;
-    const midPoint = Math.ceil(totalPlayers / 2); // Split half-half
-    const team1 = playersList.slice(0, midPoint);
-    const team2 = playersList.slice(midPoint);
-
-    // Determine which team corresponds to Runners and Taggers based on currentRole
-    // We need to know which team the LOCAL player is on to orient "My Team" vs "Enemy Team"
-    // However, simplest way: Team 1 starts as Runner, Team 2 starts as Tagger.
-    // If roles swap, Team 1 becomes Tagger, Team 2 becomes Runner.
-
-    // Wait, gameState.currentRole tells us what the LOCAL player is.
-    // We need to align the teams so tha local player gets the correct role status.
+    // Build team player lists using Firebase team assignments
+    const team1Players = team1Ids.map(id => ({ ...playersMap[id], id })).filter(p => p.name); // Filter out undefined
+    const team2Players = team2Ids.map(id => ({ ...playersMap[id], id })).filter(p => p.name);
 
     const myId = window.multiplayerState.playerId;
-    const amInTeam1 = team1.find(p => p.name === playersMap[myId]?.name); // Using name or ID match
-    // Note: main.js stores players with firebase UID as key. 'playersList' is values.
-    // We need to match ID. Let's re-map list to include ID.
-    const playersListWithId = Object.entries(playersMap).map(([id, p]) => ({ ...p, id })).sort((a, b) => a.joinedAt - b.joinedAt);
 
-    const team1Ids = playersListWithId.slice(0, midPoint);
-    const team2Ids = playersListWithId.slice(midPoint);
-
-    const amInTeam1WithId = team1Ids.find(p => p.id === myId);
-
+    // Determine runner and tagger teams based on Firebase data
     let runnerTeam = [];
     let taggerTeam = [];
 
-    // This logic assumes "Team 1" is the "Runner" team initially? 
-    // Or we align with `gameState.currentRole`.
-    // If `currentRole` is Runner, and I am in Team 1, then Team 1 is Runner.
-    // If `currentRole` is Runner, and I am in Team 2, then Team 2 is Runner.
+    // Determine teams based on whether we're in first round or second round
+    // In first round: team1AreRunners determines roles
+    // In second round: roles are swapped
+    const isSecondRound = gameState.roundsCompleted >= 1;
 
-    if (gameState.currentRole === 'runner') {
-        if (amInTeam1WithId) {
-            runnerTeam = team1Ids;
-            taggerTeam = team2Ids;
+    if (isSecondRound) {
+        // Roles are swapped for second round
+        if (team1AreRunners) {
+            // Team 1 was runners, now they're taggers
+            taggerTeam = team1Players;
+            runnerTeam = team2Players;
         } else {
-            runnerTeam = team2Ids;
-            taggerTeam = team1Ids;
+            // Team 2 was runners, now they're taggers
+            runnerTeam = team1Players;
+            taggerTeam = team2Players;
         }
-        // Determine Runner Team ID for scoring
-        // Host logic:
-        if (gameState.currentRole === 'runner') {
-            gameState.runnerTeamId = gameState.myTeamId;
+    } else {
+        // First round: use original team assignments
+        if (team1AreRunners) {
+            runnerTeam = team1Players;
+            taggerTeam = team2Players;
         } else {
-            gameState.runnerTeamId = gameState.myTeamId === 1 ? 2 : 1;
+            taggerTeam = team1Players;
+            runnerTeam = team2Players;
         }
-
-        updateStatus(gameState.currentRole === 'runner' ? "ROLE: RUNNER - Complete runs to earn points!" : "ROLE: TAGGER - Stop them all!");
-    } else { // I am Tagger
-        if (amInTeam1WithId) {
-            taggerTeam = team1Ids;
-            runnerTeam = team2Ids;
-        } else {
-            taggerTeam = team2Ids;
-            runnerTeam = team1Ids;
-        }
-
-        // Determine Runner Team ID for scoring
-        if (gameState.currentRole === 'runner') {
-            gameState.runnerTeamId = gameState.myTeamId;
-        } else {
-            gameState.runnerTeamId = gameState.myTeamId === 1 ? 2 : 1;
-        }
-
-        updateStatus(gameState.currentRole === 'runner' ? "ROLE: RUNNER - Complete runs to earn points!" : "ROLE: TAGGER - Stop them all!");
     }
+
+    // Determine Runner Team ID for scoring
+    const runnerTeamIsTeam1 = (team1AreRunners && !isSecondRound) || (!team1AreRunners && isSecondRound);
+    gameState.runnerTeamId = runnerTeamIsTeam1 ? 1 : 2;
+
+    console.log('[GAME] Team composition:');
+    console.log(' - Runner Team:', runnerTeam.map(p => p.name));
+    console.log(' - Tagger Team:', taggerTeam.map(p => p.name));
+    console.log(' - My ID:', myId);
+    console.log(' - My Role:', gameState.currentRole);
+
+    updateStatus(gameState.currentRole === 'runner' ? "ROLE: RUNNER - Complete runs to earn points!" : "ROLE: TAGGER - Stop them all!");
 
     // --- DYNAMIC FIELD RESIZING & SPAWNING ---
 
