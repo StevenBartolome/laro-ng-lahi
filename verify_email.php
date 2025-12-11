@@ -344,7 +344,7 @@ $conn->close();
         
         <div class="email-info">
             <p>Verification code sent to:</p>
-            <strong><?php echo htmlspecialchars($_SESSION['temp_email']); ?></strong>
+            <strong><?php echo isset($_SESSION['temp_email']) ? htmlspecialchars($_SESSION['temp_email']) : 'your email'; ?></strong>
         </div>
         
         <form method="POST" action="">
