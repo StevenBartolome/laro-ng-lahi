@@ -170,16 +170,19 @@ const Game = {
         // Store difficulty for later checks
         GameState.difficulty = difficulty;
         
-        // Set angle speed based on difficulty
+        // Set angle speed and speed multiplier based on difficulty
         switch (difficulty) {
             case 'easy':
-                GameState.angleSpeed = 1;
+                GameState.angleSpeed = 3.5;
+                GameState.difficultyMultiplier = 1.0;
                 break;
             case 'normal':
-                GameState.angleSpeed = 2;
+                GameState.angleSpeed = 4.5;
+                GameState.difficultyMultiplier = 1.2;
                 break;
             case 'hard':
-                GameState.angleSpeed = 4;
+                GameState.angleSpeed = 6;
+                GameState.difficultyMultiplier = 1.5;
                 break;
         }
         
@@ -197,12 +200,11 @@ const Game = {
     
     animationFrameId: null,
     
-    update() {
+    update(timeScale = 1.0) {
         switch (GameState.state) {
             case 'running':
-                Player.x += CONFIG.runSpeed * GameState.difficultyMultiplier;
+                Player.x += CONFIG.runSpeed * GameState.difficultyMultiplier * timeScale;
                 
-                // Check if player ran into the baka (didn't jump!)
                 // Check if player ran into the baka (didn't jump!)
                 if (Player.x + Player.width > Baka.x + 30) {
                     Sound.stopRun();
@@ -223,7 +225,7 @@ const Game = {
                 
             case 'charging':
                 // Oscillate angle with extended range
-                GameState.chargeAngle += GameState.angleDirection * GameState.angleSpeed * GameState.difficultyMultiplier;
+                GameState.chargeAngle += GameState.angleDirection * GameState.angleSpeed * GameState.difficultyMultiplier * timeScale;
                 if (GameState.chargeAngle >= CONFIG.maxAngle) {
                     GameState.chargeAngle = CONFIG.maxAngle;
                     GameState.angleDirection = -1;
@@ -258,7 +260,7 @@ const Game = {
                 break;
                 
             case 'jumping':
-                const landed = GameLogic.updateJumpArc();
+                const landed = GameLogic.updateJumpArc(timeScale);
                 const collision = GameLogic.checkBakaCollision();
                 
                 // Bounce off top - REQUIRES TIMING!
@@ -273,7 +275,6 @@ const Game = {
                         UI.showMessage('✨ PERFECT! ✨', 'success');
                         GameState.bounceInputTime = 0; // Reset to prevent double bounce
                     } else {
-                        // FAILED TO TIME IT - CRASH!
                         // FAILED TO TIME IT - CRASH!
                         GameState.state = 'fail';
                         const isGameOver = GameLogic.loseLife();
@@ -341,10 +342,20 @@ const Game = {
         }
     },
     
-    loop() {
-        this.update();
+    lastTime: 0,
+    loop(timestamp) {
+        if (!this.lastTime) this.lastTime = timestamp;
+        const deltaTime = timestamp - this.lastTime;
+        this.lastTime = timestamp;
+
+        // Target 60 FPS (approx 16.67ms per frame)
+        const timeScale = deltaTime / (1000 / 60);
+        // Clamp to avoid spiraling
+        const clampedTimeScale = Math.min(timeScale, 4.0);
+
+        this.update(clampedTimeScale);
         Rendering.render();
-        this.animationFrameId = requestAnimationFrame(() => this.loop());
+        this.animationFrameId = requestAnimationFrame((t) => this.loop(t));
     }
 };
 

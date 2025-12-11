@@ -214,13 +214,25 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Game Loop ---
-  function update() {
+  let lastTime = 0;
+  function update(timestamp) {
+    if (!lastTime) lastTime = timestamp;
+    const deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+
+    // Target 60 FPS (approx 16.67ms per frame)
+    // timeScale will be ~1.0 at 60fps, ~0.5 at 120fps, ~2.0 at 30fps
+    const timeScale = deltaTime / (1000 / 60);
+
+    // Limit timeScale to prevent huge jumps if lag occurs (e.g. max 3 frames skipped)
+    const clampedTimeScale = Math.min(timeScale, 4.0);
+
     // Update marbles
     if (gameState === "shooting") {
       let anyMoving = false;
 
       // Update player marble
-      if (updateMarble(playerMarble, canvas.width, canvas.height)) {
+      if (updateMarble(playerMarble, canvas.width, canvas.height, clampedTimeScale)) {
         anyMoving = true;
       }
 
@@ -230,7 +242,8 @@ document.addEventListener("DOMContentLoaded", () => {
         modeState,
         score,
         canvas.width,
-        canvas.height
+        canvas.height,
+        clampedTimeScale
       );
 
       if (result.anyMoving) anyMoving = true;

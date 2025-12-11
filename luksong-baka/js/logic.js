@@ -8,10 +8,10 @@ const GameLogic = {
      * Update player position during jump arc
      * @returns {boolean} - True if player has landed
      */
-    updateJumpArc() {
-        Player.x += Player.vx;
-        Player.y += Player.vy;
-        Player.vy += CONFIG.gravity;
+    updateJumpArc(timeScale = 1.0) {
+        Player.x += Player.vx * timeScale;
+        Player.y += Player.vy * timeScale;
+        Player.vy += CONFIG.gravity * timeScale;
         
         if (Player.y >= CONFIG.groundY) {
             Player.y = CONFIG.groundY;

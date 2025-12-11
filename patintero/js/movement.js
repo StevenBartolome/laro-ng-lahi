@@ -4,7 +4,10 @@ import { showPointNotification } from './ui.js';
 /**
  * Update all runners (player and bot movement)
  */
-export function updateRunners() {
+/**
+ * Update all runners (player and bot movement)
+ */
+export function updateRunners(timeScale = 1.0) {
     const field = document.getElementById('field');
     const fw = field.offsetWidth;
     const fh = field.offsetHeight;
@@ -19,43 +22,123 @@ export function updateRunners() {
         if (r.type === 'player') {
             // Player Movement
             if (boost.active) speed *= boost.multiplier;
-            if (keys.ArrowUp || keys.w) dy -= speed;
-            if (keys.ArrowDown || keys.s) dy += speed;
-            if (keys.ArrowLeft || keys.a) dx -= speed;
-            if (keys.ArrowRight || keys.d) dx += speed;
+
+            // Scale speed by timeScale for frame independence
+            const scaledSpeed = speed * timeScale;
+
+            if (keys.ArrowUp || keys.w) dy -= scaledSpeed;
+            if (keys.ArrowDown || keys.s) dy += scaledSpeed;
+            if (keys.ArrowLeft || keys.a) dx -= scaledSpeed;
+            if (keys.ArrowRight || keys.d) dx += scaledSpeed;
         } else {
             // Bot AI Logic
+            const scaledSpeed = speed * timeScale;
+
+            // Initialize stuck detection if not exists
+            if (!r.stuckTimer) r.stuckTimer = 0;
+            if (!r.lastX) r.lastX = r.x;
+            if (!r.lastY) r.lastY = r.y;
+
+            // Detect if bot is stuck (hasn't moved much in recent frames)
+            const movementThreshold = 5;
+            const isStuck = Math.abs(r.x - r.lastX) < movementThreshold && Math.abs(r.y - r.lastY) < movementThreshold;
+            if (isStuck) {
+                r.stuckTimer += timeScale;
+            } else {
+                r.stuckTimer = 0;
+            }
+
+            // Update last position
+            r.lastX = r.x;
+            r.lastY = r.y;
+
             // Target: Bottom (if not reached) or Top (if reached)
             let targetY = r.reachedBottom ? 20 : fh - 40;
 
-            // Basic Pathfinding
-            if (r.y < targetY) dy += speed * 0.6;
-            else if (r.y > targetY) dy -= speed * 0.6;
+            // Define edge and corner zones
+            const edgeMargin = 60;
+            const cornerMargin = 80;
+            const isOnLeftEdge = r.x < edgeMargin;
+            const isOnRightEdge = r.x > fw - edgeMargin;
+            const isOnTopEdge = r.y < edgeMargin;
+            const isOnBottomEdge = r.y > fh - edgeMargin;
+            const isInCorner = (isOnLeftEdge || isOnRightEdge) && (isOnTopEdge || isOnBottomEdge);
+            const isStuckLong = r.stuckTimer > 20; // Stuck for more than 20 frames
 
-            // Evasion Logic: Run away from nearest tagger
-            let nearestTagger = null;
-            let minDist = 100;
-            taggers.forEach(t => {
-                const dist = Math.sqrt((r.x - t.x) ** 2 + (r.y - t.y) ** 2);
-                if (dist < minDist) {
-                    minDist = dist;
-                    nearestTagger = t;
+            // PRIORITY 1: Escape from corners with strong force
+            if (isInCorner || isStuckLong) {
+                // Force movement toward center horizontally
+                if (r.x < fw / 2) {
+                    dx += scaledSpeed * 1.2; // Strong push right
+                } else {
+                    dx -= scaledSpeed * 1.2; // Strong push left
                 }
-            });
 
-            if (nearestTagger) {
-                // Simple flee behavior
-                if (nearestTagger.x < r.x) dx += speed * 0.5;
-                else dx -= speed * 0.5;
+                // Force movement toward center vertically (but respect target direction)
+                if (r.y < fh / 3) {
+                    dy += scaledSpeed * 0.8; // Push down from top
+                } else if (r.y > fh * 2 / 3) {
+                    dy -= scaledSpeed * 0.8; // Push up from bottom
+                }
 
-                // Wait behavior if tagger is directly ahead
-                if (Math.abs(nearestTagger.y - r.y) < 60 && Math.abs(nearestTagger.x - r.x) < 50) {
-                    dy = 0; // Stop and wait
+                // Reset stuck timer if using escape logic
+                if (isStuckLong) r.stuckTimer = 0;
+            }
+            // PRIORITY 2: Normal pathfinding toward target
+            else {
+                // Basic Pathfinding
+                if (r.y < targetY) dy += scaledSpeed * 0.6;
+                else if (r.y > targetY) dy -= scaledSpeed * 0.6;
+
+                // Evasion Logic: Run away from nearest tagger
+                let nearestTagger = null;
+                let minDist = 100;
+                taggers.forEach(t => {
+                    const dist = Math.sqrt((r.x - t.x) ** 2 + (r.y - t.y) ** 2);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearestTagger = t;
+                    }
+                });
+
+                if (nearestTagger) {
+                    // Reduced flee behavior to prevent pushing into corners
+                    const fleeStrength = 0.3; // Reduced from 0.5
+                    if (nearestTagger.x < r.x && !isOnRightEdge) {
+                        dx += scaledSpeed * fleeStrength;
+                    } else if (nearestTagger.x > r.x && !isOnLeftEdge) {
+                        dx -= scaledSpeed * fleeStrength;
+                    }
+
+                    // Wait behavior if tagger is directly ahead
+                    if (Math.abs(nearestTagger.y - r.y) < 60 && Math.abs(nearestTagger.x - r.x) < 50) {
+                        dy = 0; // Stop forward movement
+
+                        // Anti-Edge: Move toward center when tagger blocks
+                        if (isOnLeftEdge) {
+                            dx += scaledSpeed * 0.9;
+                        } else if (isOnRightEdge) {
+                            dx -= scaledSpeed * 0.9;
+                        }
+                        // If in center, try to dodge
+                        else if (Math.abs(r.x - fw / 2) < 100) {
+                            dx += (Math.random() < 0.5 ? 1 : -1) * scaledSpeed * 0.7;
+                        }
+                    }
+                }
+
+                // Bias toward center when on edges (but not in corners)
+                if (isOnLeftEdge && !isInCorner) {
+                    dx += scaledSpeed * 0.4;
+                } else if (isOnRightEdge && !isInCorner) {
+                    dx -= scaledSpeed * 0.4;
+                }
+
+                // Random Jitter (reduced to prevent erratic movement into corners)
+                if (Math.random() < 0.03 * timeScale) {
+                    dx += (Math.random() - 0.5) * 5 * timeScale;
                 }
             }
-
-            // Random Jitter
-            if (Math.random() < 0.05) dx += (Math.random() - 0.5) * 10;
         }
 
         r.x += dx;
@@ -104,7 +187,10 @@ export function updateRunners() {
 /**
  * Update all taggers (player and bot AI movement)
  */
-export function updateTaggers() {
+/**
+ * Update all taggers (player and bot AI movement)
+ */
+export function updateTaggers(timeScale = 1.0) {
     const field = document.getElementById('field');
     const fw = field.offsetWidth;
     const fh = field.offsetHeight;
@@ -114,17 +200,20 @@ export function updateTaggers() {
         // PLAYER CONTROLLED TAGGER
         if (t.controller === 'player') {
             let dx = 0, dy = 0;
-            let speed = CONFIG.taggerSpeed * 1.5; // Slightly faster for player fun
+            let speed = CONFIG.taggerSpeed; // Removed 1.5x multiplier for equality
 
             // Apply boost multiplier if active
             if (taggerBoost.active) {
                 speed *= taggerBoost.multiplier;
             }
 
-            if (keys.ArrowUp || keys.w) dy -= speed;
-            if (keys.ArrowDown || keys.s) dy += speed;
-            if (keys.ArrowLeft || keys.a) dx -= speed;
-            if (keys.ArrowRight || keys.d) dx += speed;
+            // Scale for time
+            const scaledSpeed = speed * timeScale;
+
+            if (keys.ArrowUp || keys.w) dy -= scaledSpeed;
+            if (keys.ArrowDown || keys.s) dy += scaledSpeed;
+            if (keys.ArrowLeft || keys.a) dx -= scaledSpeed;
+            if (keys.ArrowRight || keys.d) dx += scaledSpeed;
 
             t.x += dx;
             t.y += dy;
@@ -196,12 +285,14 @@ export function updateTaggers() {
                     scaledResp *= 1.5; // 50% faster when chasing edge runners
                 }
 
-                t.x += (desiredX - t.x) * scaledResp;
+                // Apply time scaling to interpolation speed
+                // Approximate time scaling for lerp: factor * timeScale
+                t.x += (desiredX - t.x) * scaledResp * timeScale;
             } else {
                 // Instead of returning to center, move toward nearest runner's X position
                 // This helps cover the field better and prevents side exploits
                 desiredX = target.x;
-                t.x += (desiredX - t.x) * 0.02; // Slow positioning toward runner
+                t.x += (desiredX - t.x) * 0.02 * timeScale; // Slow positioning toward runner
             }
             // Clamp
             if (t.x < 20) t.x = 20;
@@ -228,7 +319,7 @@ export function updateTaggers() {
             const distanceRatio = Math.min(distanceToTarget / maxDistance, 1);
             const scaledResp = t.resp * (1 - distanceRatio * 0.9) + minResponsiveness;
 
-            t.y += (desiredY - t.y) * scaledResp;
+            t.y += (desiredY - t.y) * scaledResp * timeScale;
 
             // Constraints
             const safeZoneY = fh * 0.2;

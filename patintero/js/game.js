@@ -1,18 +1,22 @@
-import { 
-    gameState, CONFIG, DIFFICULTY, 
-    boost, taggerBoost, 
-    runners, taggers 
+import {
+    gameState, CONFIG, DIFFICULTY,
+    boost, taggerBoost,
+    runners, taggers
 } from './config.js';
 import { createRunner, createTagger } from './entities.js';
 import { updateBoostUI } from './boost.js';
 import { updateRunners, updateTaggers } from './movement.js';
 import { checkCollisions } from './collision.js';
-import { 
-    updateStatus, showRoundModal, updateTimerDisplay, 
-    updateTimer, setGameFlowFunctions 
+import {
+    updateStatus, showRoundModal, updateTimerDisplay,
+    updateTimer, setGameFlowFunctions
 } from './ui.js';
 import { updateCharacterPanel } from './character-switch.js';
 import { checkBoostInput } from './input.js';
+
+// Move lastTime to module scope and export reset function if needed, 
+// or just reset it inside startGame/startRound.
+let lastTime = 0;
 
 /**
  * Start the game with selected difficulty
@@ -23,6 +27,8 @@ export function startGame(difficulty) {
         cancelAnimationFrame(gameState.animationFrameId);
         gameState.animationFrameId = null;
     }
+    lastTime = 0; // Reset time tracker
+
     if (gameState.timerInterval) {
         clearInterval(gameState.timerInterval);
         gameState.timerInterval = null;
@@ -88,7 +94,12 @@ export function startRound() {
     const field = document.getElementById('field');
     const fw = field.offsetWidth;
     const diff = DIFFICULTY[gameState.selectedDifficulty];
-    CONFIG.taggerSpeed = diff.speed;
+
+    // Equalize speeds based on difficulty multiplier (Base speed 10)
+    const baseSpeed = 10;
+    CONFIG.runnerSpeed = baseSpeed * diff.speedMult;
+    CONFIG.taggerSpeed = baseSpeed * diff.speedMult;
+    CONFIG.botSpeed = baseSpeed * diff.speedMult;
 
     // Initialize/Reset Timer (2 minutes countdown)
     gameState.gameTimer = 120;
@@ -153,19 +164,34 @@ export function startRound() {
     }
 
     gameState.gameActive = true;
-    gameLoop();
+    gameState.animationFrameId = requestAnimationFrame(gameLoop);
 }
 
 /**
  * Main game loop
  */
-export function gameLoop() {
+/**
+ * Main game loop
+ */
+export function gameLoop(timestamp) {
     if (!gameState.gameActive) return;
+
+    // Safety check for timestamp
+    if (!timestamp) timestamp = performance.now();
+
+    if (!lastTime) lastTime = timestamp;
+    const deltaTime = timestamp - lastTime;
+    lastTime = timestamp;
+
+    // Target 60 FPS (approx 16.67ms per frame)
+    const timeScale = deltaTime / (1000 / 60);
+    // Clamp timeScale to avoid huge jumps
+    const clampedTimeScale = Math.min(timeScale, 4.0);
 
     checkBoostInput();
 
-    updateRunners();
-    updateTaggers();
+    updateRunners(clampedTimeScale);
+    updateTaggers(clampedTimeScale);
     checkCollisions();
 
     // Check if all runners are tagged
