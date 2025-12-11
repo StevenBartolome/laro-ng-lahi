@@ -14,7 +14,6 @@ import {
 import * as TargetMode from "./TargetMode.js";
 import * as CircleMode from "./CircleMode.js";
 import * as HoleMode from "./HoleMode.js";
-import * as TumbangMode from "./TumbangMode.js";
 import * as LineMode from "./LineMode.js";
 
 import { UI } from "./UI.js";
@@ -414,7 +413,6 @@ document.addEventListener("DOMContentLoaded", () => {
       case "target": currentModeModule = TargetMode; break;
       case "circle": currentModeModule = CircleMode; break;
       case "hole": currentModeModule = HoleMode; break;
-      case "tumbang": currentModeModule = TumbangMode; break;
       case "line": currentModeModule = LineMode; break;
       default: currentModeModule = TargetMode; break;
     }

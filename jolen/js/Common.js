@@ -5,7 +5,7 @@ export const TARGET_COLOR = "#f44336";
 export const MAX_DRAG_DISTANCE = 150;
 export const POWER_MULTIPLIER = 0.15;
 export const COLLISION_ELASTICITY = 0.8;
-export const CIRCLE_RADIUS = 220;
+export const CIRCLE_RADIUS = 190; // Reduced from 220 for smaller circle
 
 export const images = {
   background: new Image(),
