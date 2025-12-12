@@ -2,10 +2,10 @@ export const UI = {
   elements: {},
   gameStarted: false,
   currentMenuMode: 'both',
-  
+
   setGameStarted(val) {
-      console.log('UI: Game started set to', val);
-      this.gameStarted = val;
+    console.log('UI: Game started set to', val);
+    this.gameStarted = val;
   },
 
   init() {
@@ -14,12 +14,17 @@ export const UI = {
       closeOverlayBtn: document.getElementById("closeOverlayBtn"),
       levelDisplay: document.getElementById("level-display"),
       scoreDisplay: document.getElementById("score-display"),
+      livesDisplay: document.getElementById("livesDisplay"),
+      messageOverlay: document.getElementById("messageOverlay"),
+      messageText: document.getElementById("messageText"),
       modeBtns: document.querySelectorAll(".mode-btn"),
       diffBtns: document.querySelectorAll(".diff-btn"),
       overlayContent: document.querySelector(".overlay-content"),
       gameContainer: document.getElementById("game-container"),
       appContainer: document.querySelector(".app-container"),
     };
+
+    this.messageTimeout = null;
 
     if (this.elements.closeOverlayBtn) {
       this.elements.closeOverlayBtn.addEventListener("click", () => {
@@ -28,10 +33,10 @@ export const UI = {
         } else {
           // If viewing instructions specifically, go back to main menu
           if (this.currentMenuMode === 'instructions') {
-             this.showMenu('both', true);
+            this.showMenu('both', true);
           } else {
-             // Otherwise (e.g. 'both' or 'difficulty'), exit to game select
-             window.location.href = '../game_select.php';
+            // Otherwise (e.g. 'both' or 'difficulty'), exit to game select
+            window.location.href = '../game_select.php';
           }
         }
       });
@@ -98,13 +103,13 @@ export const UI = {
     console.log('UI: hideMenu called. isGameVisible:', isGameVisible);
 
     if (!isGameVisible) {
-        console.log('UI: Game not visible, forcing Main Menu return');
-        this.showMenu('both', false);
+      console.log('UI: Game not visible, forcing Main Menu return');
+      this.showMenu('both', false);
     } else {
-        console.log('UI: Game visible, hiding overlay');
-        if (this.elements.menuOverlay) {
-          this.elements.menuOverlay.classList.add("hidden");
-        }
+      console.log('UI: Game visible, hiding overlay');
+      if (this.elements.menuOverlay) {
+        this.elements.menuOverlay.classList.add("hidden");
+      }
     }
   },
 
@@ -118,6 +123,73 @@ export const UI = {
     if (this.elements.levelDisplay) {
       this.elements.levelDisplay.textContent = level;
     }
+  },
+
+  updateLives(lives) {
+    for (let i = 1; i <= 3; i++) {
+      const heart = document.getElementById('heart' + i);
+      if (heart) {
+        if (i <= lives) {
+          heart.classList.remove('lost');
+        } else {
+          heart.classList.add('lost');
+        }
+      }
+    }
+  },
+
+  showMessage(text, type) {
+    if (this.messageTimeout) clearTimeout(this.messageTimeout);
+
+    if (this.elements.messageText && this.elements.messageOverlay) {
+      this.elements.messageText.textContent = text;
+      this.elements.messageText.className = type || '';
+      this.elements.messageOverlay.classList.remove('hidden');
+
+      this.messageTimeout = setTimeout(() => {
+        this.elements.messageOverlay.classList.add('hidden');
+      }, 1500);
+    }
+  },
+
+  showGameOver(score) {
+    if (this.messageTimeout) clearTimeout(this.messageTimeout);
+
+    if (!this.elements.messageOverlay || !this.elements.messageText) return;
+
+    // Add backdrop class to overlay
+    this.elements.messageOverlay.classList.add('game-complete-backdrop');
+
+    this.elements.messageText.innerHTML = `
+      <div class="game-complete-content">
+        <div class="complete-header fail">GAME OVER</div>
+        <div class="complete-sub">You ran out of lives!</div>
+        <div class="complete-score">Score: ${score}</div>
+        <div class="complete-buttons">
+          <button id="retryBtn" class="restart-btn">Try Again</button>
+          <a href="../game_select.php" class="back-menu-btn">Main Menu</a>
+        </div>
+      </div>
+    `;
+    this.elements.messageText.className = 'game-complete-box';
+    this.elements.messageOverlay.classList.remove('hidden');
+
+    // Setup retry button
+    setTimeout(() => {
+      const retryBtn = document.getElementById('retryBtn');
+      if (retryBtn) {
+        retryBtn.addEventListener('click', () => {
+          // Reload the page to restart the game
+          window.location.reload();
+        });
+      }
+
+      // Back to menu button sound (if Sound module exists)
+      const backBtn = document.querySelector('.back-menu-btn');
+      if (backBtn && window.Sound) {
+        backBtn.addEventListener('click', () => Sound.playClick());
+      }
+    }, 100);
   },
 
   highlightMode(modeId) {

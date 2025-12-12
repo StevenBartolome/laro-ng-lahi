@@ -95,9 +95,6 @@
               <button id="mode-hole" class="game-card mode-btn">
                 <span class="card-icon">🕳️</span> Hole
               </button>
-              <button id="mode-tumbang" class="game-card mode-btn">
-                <span class="card-icon">🥫</span> Tumbang
-              </button>
               <button id="mode-line" class="game-card mode-btn">
                 <span class="card-icon">📏</span> Line
               </button>
@@ -135,6 +132,11 @@
           <span class="stat-label">SCORE</span>
           <span id="score-display" class="stat-value">0</span>
         </div>
+        <div class="lives-display" id="livesDisplay">
+          <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart1">
+          <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart2">
+          <img src="../assets/luksong_baka_assets/player-life.png" class="heart" id="heart3">
+        </div>
 
         <button id="menuBtn" class="ui-icon-btn" title="Menu">
           <span style="font-size: 24px">⚙️</span>
@@ -144,11 +146,22 @@
       <!-- Canvas -->
       <div class="canvas-wrapper">
         <canvas id="gameCanvas"></canvas>
+
+        <!-- Instruction Prompt -->
+        <div id="instruction-prompt" class="instruction-prompt" style="display: none;">
+          <span class="mouse-icon">🖱️</span>
+          <span>Click and drag your marble to shoot!</span>
+        </div>
+      </div>
+
+      <!-- Message Overlay -->
+      <div id="messageOverlay" class="message-overlay hidden">
+        <div id="messageText"></div>
       </div>
 
       <!-- Back Button -->
-      <a href="../game_select.php" class="back-btn" title="Exit">
-        <img src="../assets/startmenu/back_button.png" alt="Back" style="width: 150px" />
+      <a href="../game_select.php" class="back-btn" title="Back to Game Select">
+        <img src="../assets/startmenu/back_button.png" alt="Back" />
       </a>
     </div>
   </div>
