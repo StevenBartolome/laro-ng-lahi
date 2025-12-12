@@ -44,26 +44,43 @@ export function updateStatus(msg) {
 /**
  * Show round modal with callback
  */
+/**
+ * Show round modal with callback
+ */
 export function showRoundModal(titleText, msgText, callback) {
-    const modal = document.getElementById('gameOverModal');
+    const modal = document.getElementById('messageOverlay');
     const title = document.getElementById('modalTitle');
     const msg = document.getElementById('modalMessage');
-    const btn = document.querySelector('.game-over-modal .btn');
+    const btn = document.getElementById('modalActionBtn');
+    const menuBtn = document.getElementById('modalMenuBtn');
 
+    // Ensure backdrop mode
+    modal.classList.add('game-complete-backdrop');
+
+    // Update Text
     title.textContent = titleText;
-    msg.textContent = msgText;
+    title.classList.remove('fail');
+    title.classList.add('round'); // Gold for round transition
+    
+    // Allow HTML in msg
+    msg.innerHTML = msgText.replace(/\n/g, '<br>');
+    
     btn.textContent = "Start Next Round";
+    
+    // Hide Main Menu button for round transitions (optional, can keep if desired)
+    // For now, let's keep it but maybe it's cleaner without
+    menuBtn.style.display = 'none';
 
     // Override button click
     const newBtn = btn.cloneNode(true);
     btn.parentNode.replaceChild(newBtn, btn);
 
     newBtn.onclick = () => {
-        modal.style.display = 'none';
+        modal.classList.add('hidden');
         callback();
     };
 
-    modal.style.display = 'block';
+    modal.classList.remove('hidden');
 }
 
 /**

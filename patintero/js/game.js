@@ -268,35 +268,54 @@ export function endGame() {
     gameState.gameActive = false;
     clearInterval(gameState.timerInterval);
 
-    const modal = document.getElementById('gameOverModal');
+    const modal = document.getElementById('messageOverlay');
     const title = document.getElementById('modalTitle');
     const msg = document.getElementById('modalMessage');
-    const btn = document.querySelector('.game-over-modal .btn');
-
-    title.textContent = "GAME OVER!";
+    const scoreDisplay = document.getElementById('modalScore');
+    const btn = document.getElementById('modalActionBtn');
+    const menuBtn = document.getElementById('modalMenuBtn');
+    
+    // Ensure backdrop mode
+    modal.classList.add('game-complete-backdrop');
+    menuBtn.style.display = 'flex'; // Ensure menu button is visible
 
     // Determine winner
     const winner = gameState.playerTeamScore > gameState.enemyTeamScore ? 'My Team' :
-        gameState.playerTeamScore < gameState.enemyTeamScore ? 'Enemy Team' : 'Tie';
-    const winnerColor = gameState.playerTeamScore > gameState.enemyTeamScore ? '#4CAF50' :
-        gameState.playerTeamScore < gameState.enemyTeamScore ? '#f44336' : '#FFA500';
+                   gameState.playerTeamScore < gameState.enemyTeamScore ? 'Enemy Team' : 'Tie';
+    
+    // Set Title
+    title.textContent = "GAME OVER";
+    
+    if (winner === 'Enemy Team') {
+        title.classList.add('fail');
+        title.classList.remove('round');
+    } else {
+        title.classList.remove('fail');
+        title.classList.add('round'); // Use gold/positive for win or tie
+    }
+
+    // Winner Color for Text
+    const winnerColor = winner === 'My Team' ? '#4CAF50' : 
+                        winner === 'Enemy Team' ? '#ff4444' : '#FFA500';
 
     msg.innerHTML = `
-        <div style="font-size: 1.5em; margin: 20px 0;">
-            <div style="margin-bottom: 15px;">
-                My Team: <span style="color: #4CAF50; font-size: 1.2em;">${gameState.playerTeamScore}</span> | 
-                Enemy Team: <span style="color: #f44336; font-size: 1.2em;">${gameState.enemyTeamScore}</span>
+        <div style="font-size: 1.1em; margin-bottom: 20px;">
+            <div style="margin-bottom: 10px; font-family: var(--font-heading);">
+                MY TEAM: <strong style="color: #4CAF50;">${gameState.playerTeamScore}</strong> 
+                <span style="opacity:0.5; margin:0 10px">|</span> 
+                ENEMY: <strong style="color: #ff4444;">${gameState.enemyTeamScore}</strong>
             </div>
-            <div style="color: ${winnerColor}; font-size: 1.4em; font-weight: bold;">
+            <div style="color: ${winnerColor}; font-size: 1.4em; font-weight: 800; font-family: var(--font-heading); text-shadow: 0 0 10px rgba(0,0,0,0.5);">
                 ${winner === 'Tie' ? "IT'S A TIE!" : winner + " WINS!"}
             </div>
         </div>
-        <div style="color: #666;">
-            ${winner === 'My Team' ? "Great job! You won!" :
-            winner === 'Enemy Team' ? "Better luck next time!" :
-                "Close match!"}
+        <div style="color: #90caf9; font-size: 0.9em; font-style: italic;">
+            ${winner === 'My Team' ? "Great job! Keep it up!" : 
+              winner === 'Enemy Team' ? "Better luck next time!" : 
+              "Close match!"}
         </div>
     `;
+    
     btn.textContent = "Play Again";
 
     // Override button click
@@ -307,7 +326,7 @@ export function endGame() {
         resetGame();
     };
 
-    modal.style.display = 'block';
+    modal.classList.remove('hidden');
 }
 
 /**
