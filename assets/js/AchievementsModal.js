@@ -121,8 +121,7 @@ class AchievementsModal {
             { id: 'general', name: 'General', icon: '🎮' },
             { id: 'jolen', name: 'Jolen', icon: '🎯' },
             { id: 'patintero', name: 'Patintero', icon: '🏃' },
-            { id: 'luksong', name: 'Luksong Baka', icon: '🦘' },
-            { id: 'special', name: 'Special', icon: '🏆' }
+            { id: 'luksong', name: 'Luksong Baka', icon: '🦘' }
         ];
 
         categories.forEach(cat => {
@@ -154,16 +153,7 @@ class AchievementsModal {
 
         let progressText = `${progress.current} / ${progress.target}`;
 
-        // Special formatting for playtime (convert seconds to minutes)
-        if (ach.requirement.type === 'playtime') {
-            const currentMins = Math.floor(progress.current / 60);
-            const targetMins = Math.floor(progress.target / 60);
-            progressText = `${currentMins}m / ${targetMins}m`;
-        } else if (ach.requirement.type === 'timeOfDay') {
-            // For time of day, just show Done/Not Done effectively
-            progressText = ach.unlocked ? 'Completed' : 'Pending';
-            // Visual adjustment: if pending, 0%, if done 100%
-        } else if (ach.requirement.type === 'luksongMaxLevel' || ach.requirement.type === 'luksongPerfect' || ach.requirement.type === 'luksongStreak' || ach.requirement.type === 'patinteroSpeed' || ach.requirement.type === 'patinteroFlawless' || ach.requirement.type === 'jolenPerfect') {
+        if (ach.requirement.type === 'luksongMaxLevel' || ach.requirement.type === 'luksongPerfect' || ach.requirement.type === 'luksongStreak' || ach.requirement.type === 'patinteroSpeed' || ach.requirement.type === 'patinteroFlawless' || ach.requirement.type === 'jolenPerfect') {
             // These single-event achievements are binary
             progressText = ach.unlocked ? 'Completed' : 'Not yet completed';
         }

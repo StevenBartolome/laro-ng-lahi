@@ -182,31 +182,7 @@ class AchievementManager {
                 requirement: { type: 'luksongWins', value: 10 }
             },
 
-            // Special Achievements
-            'marathon_player': {
-                id: 'marathon_player',
-                name: 'Marathon Player',
-                description: 'Play for 30 minutes continuously',
-                icon: '⏱️',
-                category: 'special',
-                requirement: { type: 'playtime', value: 1800 }
-            },
-            'early_bird': {
-                id: 'early_bird',
-                name: 'Early Bird',
-                description: 'Play a game before 6 AM',
-                icon: '🌅',
-                category: 'special',
-                requirement: { type: 'timeOfDay', value: 6 }
-            },
-            'night_owl': {
-                id: 'night_owl',
-                name: 'Night Owl',
-                description: 'Play a game after 10 PM',
-                icon: '🦉',
-                category: 'special',
-                requirement: { type: 'timeOfDay', value: 22 }
-            }
+
         };
 
         this.userId = null;
@@ -281,13 +257,7 @@ class AchievementManager {
         this.userStats.gamesPlayedByType = this.userStats.gamesPlayedByType || {};
         this.userStats.gamesPlayedByType[gameType] = (this.userStats.gamesPlayedByType[gameType] || 0) + 1;
 
-        // Check time-based achievements
-        const hour = new Date().getHours();
-        if (hour < 6) {
-            await this.checkAndUnlock('early_bird');
-        } else if (hour >= 22) {
-            await this.checkAndUnlock('night_owl');
-        }
+
 
         // Check general achievements
         await this.checkAndUnlock('first_steps');
@@ -394,17 +364,7 @@ class AchievementManager {
     /**
      * Track playtime for marathon achievement
      */
-    async trackPlaytime(seconds) {
-        if (this.isGuest || !this.initialized) return;
 
-        this.userStats.totalPlaytime = (this.userStats.totalPlaytime || 0) + seconds;
-
-        if (seconds >= 1800) { // 30 minutes
-            await this.unlockAchievement('marathon_player');
-        }
-
-        await this.saveUserData();
-    }
 
     /**
      * Check if requirements are met and unlock achievement
@@ -674,10 +634,7 @@ class AchievementManager {
             case 'luksongWins':
                 currentValue = this.userStats.luksongWins || 0;
                 break;
-            // Time-based (special case to format nicely later)
-            case 'playtime':
-                currentValue = this.userStats.totalPlaytime || 0;
-                break;
+
             default:
                 currentValue = 0;
         }
