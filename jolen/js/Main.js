@@ -272,16 +272,10 @@ document.addEventListener("DOMContentLoaded", () => {
         shotScore += result.scoreIncrease; // Track score gained in this shot
         UI.updateScore(score);
         updateTargetsLeft();
-        
-        // Track achievement progress
-        currentStreak++;
-        totalHits++;
-        maxStreak = Math.max(maxStreak, currentStreak);
       }
 
       // Check if level complete
       if (!anyMoving) {
-        totalShots++;
         const levelComplete = currentModeModule.checkLevelComplete(modeState);
 
         if (levelComplete) {
@@ -292,14 +286,9 @@ document.addEventListener("DOMContentLoaded", () => {
           // Player missed (didn't hit any targets) - deduct a life
           lives--;
           UI.updateLives(lives);
-          
-          // Track miss for achievements
-          currentStreak = 0;
-          isPerfectGame = false;
 
           if (lives <= 0) {
-            // Game Over - track achievement and show game over screen
-            trackAchievement();
+            // Game Over - show game over screen
             gameState = "gameOver";
             UI.showGameOver(score);
           } else {
