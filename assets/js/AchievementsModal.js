@@ -148,6 +148,26 @@ class AchievementsModal {
         const unlockedClass = ach.unlocked ? 'unlocked' : 'locked';
         const badge = ach.unlocked ? '<div class="modal-status-badge">UNLOCKED</div>' : '';
 
+        // Get progress data
+        const am = window.achievementManager;
+        const progress = am.getAchievementProgress(ach.id);
+
+        let progressText = `${progress.current} / ${progress.target}`;
+
+        // Special formatting for playtime (convert seconds to minutes)
+        if (ach.requirement.type === 'playtime') {
+            const currentMins = Math.floor(progress.current / 60);
+            const targetMins = Math.floor(progress.target / 60);
+            progressText = `${currentMins}m / ${targetMins}m`;
+        } else if (ach.requirement.type === 'timeOfDay') {
+            // For time of day, just show Done/Not Done effectively
+            progressText = ach.unlocked ? 'Completed' : 'Pending';
+            // Visual adjustment: if pending, 0%, if done 100%
+        } else if (ach.requirement.type === 'luksongMaxLevel' || ach.requirement.type === 'luksongPerfect' || ach.requirement.type === 'luksongStreak' || ach.requirement.type === 'patinteroSpeed' || ach.requirement.type === 'patinteroFlawless' || ach.requirement.type === 'jolenPerfect') {
+            // These single-event achievements are binary
+            progressText = ach.unlocked ? 'Completed' : 'Not yet completed';
+        }
+
         return `
             <div class="modal-achievement-card ${unlockedClass}">
                 ${badge}
@@ -155,6 +175,13 @@ class AchievementsModal {
                 <div class="modal-achievement-details">
                     <div class="modal-achievement-name">${ach.name}</div>
                     <div class="modal-achievement-desc">${ach.description}</div>
+                    
+                    <div class="achievement-progress-wrapper">
+                        <div class="achievement-progress-track">
+                            <div class="achievement-progress-bar" style="width: ${progress.percent}%"></div>
+                        </div>
+                        <div class="achievement-progress-text">${progressText}</div>
+                    </div>
                 </div>
             </div>
         `;

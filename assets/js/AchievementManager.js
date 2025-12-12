@@ -622,6 +622,77 @@ class AchievementManager {
     }
 
     /**
+     * Get specific achievement progress
+     */
+    getAchievementProgress(achievementId) {
+        // If guest or not initialized, return 0
+        if (this.isGuest || !this.initialized) return { current: 0, target: 1, percent: 0 };
+
+        const achievement = this.achievements[achievementId];
+        if (!achievement) return { current: 0, target: 1, percent: 0 };
+
+        // If already unlocked, return 100%
+        if (this.unlockedAchievements[achievementId]) {
+            return {
+                current: achievement.requirement.value,
+                target: achievement.requirement.value,
+                percent: 100
+            };
+        }
+
+        const { type, value } = achievement.requirement;
+        let currentValue = 0;
+
+        switch (type) {
+            case 'gamesPlayed':
+                currentValue = this.userStats.gamesPlayed || 0;
+                break;
+            case 'uniqueGames':
+                currentValue = Object.keys(this.userStats.gamesPlayedByType || {}).length;
+                break;
+            case 'jolenGames':
+                currentValue = this.userStats.gamesPlayedByType?.jolen || 0;
+                break;
+            case 'jolenStreak':
+                currentValue = this.userStats.jolenStreak || 0;
+                break;
+            case 'jolenWins':
+                currentValue = this.userStats.jolenWins || 0;
+                break;
+            case 'patinteroGames':
+                currentValue = this.userStats.gamesPlayedByType?.patintero || 0;
+                break;
+            case 'patinteroPoints':
+                currentValue = this.userStats.patinteroPoints || 0;
+                break;
+            case 'patinteroTags':
+                currentValue = this.userStats.patinteroTags || 0;
+                break;
+            case 'luksongGames':
+                currentValue = this.userStats.gamesPlayedByType?.luksong || 0;
+                break;
+            case 'luksongWins':
+                currentValue = this.userStats.luksongWins || 0;
+                break;
+            // Time-based (special case to format nicely later)
+            case 'playtime':
+                currentValue = this.userStats.totalPlaytime || 0;
+                break;
+            default:
+                currentValue = 0;
+        }
+
+        // Cap at target value
+        currentValue = Math.min(currentValue, value);
+
+        return {
+            current: currentValue,
+            target: value,
+            percent: Math.round((currentValue / value) * 100)
+        };
+    }
+
+    /**
      * Get unlock progress
      */
     getProgress() {
