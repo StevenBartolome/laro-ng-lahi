@@ -25,41 +25,110 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <link rel="stylesheet" href="assets/css/login.css">
 </head>
 <body>
+    <!-- Floating particles -->
+    <div class="particles">
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+        <div class="particle"></div>
+    </div>
+
+    <!-- Audio System -->
+    <audio id="bgMusic" loop>
+        <source src="assets/game_sfx/login_background_music.mp3" type="audio/mpeg">
+    </audio>
+    <audio id="clickSound">
+        <source src="assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+    </audio>
+
     <div class="container">
         <div class="logo">
-            <h1>Laro ng Lahi</h1>
-            <p>Welcome back!</p>
+            <img src="assets/startmenu/screen_title.png" alt="Laro ng Lahi">
         </div>
         
         <div id="error-message" class="error"></div>
         
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="text" id="email" required placeholder="Enter your email">
+                <label for="email">Username</label>
+                <input type="text" id="email" required>
             </div>
             
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
+                <input type="password" id="password" required>
             </div>
             
-            <div class="forgot-password">
-                <a onclick="handleResetPassword()">Forgot password?</a>
+            <div class="button-row">
+                <button type="submit" class="btn btn-login" id="loginBtn">
+                    LOGIN
+                </button>
+                <a href="register.php" class="btn btn-register">REGISTER</a>
             </div>
-            
-            <button type="submit" class="btn" id="loginBtn">
-                Login
-                <div class="spinner" id="spinner"></div>
+
+            <div class="divider">or</div>
+
+            <button type="button" class="btn btn-guest" onclick="alert('Guest mode coming soon!')">
+                PLAY AS GUEST
             </button>
         </form>
-        
-        <div class="register-link">
-            Don't have an account? <a href="register.php">Register here</a>
-        </div>
     </div>
 
+    <!-- Audio Manager -->
+    <script src="assets/js/AudioManager.js"></script>
+
+    <!-- Music Toggle -->
+    <button id="musicToggle" class="music-toggle" title="Toggle Music">
+        <img src="assets/startmenu/volume.png" alt="Toggle Music">
+    </button>
+
     <script>
+        // Init Audio
+        window.addEventListener('load', () => {
+            const audioMgr = window.audioManager;
+            const bgMusic = document.getElementById('bgMusic');
+            const clickSound = document.getElementById('clickSound');
+            const musicToggle = document.getElementById('musicToggle');
+            const toggleIcon = musicToggle.querySelector('img');
+            
+            audioMgr.registerMusic(bgMusic);
+            audioMgr.registerSFX(clickSound);
+
+            // Update Toggle Icon based on state
+            const updateToggleIcon = () => {
+                const isMuted = audioMgr.settings.isMuted;
+                toggleIcon.src = isMuted ? 'assets/startmenu/mute.png' : 'assets/startmenu/volume.png';
+            };
+            updateToggleIcon();
+
+            // Handle Toggle Click
+            musicToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                // This click also satisfies browser autoplay policy
+                bgMusic.play().catch(() => {});
+                
+                audioMgr.toggleMute();
+                updateToggleIcon();
+            });
+
+            // Fallback: Play music on first interaction if not yet playing
+            document.addEventListener('click', () => {
+                if (bgMusic.paused && !audioMgr.settings.isMuted) {
+                    bgMusic.play().catch(() => {});
+                }
+            }, { once: true });
+
+            // Button click sounds
+            document.querySelectorAll('.btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    audioMgr.playSFX(clickSound);
+                });
+            });
+        });
+
         document.getElementById('loginForm').addEventListener('submit', async function(e) {
             e.preventDefault();
             
@@ -71,7 +140,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             
             // UI Loading State
             btn.disabled = true;
-            spinner.style.display = 'block';
+            if (spinner) spinner.style.display = 'block';
             errorMsg.style.display = 'none';
             
             // Call Auth
@@ -82,8 +151,12 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             } else {
                 errorMsg.textContent = result.message;
                 errorMsg.style.display = 'block';
+                // Shake effect on error
+                errorMsg.style.animation = 'shake 0.5s';
+                setTimeout(() => { errorMsg.style.animation = ''; }, 500);
+                
                 btn.disabled = false;
-                spinner.style.display = 'none';
+                if (spinner) spinner.style.display = 'none';
             }
         });
         

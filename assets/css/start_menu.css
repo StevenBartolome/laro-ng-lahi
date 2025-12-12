@@ -354,25 +354,37 @@ body {
     top: 20px;
     left: 20px;
     z-index: 100;
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px; /* Rounded square like login buttons */
     border: none;
-    background: rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    color: white;
-    font-size: 24px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    border-bottom: 4px solid #c8a34b; /* 3D effect matching theme */
+    background: #E9C46A; /* Saffron */
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.music-toggle img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1); /* Make icon white */
+    pointer-events: none;
 }
 
 .music-toggle:hover {
-    background: rgba(255, 255, 255, 0.3);
-    transform: scale(1.1);
+    background: #face7f; /* Lighter Saffron */
+    border-bottom-color: #dcb355;
+    transform: translateY(-2px);
+}
+
+.music-toggle:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+    margin-top: 4px; /* Simulates pressing down */
 }
 
 /* Responsive adjustments */
