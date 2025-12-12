@@ -9,8 +9,8 @@ export function createEntity(className, labelText, x, y, entityType) {
     div.style.left = `${x}px`;
     div.style.top = `${y}px`;
 
-    // Randomly select a player head image (1, 2, or 3)
-    const randomHead = Math.floor(Math.random() * 3) + 1;
+    // Randomly select a player head image (1 to 7)
+    const randomHead = Math.floor(Math.random() * 7) + 1;
     const headImage = `../assets/patintero_assets/player_head ${randomHead}.png`;
 
     // Set the background image for this specific entity

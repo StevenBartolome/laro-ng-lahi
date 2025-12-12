@@ -225,11 +225,21 @@
         </div>
     </div>
 
-    <!-- Game Over Modal -->
-    <div class="game-over-modal" id="gameOverModal">
-        <h2 id="modalTitle">Game Over!</h2>
-        <p id="modalMessage">You were tagged!</p>
-        <button class="btn" onclick="resetGame()">Play Again</button>
+    <!-- Game Over / Round Complete Modal -->
+    <div id="messageOverlay" class="message-overlay hidden">
+        <div class="game-complete-box" id="messageBox">
+            <div class="game-complete-content">
+                <div class="complete-header" id="modalTitle">GAME OVER</div>
+                <div class="complete-sub" id="modalMessage">You ran out of lives!</div>
+                <!-- Optional Score Section -->
+                <div class="complete-score" id="modalScore" style="display: none;">Score: 0</div>
+
+                <div class="complete-buttons">
+                    <button id="modalActionBtn" class="restart-btn">Try Again</button>
+                    <a href="../game_select.php" id="modalMenuBtn" class="back-menu-btn">Main Menu</a>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- Facts Button (Above How to Play) -->

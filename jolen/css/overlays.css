@@ -385,3 +385,188 @@ h3 {
     grid-template-columns: 1fr;
   }
 }
+
+/* Generic Message Overlay (You Missed, etc.) */
+.message-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.message-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#messageText {
+  background: rgba(62, 39, 35, 0.95);
+  padding: 30px 50px;
+  border-radius: 20px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffecb3;
+  border: 3px solid #8d6e63;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-heading);
+  text-align: center;
+  /* Ensure it has a base transition if we want it to pop */
+  transition: transform 0.2s ease; 
+}
+
+#messageText.fail {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+#messageText.success {
+  color: #51cf66;
+  border-color: #51cf66;
+}
+
+/* Enhanced Game Complete / Game Over Styles (Adapted from Luksong Baka) */
+
+/* Backdrop */
+#messageOverlay.game-complete-backdrop {
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    transform: none;
+    background: rgba(30, 20, 10, 0.9); /* Dark Brown Dim */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    pointer-events: all;
+}
+
+/* Content Box */
+.game-complete-box {
+    background: #3e2723 !important; /* Dark Wood */
+    padding: 3rem 4rem !important;
+    border: 1px solid rgba(255, 236, 179, 0.3) !important; /* Gold Border */
+    border-radius: 24px !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6) !important;
+    min-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* Header Text */
+.complete-header {
+    font-size: 3.5rem;
+    font-family: var(--font-heading, "Fredoka One", cursive);
+    background: linear-gradient(to bottom, #ffd700, #ffb300); /* Gold Gradient */
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    filter: drop-shadow(0 4px 0 rgba(0,0,0,0.2));
+    margin-bottom: 0.5rem;
+    line-height: 1.2;
+}
+
+.complete-header.fail {
+    background: linear-gradient(to bottom, #e74c3c, #c0392b); /* Red Gradient for Fail */
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Subtitle */
+.complete-sub {
+    font-size: 1.5rem;
+    color: #ae8b75; /* Lighter Brown Text */
+    font-family: var(--font-body, "Poppins", sans-serif);
+    font-weight: 600;
+}
+
+/* Score Display */
+.complete-score {
+    font-size: 2.5rem;
+    color: #fff;
+    font-family: var(--font-heading, "Fredoka One", cursive);
+    background: rgba(0,0,0,0.3);
+    padding: 0.5rem 2rem;
+    border-radius: 50px;
+    margin: 1rem 0 2rem 0;
+    border: 1px solid rgba(255,255,255,0.1);
+}
+
+/* Buttons Container */
+.complete-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    width: 100%;
+}
+
+/* Buttons */
+.restart-btn, .back-menu-btn {
+    padding: 16px 32px;
+    font-size: 1.2rem;
+    font-weight: 700;
+    font-family: var(--font-body, "Poppins", sans-serif);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 160px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+/* Restart Button - Lighter Brown (Primary Action) */
+.restart-btn {
+    background: linear-gradient(135deg, #a1887f, #8d6e63);
+    color: #fff;
+    box-shadow: 0 4px 0 #5d4037;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.restart-btn:hover {
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #5d4037;
+    background: linear-gradient(135deg, #bcaaa4, #a1887f);
+}
+
+.restart-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
+
+/* Back Button - Darker Brown (Secondary Action) */
+.back-menu-btn {
+    background: #3e2723;
+    color: #d7ccc8;
+    border: 1px solid #5d4037;
+    box-shadow: 0 4px 0 #1b0000;
+}
+
+.back-menu-btn:hover {
+    background: #4e342e;
+    color: #fff;
+    transform: translateY(2px);
+    box-shadow: 0 2px 0 #1b0000;
+    border-color: #8d6e63;
+}
+
+.back-menu-btn:active {
+    transform: translateY(4px);
+    box-shadow: none;
+}
