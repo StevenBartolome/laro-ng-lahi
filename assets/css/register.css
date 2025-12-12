@@ -1,0 +1,189 @@
+/* Register Page Styles - Based on Login Theme */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Warm Brown scanline/stripe background */
+    background: repeating-linear-gradient(
+        to bottom,
+        #4E342E,
+        #4E342E 2px,
+        #3E2723 2px,
+        #3E2723 4px
+    );
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+}
+
+.container {
+    /* Transparent container to let background show through */
+    background: transparent;
+    max-width: 450px; /* Slightly wider for register form */
+    width: 100%;
+    padding: 20px;
+    text-align: center;
+    position: relative;
+}
+
+.logo {
+    margin-bottom: 50px;
+    position: relative;
+    z-index: 20;
+}
+
+.logo img {
+    /* Enlarge title significantly */
+    width: 140%; 
+    max-width: none;
+    margin-left: -20%;
+    height: auto;
+    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
+    transform: translateY(-10px); /* Static lift, no float animation */
+}
+
+.form-group {
+    margin-bottom: 30px;
+    position: relative;
+    text-align: left;
+}
+
+label {
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    font-size: 12px;
+    font-weight: 800;
+    color: #E0FBFC; /* Light Cyan */
+    background-color: transparent;
+    padding: 0 4px;
+    text-transform: uppercase;
+    text-shadow: 1px 1px 2px black;
+    z-index: 10;
+    letter-spacing: 0.5px;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"] {
+    width: 100%;
+    padding: 10px 15px;
+    background-color: #E76F51; /* Burnt Sienna */
+    border: 2px solid #3E2723; /* Dark Brown */
+    border-radius: 6px;
+    font-size: 14px;
+    color: #E0FBFC; /* Light Cyan */
+    font-weight: 500;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input::placeholder {
+    color: rgba(224, 251, 252, 0.7);
+}
+
+input:focus {
+    border-color: #E9C46A; /* Saffron */
+}
+
+.btn {
+    width: 100%;
+    padding: 10px 0;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 800;
+    cursor: pointer;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-transform: uppercase;
+    background-color: #E9C46A; /* Saffron */
+    color: #264653; /* Charcoal Text */
+    border-bottom: 4px solid #c8a34b; /* Darker Saffron */
+    margin-top: 10px;
+}
+
+.btn:hover {
+    background-color: #face7f; /* Lighter Saffron */
+    border-bottom-color: #dcb355;
+}
+
+.btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+    margin-top: 14px; /* Simulates press */
+}
+
+.btn:disabled {
+    background: #99a3d6; /* Keep original disabled shade or adjust? */
+    background-color: #D4A373; /* Muted brown */
+    color: #eee;
+    cursor: wait;
+    transform: none;
+    border-bottom: 4px solid #997B55;
+    margin-top: 10px;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+    color: #E0FBFC;
+    font-size: 14px;
+    font-weight: 600;
+    text-shadow: 1px 1px 2px black;
+}
+
+.login-link a {
+    color: #E9C46A; /* Saffron */
+    text-decoration: none;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin-left: 5px;
+}
+
+.login-link a:hover {
+    color: #face7f;
+    text-decoration: underline;
+}
+
+.error {
+    background: rgba(198, 40, 40, 0.9);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    display: none;
+    text-align: center;
+    border: 1px solid #ff8e8e;
+}
+
+/* Shake Animation for Error */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-10px); }
+    80% { transform: translateX(10px); }
+}
+
+.spinner {
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-radius: 50%;
+    border-top-color: #000;
+    margin-left: 8px;
+    vertical-align: middle;
+    animation: spin 1s ease-in-out infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
