@@ -40,22 +40,25 @@ body {
 
 /* Back Button */
 .back-btn {
-    position: absolute;
-    top: 20px;
-    left: 20px;
+    position: absolute; /* Changed to absolute for precise positioning */
+    bottom: 50px;
+    left: 50%;
+    transform: translateX(-50%);
     z-index: 100;
     cursor: pointer;
     transition: all 0.3s ease;
     filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+    display: block;
 }
 
 .back-btn img {
     width: 200px;
     height: auto;
+    display: block; /* Remove inline gap */
 }
 
 .back-btn:hover {
-    transform: scale(1.1) translateX(-5px);
+    transform: translateX(-50%) scale(1.1) translateY(-5px); /* Preserve centering */
     filter: drop-shadow(0 6px 15px rgba(0, 0, 0, 0.5));
 }
 
