@@ -1,3 +1,17 @@
+<?php
+session_start();
+
+// Check if user is logged in OR is a guest
+$isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+$isGuest = isset($_SESSION['is_guest']) && $_SESSION['is_guest'] === true;
+
+// Set user info
+if ($isLoggedIn) {
+    $userId = $_SESSION['username'];
+} else {
+    $userId = '';
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -10,6 +24,19 @@
     <link rel="stylesheet" href="css/core.css">
     <link rel="stylesheet" href="css/overlays.css">
     <link rel="stylesheet" href="css/hud.css">
+    <link rel="stylesheet" href="../assets/css/achievement-notifications.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="../assets/js/firebase-config.js"></script>
+    <script src="../assets/js/AchievementManager.js"></script>
+    
+    <!-- User Session Data -->
+    <script>
+        const userId = '<?php echo $userId; ?>';
+        const isGuest = <?php echo ($isGuest ? 'true' : 'false'); ?>;
+    </script>
 </head>
 
 <body>

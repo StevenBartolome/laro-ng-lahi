@@ -1,16 +1,27 @@
 <?php
 session_start();
 
-// TEMPORARY: Comment out login check for testing
-// if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-//     header("Location: login.php");
-//     exit();
-// }
+// Check if user is logged in OR is a guest
+$isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+$isGuest = isset($_SESSION['is_guest']) && $_SESSION['is_guest'] === true;
 
-// TEMPORARY: Dummy values for testing
-$username = "TestUser";
-$displayname = "Test Player";
-$email = "test@example.com";
+// If neither logged in nor guest, redirect to index
+if (!$isLoggedIn && !$isGuest) {
+    header("Location: index.php");
+    exit();
+}
+
+// Set user info based on login status
+if ($isLoggedIn) {
+    $username = $_SESSION['username'];
+    $displayname = $_SESSION['displayname'];
+    $email = $_SESSION['email'];
+} else {
+    // Guest user
+    $username = "Guest";
+    $displayname = "Guest Player";
+    $email = "";
+}
 ?>
 
 <!DOCTYPE html>
@@ -20,6 +31,13 @@ $email = "test@example.com";
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Game - Laro ng Lahi</title>
     <link rel="stylesheet" href="assets/css/game_select.css">
+    <link rel="stylesheet" href="assets/css/achievement-notifications.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/AchievementManager.js"></script>
 </head>
 <body>
     <div class="game-select-container">
@@ -41,19 +59,19 @@ $email = "test@example.com";
         
         <!-- Game Cards -->
         <div class="game-cards-container">
-            <a href="patintero/index.html" class="game-card" title="Play Patintero">
+            <a href="patintero/index.php" class="game-card" title="Play Patintero">
                 <img src="assets/startmenu/patintero_gamecard.png" alt="Patintero">
             </a>
-            <a href="jolen/index.html" class="game-card" title="Play Jolen">
+            <a href="jolen/index.php" class="game-card" title="Play Jolen">
                 <img src="assets/startmenu/jolen_gamecard.png" alt="Luksong Tinik">
             </a>
-            <a href="luksong-baka/index.html" class="game-card" title="Play Luksong Baka">
+            <a href="luksong-baka/index.php" class="game-card" title="Play Luksong Baka">
                 <img src="assets/startmenu/luksong_baka_gamecard.png" alt="Luksong Baka">
             </a>
         </div>
         
         <!-- Back Button - Moved to bottom -->
-        <a href="start_menu.php" class="back-btn" title="Back to Menu">
+        <a href="index.php" class="back-btn" title="Back to Menu">
             <img src="assets/startmenu/back_button.png" alt="Back">
         </a>
     </div>

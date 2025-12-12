@@ -1,0 +1,369 @@
+/* Achievements Modal - Woody Theme */
+
+.achievements-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.achievements-modal-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden;
+}
+
+.achievements-modal-content {
+    background: url('../startmenu/wood_panel.png') center / cover no-repeat, #8b45139f;
+    width: 90%;
+    max-width: 900px;
+    /* Wider than settings for grid */
+    height: 85vh;
+    /* Fixed height for scrolling */
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow:
+        inset 0 0 20px rgba(0, 0, 0, 0.6),
+        0 10px 30px rgba(0, 0, 0, 0.5);
+    border: 4px solid #5d4037;
+    position: relative;
+    transform: scale(1);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    color: #fff;
+    font-family: 'Fredoka One', 'Nunito', sans-serif;
+    display: flex;
+    flex-direction: column;
+}
+
+.achievements-modal-overlay.hidden .achievements-modal-content {
+    transform: scale(0.8);
+}
+
+/* Header */
+.achievements-modal-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+    flex-shrink: 0;
+    border-bottom: 2px solid rgba(93, 64, 55, 0.5);
+    padding-bottom: 15px;
+}
+
+.achievements-modal-header h2 {
+    font-size: 32px;
+    color: #ffd700;
+    text-shadow: 2px 2px 0 #3e2723;
+    letter-spacing: 2px;
+    margin: 0;
+    text-transform: uppercase;
+}
+
+.achievements-close-btn {
+    position: absolute;
+    right: -10px;
+    top: -10px;
+    background: #c62828;
+    color: white;
+    border: 2px solid #fff;
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    font-size: 24px;
+    line-height: 28px;
+    cursor: pointer;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+    transition: all 0.2s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.achievements-close-btn:hover {
+    background: #e53935;
+    transform: scale(1.1);
+}
+
+/* Body / Scrolling Area */
+.achievements-modal-body {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 10px;
+}
+
+/* Scrollbar styling */
+.achievements-modal-body::-webkit-scrollbar {
+    width: 10px;
+}
+
+.achievements-modal-body::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 5px;
+}
+
+.achievements-modal-body::-webkit-scrollbar-thumb {
+    background: #8d6e63;
+    border-radius: 5px;
+    border: 1px solid #5d4037;
+}
+
+.achievements-modal-body::-webkit-scrollbar-thumb:hover {
+    background: #a1887f;
+}
+
+/* Progress Bar */
+.modal-progress-container {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 20px;
+    padding: 15px;
+    margin-bottom: 25px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-progress-bar-bg {
+    background: rgba(0, 0, 0, 0.4);
+    height: 25px;
+    border-radius: 12.5px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.5);
+}
+
+.modal-progress-bar-fill {
+    background: linear-gradient(to right, #4CAF50, #8BC34A);
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 10px;
+}
+
+.modal-progress-text {
+    text-align: center;
+    margin-top: 5px;
+    font-size: 14px;
+    color: #ffe0b2;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+/* Category Sections */
+.modal-category-section {
+    margin-bottom: 30px;
+}
+
+.modal-category-header {
+    font-size: 22px;
+    color: #ffe0b2;
+    margin-bottom: 15px;
+    border-left: 5px solid #ffb74d;
+    padding-left: 10px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.8);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: linear-gradient(to right, rgba(0, 0, 0, 0.2), transparent);
+    padding: 5px 10px;
+    border-radius: 0 5px 5px 0;
+}
+
+.modal-achievements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 15px;
+}
+
+/* Achievement Card */
+.modal-achievement-card {
+    background: rgba(62, 39, 35, 0.8);
+    border: 2px solid #5d4037;
+    border-radius: 10px;
+    padding: 15px;
+    display: flex;
+    gap: 15px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+}
+
+.modal-achievement-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+    border-color: #8d6e63;
+}
+
+.modal-achievement-card.unlocked {
+    background: rgba(46, 125, 50, 0.2);
+    border-color: #4CAF50;
+    box-shadow: inset 0 0 15px rgba(76, 175, 80, 0.1);
+}
+
+.modal-achievement-card.locked {
+    opacity: 0.7;
+}
+
+.modal-achievement-card.locked .modal-achievement-icon {
+    filter: grayscale(100%) opacity(0.5);
+}
+
+.modal-achievement-icon {
+    font-size: 36px;
+    background: rgba(0, 0, 0, 0.3);
+    width: 60px;
+    height: 60px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.modal-achievement-details {
+    flex: 1;
+}
+
+.modal-achievement-name {
+    font-size: 16px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 4px;
+    text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.8);
+}
+
+.modal-achievement-desc {
+    font-size: 12px;
+    color: #bcaaa4;
+    line-height: 1.3;
+}
+
+.modal-status-badge {
+    position: absolute;
+    top: 0;
+    right: 0;
+    background: #4CAF50;
+    color: white;
+    font-size: 10px;
+    padding: 2px 8px;
+    border-radius: 0 0 0 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* Guest Message */
+.modal-guest-message {
+    text-align: center;
+    padding: 50px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+}
+
+.modal-guest-icon {
+    font-size: 80px;
+    margin-bottom: 20px;
+    opacity: 0.8;
+}
+
+.modal-guest-title {
+    font-size: 24px;
+    margin-bottom: 10px;
+    color: #ffccbc;
+}
+
+.modal-guest-text {
+    color: #d7ccc8;
+    margin-bottom: 25px;
+    max-width: 400px;
+    line-height: 1.5;
+}
+
+.modal-login-btn {
+    background: linear-gradient(to bottom, #8d6e63, #5d4037);
+    color: #fff;
+    border: 2px solid #a1887f;
+    padding: 10px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 25px;
+    cursor: pointer;
+    text-decoration: none;
+    display: inline-block;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.modal-login-btn:hover {
+    transform: translateY(-2px);
+    background: linear-gradient(to bottom, #a1887f, #6d4c41);
+}
+
+/* Response */
+@media (max-width: 768px) {
+    .achievements-modal-content {
+        width: 95%;
+        padding: 15px;
+        height: 90vh;
+    }
+
+    .modal-achievements-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .achievements-modal-header h2 {
+        font-size: 24px;
+    }
+}
+
+/* Individual Achievement Progress Bar */
+.achievement-progress-wrapper {
+    margin-top: 10px;
+    width: 100%;
+}
+
+.achievement-progress-track {
+    background: rgba(0, 0, 0, 0.4);
+    height: 8px;
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.5);
+    margin-bottom: 4px;
+}
+
+.achievement-progress-bar {
+    background: linear-gradient(to right, #ffb74d, #ffa726);
+    /* Orange/Gold */
+    height: 100%;
+    width: 0%;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    border-radius: 4px;
+}
+
+.unlocked .achievement-progress-bar {
+    background: #4CAF50;
+    /* Green for unlocked */
+}
+
+.achievement-progress-text {
+    font-size: 11px;
+    color: #bcaaa4;
+    text-align: right;
+    font-weight: bold;
+}
+
+.unlocked .achievement-progress-text {
+    color: #a5d6a7;
+}

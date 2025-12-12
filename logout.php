@@ -17,10 +17,10 @@ session_destroy();
     <script>
         // Ensure Firebase session is also cleared
         firebase.auth().signOut().then(() => {
-            window.location.href = 'login.php';
+            window.location.href = 'index.php';
         }).catch((error) => {
             console.error(error);
-            window.location.href = 'login.php';
+            window.location.href = 'index.php';
         });
     </script>
 </body>

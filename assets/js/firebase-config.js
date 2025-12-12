@@ -11,6 +11,9 @@ const firebaseConfig = {
 
 // Initialize Firebase
 firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const auth = firebase.auth();
-const database = firebase.database();
+
+// Make Firebase services globally available
+window.database = firebase.database();
+
+// Also create non-window references for backwards compatibility
+const database = window.database;
