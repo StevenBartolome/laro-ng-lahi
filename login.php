@@ -71,9 +71,9 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 
             <div class="divider">or</div>
 
-            <button type="button" class="btn btn-guest" onclick="alert('Guest mode coming soon!')">
-                PLAY AS GUEST
-            </button>
+                <a href="guest_session.php" class="btn btn-guest">
+                    PLAY AS GUEST
+                </a>
         </form>
     </div>
 
