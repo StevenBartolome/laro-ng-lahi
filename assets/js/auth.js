@@ -1,0 +1,98 @@
+// Import Firebase functions (using ES modules via CDN for simplicity in this setup)
+// Note: In a build step environment these would be npm imports.
+// For this PHP setup, we'll rely on global `firebase` object or specific imports in the HTML files 
+// that load the SDKs before this file. 
+
+// Standard Firebase Web SDK imports are usually done in the HTML head for simple PHP apps:
+// <script type="module">
+//   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+//   import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+//   import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+// </script>
+
+const Auth = {
+    // Current user state
+    user: null,
+
+    // Login function
+    login: async function (email, password) {
+        try {
+            const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Get additional user data from Firestore
+            const db = firebase.firestore();
+            const userDoc = await db.collection('users').doc(user.uid).get();
+            let userData = userDoc.exists ? userDoc.data() : {};
+
+            // Sync with PHP Session
+            await this.syncSession({
+                uid: user.uid,
+                email: user.email,
+                username: userData.username,
+                displayname: userData.displayname
+            });
+
+            return { success: true };
+        } catch (error) {
+            console.error("Login Error:", error);
+            return { success: false, message: error.message };
+        }
+    },
+
+    // Register function
+    register: async function (email, password, username, displayname) {
+        try {
+            const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
+            const user = userCredential.user;
+
+            // Create user document in Firestore
+            const db = firebase.firestore();
+            await db.collection('users').doc(user.uid).set({
+                username: username,
+                displayname: displayname,
+                email: email,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp()
+            });
+
+            // Sync with PHP Session
+            await this.syncSession({
+                uid: user.uid,
+                email: email,
+                username: username,
+                displayname: displayname
+            });
+
+            return { success: true };
+        } catch (error) {
+            console.error("Registration Error:", error);
+            return { success: false, message: error.message };
+        }
+    },
+
+    // Logout function
+    logout: async function () {
+        try {
+            await firebase.auth().signOut();
+            // Call PHP logout to clear session
+            window.location.href = 'logout.php';
+        } catch (error) {
+            console.error("Logout Error:", error);
+        }
+    },
+
+    // Helper to call PHP API
+    syncSession: async function (data) {
+        const response = await fetch('api/auth_session.php', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        });
+        return await response.json();
+    }
+};
+
+// Make available globally
+window.Auth = Auth;
