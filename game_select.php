@@ -31,6 +31,13 @@ if ($isLoggedIn) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Select Game - Laro ng Lahi</title>
     <link rel="stylesheet" href="assets/css/game_select.css">
+    <link rel="stylesheet" href="assets/css/achievement-notifications.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/AchievementManager.js"></script>
 </head>
 <body>
     <div class="game-select-container">
@@ -78,6 +85,16 @@ if ($isLoggedIn) {
     </audio>
     
     <script>
+        // Achievement System
+        document.addEventListener('DOMContentLoaded', () => {
+            const userId = '<?php echo $isLoggedIn ? $username : "Guest"; ?>';
+            const isGuest = <?php echo ($isGuest ? 'true' : 'false'); ?>;
+            
+            if (window.achievementManager) {
+                window.achievementManager.init(userId, isGuest);
+            }
+        });
+
         // Music persistence across pages
         const bgMusic = document.getElementById('bgMusic');
         bgMusic.volume = 0.5;

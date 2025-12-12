@@ -5,6 +5,14 @@
 
 class AchievementManager {
     constructor() {
+        this.notificationQueue = this.loadQueueFromStorage();
+        this.isShowingNotification = false;
+
+        // Start processing if items exist (small delay to allow page render)
+        if (this.notificationQueue.length > 0) {
+            setTimeout(() => this.processNotificationQueue(), 1000);
+        }
+
         this.achievements = {
             // General Achievements
             'first_steps': {
@@ -144,15 +152,15 @@ class AchievementManager {
             'high_jumper': {
                 id: 'high_jumper',
                 name: 'High Jumper',
-                description: 'Jump over the highest level',
+                description: 'Jump over the highest level (Level 5)',
                 icon: '🏔️',
                 category: 'luksong',
-                requirement: { type: 'luksongMaxLevel', value: 10 }
+                requirement: { type: 'luksongMaxLevel', value: 5 }
             },
             'flawless': {
                 id: 'flawless',
-                name: 'Flawless',
-                description: 'Complete a game without failing',
+                name: 'Flawless Victory',
+                description: 'Win without losing any lives',
                 icon: '✨',
                 category: 'luksong',
                 requirement: { type: 'luksongPerfect', value: 1 }
@@ -160,10 +168,10 @@ class AchievementManager {
             'speed_jumper': {
                 id: 'speed_jumper',
                 name: 'Speed Jumper',
-                description: 'Complete 10 consecutive jumps',
-                icon: '🚀',
+                description: 'Perform a 5-jump streak',
+                icon: '⚡',
                 category: 'luksong',
-                requirement: { type: 'luksongStreak', value: 10 }
+                requirement: { type: 'luksongStreak', value: 5 }
             },
             'baka_master': {
                 id: 'baka_master',
@@ -367,7 +375,7 @@ class AchievementManager {
             await this.checkAndUnlock('baka_master');
         }
 
-        if (maxLevel >= 10) {
+        if (maxLevel >= 5) {
             await this.unlockAchievement('high_jumper');
         }
 
@@ -375,7 +383,7 @@ class AchievementManager {
             await this.unlockAchievement('flawless');
         }
 
-        if (streak >= 10) {
+        if (streak >= 5) {
             await this.unlockAchievement('speed_jumper');
         }
 
@@ -444,6 +452,15 @@ class AchievementManager {
             case 'luksongWins':
                 currentValue = this.userStats.luksongWins || 0;
                 break;
+            case 'luksongMaxLevel':
+                // Logic handled manually in trackLuksongGame but added for completeness
+                // We don't store maxLevel in userStats directly in this implementation, 
+                // relying on manual trigger. But if we did:
+                // currentValue = this.userStats.luksongMaxLevel || 0;
+                return;
+            case 'luksongStreak':
+            case 'luksongPerfect':
+                return; // Handled manually
             default:
                 return;
         }
@@ -480,7 +497,48 @@ class AchievementManager {
     /**
      * Show achievement unlock notification
      */
+    /**
+     * Show achievement unlock notification
+     */
     showAchievementNotification(achievement) {
+        this.notificationQueue.push(achievement);
+        this.saveQueueToStorage();
+        this.processNotificationQueue();
+    }
+
+    loadQueueFromStorage() {
+        try {
+            const queue = localStorage.getItem('achievement_notification_queue');
+            return queue ? JSON.parse(queue) : [];
+        } catch (e) {
+            console.error('Error loading notification queue:', e);
+            return [];
+        }
+    }
+
+    saveQueueToStorage() {
+        try {
+            localStorage.setItem('achievement_notification_queue', JSON.stringify(this.notificationQueue));
+        } catch (e) {
+            console.error('Error saving notification queue:', e);
+        }
+    }
+
+    processNotificationQueue() {
+        if (this.isShowingNotification) {
+            console.log('Notification queue busy. Waiting...');
+            return;
+        }
+        if (this.notificationQueue.length === 0) {
+            console.log('Notification queue empty.');
+            return;
+        }
+
+        this.isShowingNotification = true;
+        const achievement = this.notificationQueue.shift();
+        this.saveQueueToStorage(); // Save immediately after removing from queue
+        console.log(`Processing notification for: ${achievement.name}`);
+
         // Create notification element
         const notification = document.createElement('div');
         notification.className = 'achievement-notification';
@@ -496,13 +554,32 @@ class AchievementManager {
         document.body.appendChild(notification);
 
         // Animate in
-        setTimeout(() => notification.classList.add('show'), 100);
+        // Use requestAnimationFrame for reliable style application
+        requestAnimationFrame(() => {
+            notification.classList.add('show');
+        });
 
-        // Remove after 5 seconds
+        // Remove after 4 seconds
         setTimeout(() => {
             notification.classList.remove('show');
-            setTimeout(() => notification.remove(), 500);
-        }, 5000);
+            setTimeout(() => {
+                if (notification.parentNode) {
+                    notification.parentNode.removeChild(notification);
+                }
+
+                this.isShowingNotification = false;
+                this.saveQueueToStorage(); // Save updated queue state (item shift happens at start, but we want to be robust)
+                // Actually shift happened at start. 
+                // We should save AFTER shift? Yes.
+
+                console.log('Notification finished. Checking queue...');
+
+                // Wait 0.5s before showing next
+                setTimeout(() => {
+                    this.processNotificationQueue();
+                }, 500);
+            }, 500);
+        }, 4000);
     }
 
     /**
