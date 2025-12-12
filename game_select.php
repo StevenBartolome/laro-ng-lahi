@@ -33,6 +33,10 @@ $email = "test@example.com";
             <div class="particle"></div>
         </div>
         
+        <!-- Back Button -->
+        <a href="start_menu.php" class="back-btn" title="Back to Menu">
+            <img src="assets/startmenu/back_button.png" alt="Back">
+        </a>
         
         <!-- Select Game Title -->
         <div class="select-title">
@@ -51,11 +55,6 @@ $email = "test@example.com";
                 <img src="assets/startmenu/luksong_baka_gamecard.png" alt="Luksong Baka">
             </a>
         </div>
-        
-        <!-- Back Button - Moved to bottom -->
-        <a href="start_menu.php" class="back-btn" title="Back to Menu">
-            <img src="assets/startmenu/back_button.png" alt="Back">
-        </a>
     </div>
     
     <!-- Background Music (continues from main menu if playing) -->
