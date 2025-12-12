@@ -22,65 +22,12 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <script src="assets/js/firebase-config.js"></script>
     <script src="assets/js/auth.js"></script>
 
-    <style>
-        /* Reusing styles for consistency */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            padding: 20px;
-        }
-        .container {
-            background: white;
-            border-radius: 15px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
-            max-width: 450px;
-            width: 100%;
-            padding: 40px;
-        }
-        .logo { text-align: center; margin-bottom: 30px; }
-        .logo h1 { color: #667eea; font-size: 32px; margin-bottom: 5px; }
-        .logo p { color: #666; font-size: 14px; }
-        .form-group { margin-bottom: 20px; }
-        label { display: block; margin-bottom: 8px; color: #333; font-weight: 500; }
-        input[type="text"], input[type="email"], input[type="password"] {
-            width: 100%; padding: 12px; border: 2px solid #e0e0e0;
-            border-radius: 8px; font-size: 14px; transition: border-color 0.3s;
-        }
-        input:focus { outline: none; border-color: #667eea; }
-        .btn {
-            width: 100%; padding: 12px; border: none; border-radius: 8px;
-            font-size: 16px; font-weight: 600; cursor: pointer;
-            transition: all 0.3s; background: #667eea; color: white;
-            position: relative;
-        }
-        .btn:hover { background: #5568d3; transform: translateY(-2px); }
-        .btn:disabled { background: #99a3d6; cursor: wait; }
-        .error {
-            background: #ffebee; color: #c62828; padding: 12px;
-            border-radius: 8px; margin-bottom: 20px; border-left: 4px solid #c62828;
-            display: none;
-        }
-        .login-link { text-align: center; margin-top: 20px; color: #666; }
-        .login-link a { color: #667eea; text-decoration: none; font-weight: 600; }
-        .spinner {
-            display: none; width: 20px; height: 20px;
-            border: 3px solid rgba(255,255,255,0.3); border-radius: 50%;
-            border-top-color: #fff; animation: spin 1s ease-in-out infinite;
-            position: absolute; right: 15px; top: 12px;
-        }
-        @keyframes spin { to { transform: rotate(360deg); } }
-    </style>
+    <link rel="stylesheet" href="assets/css/register.css">
 </head>
 <body>
     <div class="container">
         <div class="logo">
-            <h1>Laro ng Lahi</h1>
-            <p>Create your account</p>
+            <img src="assets/startmenu/screen_title.png" alt="Laro ng Lahi">
         </div>
         
         <div id="error-message" class="error"></div>
@@ -93,7 +40,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             
             <div class="form-group">
                 <label for="displayname">Display Name</label>
-                <input type="text" id="displayname" required maxlength="20" placeholder="Your in-game name">
+                <input type="text" id="displayname" required maxlength="20">
             </div>
 
             <div class="form-group">
@@ -112,13 +59,13 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             </div>
             
             <button type="submit" class="btn" id="regBtn">
-                Get Started
+                REGISTER
                 <div class="spinner" id="spinner"></div>
             </button>
         </form>
         
         <div class="login-link">
-            Already have an account? <a href="login.php">Login here</a>
+            Already have an account? <a href="login.php">LOGIN</a>
         </div>
     </div>
 

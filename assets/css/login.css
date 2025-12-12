@@ -20,7 +20,74 @@ body {
     justify-content: center;
     align-items: center;
     padding: 20px;
+    overflow: hidden; /* Prevent scrolling from particles */
 }
+
+/* Vignette Overlay */
+body::after {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(
+        circle at center,
+        transparent 60%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+    z-index: 5; /* Above particles (1), below container (10) */
+}
+
+/* Particles */
+.particles {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 1; /* Behind container but above bg */
+}
+
+.particle {
+    position: absolute;
+    width: 6px;
+    height: 6px;
+    background: rgba(255, 215, 0, 0.4); /* Gold/Yellow matching theme */
+    border-radius: 50%;
+    opacity: 0;
+    animation: floatUp 8s linear infinite;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(110vh) translateX(0) rotate(0deg);
+        opacity: 0;
+    }
+    10% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-10vh) translateX(20px) rotate(360deg);
+        opacity: 0;
+    }
+}
+
+/* Stagger particle animations */
+.particle:nth-child(1) { left: 10%; animation-duration: 7s; animation-delay: 0s; }
+.particle:nth-child(2) { left: 20%; animation-duration: 9s; animation-delay: 2s; width: 4px; height: 4px; }
+.particle:nth-child(3) { left: 35%; animation-duration: 8s; animation-delay: 4s; }
+.particle:nth-child(4) { left: 50%; animation-duration: 10s; animation-delay: 1s; width: 8px; height: 8px; }
+.particle:nth-child(5) { left: 65%; animation-duration: 6s; animation-delay: 3s; }
+.particle:nth-child(6) { left: 80%; animation-duration: 9s; animation-delay: 5s; width: 5px; height: 5px; }
+.particle:nth-child(7) { left: 90%; animation-duration: 11s; animation-delay: 0.5s; }
+
 
 .container {
     /* Transparent container to let background show through */
@@ -29,12 +96,20 @@ body {
     width: 100%;
     padding: 20px;
     text-align: center;
+    z-index: 10;
+    position: relative;
 }
 
 .logo {
     margin-bottom: 50px; /* Increased gap below logo */
     position: relative;
     z-index: 20; /* Ensure it stays on top */
+}
+
+/* Floating Logo Animation */
+@keyframes float {
+    0%, 100% { transform: translateY(-10px) scale(1.4); } 
+    50% { transform: translateY(-20px) scale(1.4); }
 }
 
 .logo img {
@@ -44,7 +119,7 @@ body {
     margin-left: -20%; /* Center it back since it's wider than container */
     height: auto;
     filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
-    transform: translateY(-10px); /* Slight lift */
+    animation: float 4s ease-in-out infinite;
 }
 
 .form-group {
@@ -160,6 +235,15 @@ input:focus {
     border: 1px solid #ff8e8e;
 }
 
+/* Shake Animation for Error */
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    20% { transform: translateX(-10px); }
+    40% { transform: translateX(10px); }
+    60% { transform: translateX(-10px); }
+    80% { transform: translateX(10px); }
+}
+
 /* Update spinner for new button style */
 .spinner {
     display: inline-block;
@@ -169,4 +253,43 @@ input:focus {
     border-top-color: #000;
     margin-left: 8px;
     vertical-align: middle;
+}
+
+/* Music Toggle Button */
+.music-toggle {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 100;
+    width: 45px;
+    height: 45px;
+    border-radius: 8px; /* Rounded square like main buttons */
+    border: none;
+    border-bottom: 4px solid #c8a34b; /* 3D effect matching Login btn */
+    background: #E9C46A; /* Saffron */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.1s ease;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+}
+
+.music-toggle img {
+    width: 24px;
+    height: 24px;
+    filter: brightness(0) invert(1); /* Make icon white */
+    pointer-events: none;
+}
+
+.music-toggle:hover {
+    background: #face7f; /* Lighter Saffron */
+    border-bottom-color: #dcb355;
+    transform: translateY(-2px);
+}
+
+.music-toggle:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+    margin-top: 4px; /* Simulates pressing down */
 }
