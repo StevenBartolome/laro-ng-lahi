@@ -42,10 +42,20 @@ const Auth = {
             return { success: true };
         } catch (error) {
             console.error("Login Error:", error);
-            // Handle specific error codes if needed
-            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+
+            // Handle specific error codes
+            // 'auth/invalid-credential' is the unified error for wrong email/password in newer protocols
+            if (error.code === 'auth/user-not-found' ||
+                error.code === 'auth/wrong-password' ||
+                error.code === 'auth/invalid-credential') {
                 return { success: false, message: "Invalid email or password." };
             }
+
+            // Handle raw API errors (like the one user reported) which might be in the message
+            if (error.message && (error.message.includes("INVALID_LOGIN_CREDENTIALS") || error.message.includes("EMAIL_NOT_FOUND"))) {
+                return { success: false, message: "Invalid email or password." };
+            }
+
             return { success: false, message: error.message };
         }
     },
