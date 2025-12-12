@@ -1,0 +1,17 @@
+{
+    "name": "laro-ng-lahi-desktop",
+    "version": "1.0.0",
+    "description": "Laro ng Lahi Desktop App Wrapper",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "pack": "electron-builder --dir",
+        "dist": "electron-builder"
+    },
+    "author": "Laro ng Lahi Team",
+    "license": "ISC",
+    "devDependencies": {
+        "electron": "^33.2.1",
+        "electron-builder": "^25.1.8"
+    }
+}
