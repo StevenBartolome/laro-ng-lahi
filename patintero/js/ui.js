@@ -77,6 +77,8 @@ export function showRoundModal(titleText, msgText, callback) {
 
     newBtn.onclick = () => {
         modal.classList.add('hidden');
+        // Crucial: Remove pointer-events blocking class
+        modal.classList.remove('game-complete-backdrop');
         callback();
     };
 
