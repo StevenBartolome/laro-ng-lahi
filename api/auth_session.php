@@ -15,6 +15,11 @@ if ($data && isset($data['uid'])) {
     $_SESSION['displayname'] = $data['displayname'] ?? 'Player';
     $_SESSION['logged_in'] = true;
     
+    // Explicitly remove guest status
+    if (isset($_SESSION['is_guest'])) {
+        unset($_SESSION['is_guest']);
+    }
+    
     // Crucial: write session data and close to ensure it saves before the redirect happens on client
     session_write_close();
 
