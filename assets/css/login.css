@@ -7,7 +7,14 @@
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Warm Brown scanline/stripe background */
+    background: repeating-linear-gradient(
+        to bottom,
+        #4E342E,
+        #4E342E 2px,
+        #3E2723 2px,
+        #3E2723 4px
+    );
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -16,135 +23,150 @@ body {
 }
 
 .container {
-    background: white;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    /* Transparent container to let background show through */
+    background: transparent;
     max-width: 400px;
     width: 100%;
-    padding: 40px;
+    padding: 20px;
+    text-align: center;
 }
 
 .logo {
-    text-align: center;
-    margin-bottom: 30px;
+    margin-bottom: 50px; /* Increased gap below logo */
+    position: relative;
+    z-index: 20; /* Ensure it stays on top */
 }
 
-.logo h1 {
-    color: #667eea;
-    font-size: 32px;
-    margin-bottom: 5px;
-}
-
-.logo p {
-    color: #666;
-    font-size: 14px;
+.logo img {
+    /* Enlarge title significantly */
+    width: 140%; 
+    max-width: none;
+    margin-left: -20%; /* Center it back since it's wider than container */
+    height: auto;
+    filter: drop-shadow(0 8px 12px rgba(0,0,0,0.5));
+    transform: translateY(-10px); /* Slight lift */
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: 30px; /* Increased gap between inputs */
+    position: relative;
+    text-align: left;
 }
 
 label {
-    display: block;
-    margin-bottom: 8px;
-    color: #333;
-    font-weight: 500;
+    position: absolute;
+    top: -8px;
+    left: 10px;
+    font-size: 12px; /* Slightly larger to match the bold look */
+    font-weight: 800; /* Match button weight */
+    color: #E0FBFC; /* Light Cyan */
+    background-color: transparent;
+    padding: 0 4px;
+    text-transform: uppercase; /* Match button case */
+    text-shadow: 1px 1px 2px black;
+    z-index: 10;
+    letter-spacing: 0.5px; /* Slight spacing for uppercase */
 }
 
 input[type="text"],
 input[type="password"] {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e0e0e0;
-    border-radius: 8px;
+    padding: 10px 15px;
+    background-color: #E76F51; /* Burnt Sienna */
+    border: 2px solid #3E2723; /* Dark Brown */
+    border-radius: 6px;
     font-size: 14px;
-    transition: border-color 0.3s;
+    color: #E0FBFC; /* Light Cyan */
+    font-weight: 500;
+    outline: none;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.2);
+}
+
+input::placeholder {
+    color: rgba(224, 251, 252, 0.7); /* Light Cyan opacity */
 }
 
 input:focus {
-    outline: none;
-    border-color: #667eea;
+    border-color: #E9C46A; /* Saffron */
+}
+
+.button-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px; /* Increased gap between buttons */
+    margin-top: 30px; /* Increased gap above buttons */
 }
 
 .btn {
-    width: 100%;
-    padding: 12px;
+    padding: 10px 0;
     border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 600;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 800;
     cursor: pointer;
-    transition: all 0.3s;
-    background: #667eea;
-    color: white;
-    position: relative;
+    text-align: center;
+    text-decoration: none;
+    transition: transform 0.1s, box-shadow 0.1s;
+    text-transform: uppercase;
 }
 
-.btn:hover {
-    background: #5568d3;
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+.btn:active {
+    transform: translateY(2px);
 }
 
-.btn:disabled {
-    background: #99a3d6;
-    cursor: running;
-    transform: none;
+.btn-login, .btn-register {
+    width: 48%;
+    background-color: #E9C46A; /* Saffron */
+    color: #264653; /* Charcoal Text */
+    border-bottom: 4px solid #c8a34b; /* Darker Saffron */
+}
+
+.btn-login:hover, .btn-register:hover {
+    background-color: #face7f; /* Lighter Saffron/Yellow */
+    border-bottom-color: #dcb355; /* Slightly lighter border adjustment */
+}
+
+.divider {
+    margin: 25px 0;
+    color: #E0FBFC; /* Light Cyan */
+    font-size: 14px;
+    font-weight: 800; /* Match button weight */
+    text-shadow: 1px 1px 2px black;
+    text-transform: uppercase; /* Make consistent */
+    letter-spacing: 1px;
+}
+
+.btn-guest {
+    width: 100%;
+    background-color: #F4A261; /* Sandy Brown */
+    color: #3E2723; /* Dark Brown Text */
+    border-bottom: 4px solid #C08040; /* Darker Sandy Brown */
+}
+
+.btn-guest:hover {
+    background-color: #ffb57b; /* Softened/Lighter Sandy Brown */
+    border-bottom-color: #d4914f; /* Slightly lighter border */
 }
 
 .error {
-    background: #ffebee;
-    color: #c62828;
-    padding: 12px;
-    border-radius: 8px;
+    background: rgba(198, 40, 40, 0.9);
+    color: white;
+    padding: 10px;
+    border-radius: 5px;
     margin-bottom: 20px;
-    border-left: 4px solid #c62828;
+    font-size: 13px;
     display: none;
-}
-
-.register-link {
     text-align: center;
-    margin-top: 20px;
-    color: #666;
+    border: 1px solid #ff8e8e;
 }
 
-.register-link a {
-    color: #667eea;
-    text-decoration: none;
-    font-weight: 600;
-}
-
-.register-link a:hover {
-    text-decoration: underline;
-}
-
-.forgot-password {
-    text-align: right;
-    margin-top: 10px;
-    margin-bottom: 20px;
-}
-
-.forgot-password a {
-    color: #667eea;
-    text-decoration: none;
-    font-size: 14px;
-    cursor: pointer;
-}
-
-/* Spinner */
+/* Update spinner for new button style */
 .spinner {
-    display: none;
-    width: 20px;
-    height: 20px;
-    border: 3px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    border-top-color: #fff;
-    animation: spin 1s ease-in-out infinite;
-    position: absolute;
-    right: 15px;
-    top: 12px;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
+    display: inline-block;
+    width: 14px;
+    height: 14px;
+    border: 2px solid rgba(0,0,0,0.3);
+    border-top-color: #000;
+    margin-left: 8px;
+    vertical-align: middle;
 }

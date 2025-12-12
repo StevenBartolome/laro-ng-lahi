@@ -27,36 +27,35 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 <body>
     <div class="container">
         <div class="logo">
-            <h1>Laro ng Lahi</h1>
-            <p>Welcome back!</p>
+            <img src="assets/startmenu/screen_title.png" alt="Laro ng Lahi">
         </div>
         
         <div id="error-message" class="error"></div>
         
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Email Address</label>
-                <input type="text" id="email" required placeholder="Enter your email">
+                <label for="email">Username</label>
+                <input type="text" id="email" required>
             </div>
             
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" required placeholder="Enter your password">
+                <input type="password" id="password" required>
             </div>
             
-            <div class="forgot-password">
-                <a onclick="handleResetPassword()">Forgot password?</a>
+            <div class="button-row">
+                <button type="submit" class="btn btn-login" id="loginBtn">
+                    LOGIN
+                </button>
+                <a href="register.php" class="btn btn-register">REGISTER</a>
             </div>
-            
-            <button type="submit" class="btn" id="loginBtn">
-                Login
-                <div class="spinner" id="spinner"></div>
+
+            <div class="divider">or</div>
+
+            <button type="button" class="btn btn-guest" onclick="alert('Guest mode coming soon!')">
+                PLAY AS GUEST
             </button>
         </form>
-        
-        <div class="register-link">
-            Don't have an account? <a href="register.php">Register here</a>
-        </div>
     </div>
 
     <script>
