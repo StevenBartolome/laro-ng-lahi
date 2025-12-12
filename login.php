@@ -1,61 +1,27 @@
 <?php
 session_start();
-
-// Include database configuration
-require_once 'config/db.php';
-
-$message = "";
-
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $login_input = trim($_POST['username']); // Can be username or email
-    $password = $_POST['password'];
-    
-    if (empty($login_input) || empty($password)) {
-        $message = "<div class='error'>All fields are required.</div>";
-    } else {
-        // Check if login input is email or username
-        $stmt = $conn->prepare("SELECT u.user_id, u.username, u.email, u.password_hash, p.displayname 
-                                FROM users u 
-                                LEFT JOIN user_profile p ON u.user_id = p.user_id 
-                                WHERE u.username = ? OR u.email = ?");
-        $stmt->bind_param("ss", $login_input, $login_input);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        
-        if ($result->num_rows > 0) {
-            $user = $result->fetch_assoc();
-            
-            // Verify password
-            if (password_verify($password, $user['password_hash'])) {
-                // Login successful
-                $_SESSION['user_id'] = $user['user_id'];
-                $_SESSION['username'] = $user['username'];
-                $_SESSION['email'] = $user['email'];
-                $_SESSION['displayname'] = $user['displayname'];
-                $_SESSION['logged_in'] = true;
-                
-                header("Location: start_menu.php"); // Redirect to game dashboard
-                exit();
-            } else {
-                $message = "<div class='error'>Invalid username/email or password.</div>";
-            }
-        } else {
-            $message = "<div class='error'>Invalid username/email or password.</div>";
-        }
-        
-        $stmt->close();
-    }
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    header("Location: start_menu.php");
+    exit();
 }
-
-$conn->close();
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Laro ng Lahi</title>
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-firestore.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <!-- Custom Scripts -->
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="assets/js/auth.js"></script>
+
     <style>
         * {
             margin: 0;
@@ -135,12 +101,19 @@ $conn->close();
             transition: all 0.3s;
             background: #667eea;
             color: white;
+            position: relative;
         }
         
         .btn:hover {
             background: #5568d3;
             transform: translateY(-2px);
             box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        
+        .btn:disabled {
+            background: #99a3d6;
+            cursor: running;
+            transform: none;
         }
         
         .error {
@@ -150,6 +123,7 @@ $conn->close();
             border-radius: 8px;
             margin-bottom: 20px;
             border-left: 4px solid #c62828;
+            display: none;
         }
         
         .register-link {
@@ -178,10 +152,25 @@ $conn->close();
             color: #667eea;
             text-decoration: none;
             font-size: 14px;
+            cursor: pointer;
         }
         
-        .forgot-password a:hover {
-            text-decoration: underline;
+        /* Spinner */
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            position: absolute;
+            right: 15px;
+            top: 12px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
         }
     </style>
 </head>
@@ -192,31 +181,77 @@ $conn->close();
             <p>Welcome back!</p>
         </div>
         
-        <?php echo $message; ?>
+        <div id="error-message" class="error"></div>
         
-        <form method="POST" action="">
+        <form id="loginForm">
             <div class="form-group">
-                <label for="username">Username or Email</label>
-                <input type="text" id="username" name="username" required 
-                       placeholder="Enter your username or email">
+                <label for="email">Email Address</label>
+                <input type="text" id="email" required placeholder="Enter your email">
             </div>
             
             <div class="form-group">
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required 
-                       placeholder="Enter your password">
+                <input type="password" id="password" required placeholder="Enter your password">
             </div>
             
             <div class="forgot-password">
-                <a href="forgot_password.php">Forgot password?</a>
+                <a onclick="handleResetPassword()">Forgot password?</a>
             </div>
             
-            <button type="submit" class="btn">Login</button>
+            <button type="submit" class="btn" id="loginBtn">
+                Login
+                <div class="spinner" id="spinner"></div>
+            </button>
         </form>
         
         <div class="register-link">
             Don't have an account? <a href="register.php">Register here</a>
         </div>
     </div>
+
+    <script>
+        document.getElementById('loginForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const spinner = document.getElementById('spinner');
+            const errorMsg = document.getElementById('error-message');
+            
+            // UI Loading State
+            btn.disabled = true;
+            spinner.style.display = 'block';
+            errorMsg.style.display = 'none';
+            
+            // Call Auth
+            const result = await Auth.login(email, password);
+            
+            if (result.success) {
+                window.location.href = 'start_menu.php';
+            } else {
+                errorMsg.textContent = result.message;
+                errorMsg.style.display = 'block';
+                btn.disabled = false;
+                spinner.style.display = 'none';
+            }
+        });
+        
+        function handleResetPassword() {
+            const email = document.getElementById('email').value;
+            if(!email) {
+                alert('Please enter your email address first to reset password.');
+                return;
+            }
+            
+            firebase.auth().sendPasswordResetEmail(email)
+                .then(() => {
+                    alert('Password reset email sent! Check your inbox.');
+                })
+                .catch((error) => {
+                    alert('Error: ' + error.message);
+                });
+        }
+    </script>
 </body>
 </html>
