@@ -50,7 +50,8 @@
 
 /* Icon Buttons */
 .ui-icon-btn {
-  background: rgba(62, 39, 35, 0.85); /* Dark brown to match stat-box */
+  background: rgba(62, 39, 35, 0.85);
+  /* Dark brown to match stat-box */
   border: 2px solid #8d6e63;
   cursor: pointer;
   width: 45px;
@@ -90,19 +91,23 @@ canvas {
 
 /* Back Button */
 .back-btn {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
   cursor: pointer;
   transition: all 0.3s ease;
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+  z-index: 100;
 }
 
 .back-btn img {
-  margin-top: 40px;
-  width: 150px;
+  width: 220px;
   height: auto;
 }
 
 .back-btn:hover {
-  transform: scale(1.1);
+  transform: translateX(-50%) scale(1.1);
 }
 
 /* Floating Action Buttons (FABs) */
@@ -134,13 +139,14 @@ canvas {
 .info-fab.facts-btn {
   bottom: 100px;
   background: linear-gradient(135deg, #8d6e63, #5d4037);
-  color: white; /* Ensure consistent text/icon color */
+  color: white;
+  /* Ensure consistent text/icon color */
 }
 
 .info-fab.facts-btn img {
   width: 70%;
   height: auto;
-  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
+  filter: drop-shadow(0 2px 2px rgba(0, 0, 0, 0.2));
 }
 
 /* Floating Instructions */
@@ -184,4 +190,200 @@ canvas {
 .tips-box p {
   font-size: 0.85rem;
   line-height: 1.4;
+}
+
+/* Lives Display with Hearts */
+.lives-display {
+  display: flex;
+  gap: 8px;
+  background: rgba(62, 39, 35, 0.85);
+  backdrop-filter: blur(5px);
+  padding: 8px 15px;
+  border-radius: 25px;
+  border: 2px solid #8d6e63;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.heart {
+  width: 35px;
+  height: auto;
+  transition: all 0.3s ease;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+}
+
+.heart.lost {
+  opacity: 0.3;
+  filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+  transform: scale(0.9);
+}
+
+/* Instruction Prompt */
+.instruction-prompt {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(62, 39, 35, 0.9);
+  padding: 15px 30px;
+  border-radius: 30px;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  pointer-events: none;
+  border: 2px solid #8d6e63;
+  color: #ffecb3;
+  animation: float 3s ease-in-out infinite;
+  font-weight: 600;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+}
+
+@keyframes float {
+
+  0%,
+  100% {
+    transform: translateX(-50%) translateY(0);
+  }
+
+  50% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+}
+
+/* Message Overlay */
+.message-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.message-overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+#messageText {
+  background: rgba(62, 39, 35, 0.95);
+  padding: 30px 50px;
+  border-radius: 20px;
+  font-size: 2rem;
+  font-weight: 700;
+  color: #ffecb3;
+  border: 3px solid #8d6e63;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
+  font-family: var(--font-heading);
+  text-align: center;
+}
+
+#messageText.fail {
+  color: #ff6b6b;
+  border-color: #ff6b6b;
+}
+
+#messageText.success {
+  color: #51cf66;
+  border-color: #51cf66;
+}
+
+/* Game Complete/Over Backdrop */
+.message-overlay.game-complete-backdrop {
+  background: rgba(0, 0, 0, 0.85);
+  pointer-events: all;
+}
+
+/* Game Complete Box */
+.game-complete-box {
+  background: linear-gradient(135deg, rgba(62, 39, 35, 0.98), rgba(93, 64, 55, 0.98));
+  padding: 50px 60px;
+  border-radius: 30px;
+  border: 4px solid #8d6e63;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8);
+  max-width: 500px;
+  width: 90%;
+}
+
+.game-complete-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.complete-header {
+  font-size: 3rem;
+  font-weight: 800;
+  color: #51cf66;
+  font-family: var(--font-heading);
+  text-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+  letter-spacing: 2px;
+}
+
+.complete-header.fail {
+  color: #ff6b6b;
+}
+
+.complete-sub {
+  font-size: 1.3rem;
+  color: #d7ccc8;
+  margin-top: -10px;
+}
+
+.complete-score {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #ffd54f;
+  margin: 10px 0;
+  font-family: var(--font-heading);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.complete-buttons {
+  display: flex;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.restart-btn,
+.back-menu-btn {
+  padding: 15px 35px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  border-radius: 50px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: var(--font-body);
+  text-decoration: none;
+  display: inline-block;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+}
+
+.restart-btn {
+  background: linear-gradient(135deg, #51cf66, #37b24d);
+  color: white;
+}
+
+.restart-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(81, 207, 102, 0.4);
+}
+
+.back-menu-btn {
+  background: linear-gradient(135deg, #8d6e63, #5d4037);
+  color: white;
+}
+
+.back-menu-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(141, 110, 99, 0.4);
 }

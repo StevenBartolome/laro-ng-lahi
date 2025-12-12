@@ -2,20 +2,20 @@
 session_start();
 
 // TEMPORARY: Comment out login check for testing
-// if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-//     header("Location: login.php");
-//     exit();
-// }
+if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
+    header("Location: login.php");
+    exit();
+}
 
 // TEMPORARY: Dummy values for testing
-$username = "TestUser";
-$displayname = "Test Player";
-$email = "test@example.com";
+// $username = "TestUser";
+// $displayname = "Test Player";
+// $email = "test@example.com";
 
 // Uncomment below and remove dummy values when database is ready:
-// $username = $_SESSION['username'];
-// $displayname = $_SESSION['displayname'];
-// $email = $_SESSION['email'];
+$username = $_SESSION['username'];
+$displayname = $_SESSION['displayname'];
+$email = $_SESSION['email'];
 ?>
 
 <!DOCTYPE html>

@@ -29,7 +29,7 @@ export function setup(level, canvasWidth, canvasHeight) {
     holes.push({
       x: x,
       y: y,
-      radius: 20,
+      radius: 15, // Smaller hole for more challenge
       filled: false,
     });
   }
@@ -44,12 +44,17 @@ export function update(playerMarble, holes, score, canvasWidth, canvasHeight) {
   holes.forEach((hole) => {
     if (!hole.filled) {
       const dist = distance(playerMarble.x, playerMarble.y, hole.x, hole.y);
-      if (dist < hole.radius) {
+      const marbleSpeed = Math.sqrt(playerMarble.vx ** 2 + playerMarble.vy ** 2);
+
+      // Stricter requirement: marble must be well-centered (within 8px) and moving slowly
+      const maxCenterDistance = 8; // Marble must be very centered
+      const maxSpeed = 2; // Must be moving slowly to count
+
+      if (dist < maxCenterDistance && marbleSpeed < maxSpeed) {
         hole.filled = true;
         playerMarble.vx = 0;
         playerMarble.vy = 0;
         playerMarble.x = hole.x;
-        playerMarble.y = hole.y;
         playerMarble.y = hole.y;
         scoreIncrease += 20;
         Sound.playHit();
