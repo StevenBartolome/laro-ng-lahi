@@ -1,16 +1,27 @@
 <?php
 session_start();
 
-// TEMPORARY: Comment out login check for testing
-// if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-//     header("Location: login.php");
-//     exit();
-// }
+// Check if user is logged in OR is a guest
+$isLoggedIn = isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
+$isGuest = isset($_SESSION['is_guest']) && $_SESSION['is_guest'] === true;
 
-// TEMPORARY: Dummy values for testing
-$username = "TestUser";
-$displayname = "Test Player";
-$email = "test@example.com";
+// If neither logged in nor guest, redirect to index
+if (!$isLoggedIn && !$isGuest) {
+    header("Location: index.php");
+    exit();
+}
+
+// Set user info based on login status
+if ($isLoggedIn) {
+    $username = $_SESSION['username'];
+    $displayname = $_SESSION['displayname'];
+    $email = $_SESSION['email'];
+} else {
+    // Guest user
+    $username = "Guest";
+    $displayname = "Guest Player";
+    $email = "";
+}
 ?>
 
 <!DOCTYPE html>
@@ -53,7 +64,7 @@ $email = "test@example.com";
         </div>
         
         <!-- Back Button - Moved to bottom -->
-        <a href="start_menu.php" class="back-btn" title="Back to Menu">
+        <a href="index.php" class="back-btn" title="Back to Menu">
             <img src="assets/startmenu/back_button.png" alt="Back">
         </a>
     </div>
