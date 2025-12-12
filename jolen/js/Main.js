@@ -77,6 +77,23 @@ document.addEventListener("DOMContentLoaded", () => {
     UI.highlightMode(gameMode); // Highlight default mode
   });
 
+  // --- Achievement Tracking ---
+  let currentStreak = 0;
+  let maxStreak = 0;
+  let totalHits = 0;
+  let totalShots = 0;
+  let isPerfectGame = true;
+
+  function trackAchievement() {
+    if (window.achievementManager) {
+      window.achievementManager.trackJolenGame({
+        won: true,
+        streak: maxStreak,
+        perfect: isPerfectGame
+      });
+    }
+  }
+
   // --- Helper Functions ---
   function resetPlayerMarble() {
     playerMarble.x = startingPosition.x;
@@ -255,10 +272,16 @@ document.addEventListener("DOMContentLoaded", () => {
         shotScore += result.scoreIncrease; // Track score gained in this shot
         UI.updateScore(score);
         updateTargetsLeft();
+        
+        // Track achievement progress
+        currentStreak++;
+        totalHits++;
+        maxStreak = Math.max(maxStreak, currentStreak);
       }
 
       // Check if level complete
       if (!anyMoving) {
+        totalShots++;
         const levelComplete = currentModeModule.checkLevelComplete(modeState);
 
         if (levelComplete) {
@@ -269,9 +292,14 @@ document.addEventListener("DOMContentLoaded", () => {
           // Player missed (didn't hit any targets) - deduct a life
           lives--;
           UI.updateLives(lives);
+          
+          // Track miss for achievements
+          currentStreak = 0;
+          isPerfectGame = false;
 
           if (lives <= 0) {
-            // Game Over - show game over screen
+            // Game Over - track achievement and show game over screen
+            trackAchievement();
             gameState = "gameOver";
             UI.showGameOver(score);
           } else {
