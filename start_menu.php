@@ -1,21 +1,20 @@
 <?php
 session_start();
+// Initialize default values to prevent PHP errors
+$username = '';
+$displayname = '';
+$email = '';
+$is_guest_server = false; // Renamed to avoid confusion with JS client state
 
-// TEMPORARY: Comment out login check for testing
-if (!isset($_SESSION['logged_in']) || $_SESSION['logged_in'] !== true) {
-    header("Location: login.php");
-    exit();
+// Check if PHP session exists (Online / Server-Rendered)
+if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
+    $username = $_SESSION['username'];
+    $displayname = $_SESSION['displayname'];
+    $email = $_SESSION['email'];
 }
-
-// TEMPORARY: Dummy values for testing
-// $username = "TestUser";
-// $displayname = "Test Player";
-// $email = "test@example.com";
-
-// Uncomment below and remove dummy values when database is ready:
-$username = $_SESSION['username'];
-$displayname = $_SESSION['displayname'];
-$email = $_SESSION['email'];
+// We no longer redirect here in PHP to allow the page to load for Offline/Guest PWA.
+// Protection is now handled by the JavaScript below.
+?>
 ?>
 
 <!DOCTYPE html>
@@ -26,8 +25,33 @@ $email = $_SESSION['email'];
     <title>Laro ng Lahi - Main Menu</title>
     <link rel="stylesheet" href="assets/css/start_menu.css">
     <link rel="stylesheet" href="assets/css/settings_modal.css">
+    <link rel="manifest" href="manifest.json">
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('service-worker.js')
+            .then(reg => console.log('Service Worker registered!', reg))
+            .catch(err => console.log('Service Worker registration failed:', err));
+        });
+      }
+    </script>
 </head>
 <body>
+    <script>
+        // CLIENT-SIDE AUTH CHECK (For PWA/Offline Support)
+        (function() {
+            const isGuest = localStorage.getItem('is_guest') === 'true';
+            // We can check if PHP rendered a session by checking if displayname is populated
+            // But cleaner to trust LocalStorage for Guest Mode
+            
+            const serverLoggedIn = <?php echo (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) ? 'true' : 'false'; ?>;
+            
+            if (!isGuest && !serverLoggedIn) {
+                // Not a guest, and not logged in on server -> Redirect to Login
+                window.location.href = 'login.php';
+            }
+        })();
+    </script>
     <div class="game-container">
         <!-- Decorative glow -->
         <div class="glow-effect"></div>
@@ -104,6 +128,20 @@ $email = $_SESSION['email'];
 
         // Wait for manager to load
         window.addEventListener('load', () => {
+            // Apply Guest Mode UI Updates
+            const isGuest = localStorage.getItem('is_guest') === 'true';
+            if (isGuest) {
+                // Update Name
+                const nameDisplay = document.querySelector('.user-name');
+                const avatarDisplay = document.querySelector('.user-avatar');
+                if (nameDisplay) nameDisplay.textContent = localStorage.getItem('guest_name') || 'Guest';
+                if (avatarDisplay) avatarDisplay.textContent = 'G';
+                
+                // Hide Achievements
+                const achBtn = document.querySelector('.achievements-btn');
+                if (achBtn) achBtn.style.display = 'none';
+            }
+
             const audioMgr = window.audioManager;
             
             // Register Elements

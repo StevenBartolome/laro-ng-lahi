@@ -1,0 +1,21 @@
+{
+    "name": "Laro ng Lahi",
+    "short_name": "LaroNgLahi",
+    "start_url": "index.php",
+    "display": "standalone",
+    "background_color": "#667eea",
+    "theme_color": "#667eea",
+    "icons": [
+        {
+            "src": "assets/startmenu/screen_title.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "assets/startmenu/screen_title.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ],
+    "orientation": "landscape"
+}

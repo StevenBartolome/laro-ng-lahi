@@ -15,13 +15,21 @@ session_destroy();
 </head>
 <body>
     <script>
+        // Clear LocalStorage (Guest Mode & PWA data)
+        localStorage.removeItem('is_guest');
+        localStorage.removeItem('guest_name');
+        
         // Ensure Firebase session is also cleared
-        firebase.auth().signOut().then(() => {
-            window.location.href = 'login.php';
-        }).catch((error) => {
-            console.error(error);
-            window.location.href = 'login.php';
-        });
+        if (typeof firebase !== 'undefined') {
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'login.php';
+            }).catch((error) => {
+                console.error(error);
+                window.location.href = 'login.php';
+            });
+        } else {
+             window.location.href = 'login.php';
+        }
     </script>
 </body>
 </html>
