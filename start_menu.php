@@ -89,7 +89,7 @@ $email = $_SESSION['email'];
         
         <!-- Music Toggle Button -->
         <button id="musicToggle" class="music-toggle" title="Toggle Music">
-            🔊
+            <img src="assets/startmenu/volume.png" alt="Toggle Music">
         </button>
     </div>
     
@@ -119,8 +119,11 @@ $email = $_SESSION['email'];
 
             // Music Toggle Button (Simple mute toggle that syncs with global settings)
             const musicToggle = document.getElementById('musicToggle');
+            const toggleIcon = musicToggle.querySelector('img');
+
             const updateToggleButton = () => {
-                musicToggle.textContent = audioMgr.settings.isMuted ? '🔇' : '🔊';
+                const isMuted = audioMgr.settings.isMuted;
+                toggleIcon.src = isMuted ? 'assets/startmenu/mute.png' : 'assets/startmenu/volume.png';
             };
             
             // Initial state

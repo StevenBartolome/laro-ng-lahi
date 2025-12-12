@@ -66,75 +66,79 @@ $email = "test@example.com";
         <source src="assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
     </audio>
     
+    <!-- Audio Manager -->
+    <script src="assets/js/AudioManager.js"></script>
+    
+    <!-- Music Toggle -->
+    <button id="musicToggle" class="music-toggle" title="Toggle Music">
+        <img src="assets/startmenu/volume.png" alt="Toggle Music">
+    </button>
+    
     <script>
-        // Music persistence across pages
-        const bgMusic = document.getElementById('bgMusic');
-        bgMusic.volume = 0.5;
-        bgMusic.loop = true;
-        
-        // Check if music was muted
-        const isMuted = localStorage.getItem('musicMuted') === 'true';
-        if (isMuted) {
-            bgMusic.muted = true;
-        }
-        
-        // Resume music from saved position
-        const savedTime = localStorage.getItem('musicTime');
-        if (savedTime) {
-            bgMusic.currentTime = parseFloat(savedTime);
-        }
-        
-        // Try to autoplay
-        bgMusic.play().catch(() => {
-            document.addEventListener('click', function initAudio() {
-                bgMusic.play().catch(() => {});
-            }, { once: true });
-        });
-        
-        // Save music position periodically
-        setInterval(() => {
-            if (!bgMusic.paused) {
-                localStorage.setItem('musicTime', bgMusic.currentTime);
-            }
-        }, 500);
-        
-        // Save position before leaving page
-        window.addEventListener('beforeunload', () => {
-            localStorage.setItem('musicTime', bgMusic.currentTime);
-        });
-        
-        // Save when clicking any link
-        document.querySelectorAll('a').forEach(link => {
-            link.addEventListener('click', () => {
-                localStorage.setItem('musicTime', bgMusic.currentTime);
-            });
-        });
-        
-        // Fallback: restart if ended
-        bgMusic.addEventListener('ended', () => {
-            bgMusic.currentTime = 0;
-            bgMusic.play();
-        });
-        
-        // Card click animation and sound
-        const gameCards = document.querySelectorAll('.game-card, .back-btn');
-        const clickSound = document.getElementById('clickSound');
-        
-        gameCards.forEach(card => {
-            card.addEventListener('click', (e) => {
-                // Play sound
-                if (clickSound) {
-                    clickSound.currentTime = 0;
-                    clickSound.play().catch(() => {});
+        document.addEventListener('DOMContentLoaded', () => {
+            // Audio Manager Setup
+            const audioMgr = new AudioManager(); // Using singleton pattern internally or global instance
+            const bgMusic = document.getElementById('bgMusic');
+            const clickSound = document.getElementById('clickSound');
+            const musicToggle = document.getElementById('musicToggle');
+            const toggleIcon = musicToggle.querySelector('img');
+            
+            audioMgr.registerMusic(bgMusic);
+            audioMgr.registerSFX(clickSound);
+            
+            // Sync Toggle Button State
+            const updateToggleIcon = () => {
+                const isMuted = audioMgr.settings.isMuted;
+                toggleIcon.src = isMuted ? 'assets/startmenu/mute.png' : 'assets/startmenu/volume.png';
+            };
+            updateToggleIcon();
+            
+            // Handle Toggle Click
+            musicToggle.addEventListener('click', (e) => {
+                // Ensure music starts if browser blocked it initially
+                if (bgMusic.paused && !audioMgr.settings.isMuted) {
+                    bgMusic.play().catch(() => {});
                 }
                 
-                // Animation for cards
-                if (card.classList.contains('game-card')) {
-                    card.style.transform = 'scale(0.9)';
-                    setTimeout(() => {
-                        card.style.transform = '';
-                    }, 150);
+                audioMgr.toggleMute();
+                updateToggleIcon();
+                
+                // Button animation
+                musicToggle.style.transform = 'translateY(2px)';
+                setTimeout(() => {
+                   musicToggle.style.transform = ''; 
+                }, 100);
+            });
+            
+            // Attempt autoplay if not muted
+            if (!audioMgr.settings.isMuted) {
+                bgMusic.play().catch(() => {
+                    // Browser policy blocked autoplay - wait for interaction
+                    console.log("Autoplay blocked - waiting for interaction");
+                });
+            }
+            
+            // Interaction fallback to start music
+            document.addEventListener('click', () => {
+                if (bgMusic.paused && !audioMgr.settings.isMuted) {
+                    bgMusic.play().catch(() => {});
                 }
+            }, { once: true });
+            
+            // Card click animation and sound
+            const gameCards = document.querySelectorAll('.game-card, .back-btn');
+            
+            gameCards.forEach(card => {
+                card.addEventListener('click', (e) => {
+                    // Play sound via Manager
+                    audioMgr.playSFX(clickSound);
+                    
+                    // Basic animation for cards (CSS handles most hover effects)
+                    // Adding a small click scale effect here if needed
+                    if (card.classList.contains('game-card')) {
+                         // CSS :active handles this, but we can enforce logic if needed
+                    }
+                });
             });
         });
     </script>
