@@ -15,6 +15,9 @@ if ($data && isset($data['uid'])) {
     $_SESSION['displayname'] = $data['displayname'] ?? 'Player';
     $_SESSION['logged_in'] = true;
     
+    // Crucial: write session data and close to ensure it saves before the redirect happens on client
+    session_write_close();
+
     echo json_encode(['success' => true]);
 } else {
     echo json_encode(['success' => false, 'error' => 'Invalid data']);
