@@ -228,7 +228,9 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             const result = await Auth.login(email, password);
             
             if (result.success) {
-                window.location.href = 'start_menu.php';
+                // Hard refresh to clear cache
+                window.location.replace('start_menu.php');
+                window.location.reload(true);
             } else {
                 errorMsg.textContent = result.message;
                 errorMsg.style.display = 'block';
