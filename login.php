@@ -53,7 +53,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         
         <form id="loginForm">
             <div class="form-group">
-                <label for="email">Username</label>
+                <label for="email">Email</label>
                 <input type="text" id="email" required>
             </div>
             
