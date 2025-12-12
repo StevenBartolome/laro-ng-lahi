@@ -145,7 +145,8 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             const result = await Auth.register(email, password, username, displayname);
             
             if (result.success) {
-                window.location.href = 'start_menu.php';
+                alert(result.message);
+                window.location.href = 'login.php';
             } else {
                 showError(result.message);
                 toggleLoading(false);

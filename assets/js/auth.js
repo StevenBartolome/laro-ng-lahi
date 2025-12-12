@@ -20,6 +20,12 @@ const Auth = {
             const userCredential = await firebase.auth().signInWithEmailAndPassword(email, password);
             const user = userCredential.user;
 
+            // Check if email is verified
+            if (!user.emailVerified) {
+                await firebase.auth().signOut();
+                return { success: false, message: "Please verify your email address before logging in. Check your inbox." };
+            }
+
             // Get additional user data from Firestore
             const db = firebase.firestore();
             const userDoc = await db.collection('users').doc(user.uid).get();
@@ -36,6 +42,10 @@ const Auth = {
             return { success: true };
         } catch (error) {
             console.error("Login Error:", error);
+            // Handle specific error codes if needed
+            if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
+                return { success: false, message: "Invalid email or password." };
+            }
             return { success: false, message: error.message };
         }
     },
@@ -46,6 +56,9 @@ const Auth = {
             const userCredential = await firebase.auth().createUserWithEmailAndPassword(email, password);
             const user = userCredential.user;
 
+            // Send Verification Email
+            await user.sendEmailVerification();
+
             // Create user document in Firestore
             const db = firebase.firestore();
             await db.collection('users').doc(user.uid).set({
@@ -55,15 +68,10 @@ const Auth = {
                 createdAt: firebase.firestore.FieldValue.serverTimestamp()
             });
 
-            // Sync with PHP Session
-            await this.syncSession({
-                uid: user.uid,
-                email: email,
-                username: username,
-                displayname: displayname
-            });
+            // Sign out immediately so they have to login after verifying
+            await firebase.auth().signOut();
 
-            return { success: true };
+            return { success: true, message: "Registration successful! Verification email sent. Please check your inbox." };
         } catch (error) {
             console.error("Registration Error:", error);
             return { success: false, message: error.message };
