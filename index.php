@@ -16,16 +16,20 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <title>Laro ng Lahi - Main Menu</title>
     <link rel="stylesheet" href="assets/css/start_menu.css">
     <link rel="stylesheet" href="assets/css/settings_modal.css">
+    <link rel="stylesheet" href="assets/css/achievements_modal.css">
+    
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+
     <style>
         /* Hide the user bar (player name and logout) */
         .user-bar {
             display: none !important;
         }
 
-        /* Hide the achievements button */
-        .achievements-btn {
-            display: none !important;
-        }
+
 
         /* Start button styling (button element instead of link) */
         .start-btn {
@@ -190,7 +194,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
                 <a href="facts.php" class="menu-btn" title="Laro Fact Cards">
                     <img src="assets/startmenu/fact_button.png" alt="Facts">
                 </a>
-                <a href="achievements.php" class="menu-btn achievements-btn" title="Achievements">
+                <a href="#" class="menu-btn achievements-btn" id="achievementsBtn" title="Achievements">
                     <img src="assets/startmenu/achievements_button.png" alt="Achievements">
                 </a>
                 <a href="settings.php" class="menu-btn" title="Settings">
@@ -231,8 +235,15 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <!-- Global Audio System -->
     <script src="assets/js/AudioManager.js"></script>
     <script src="assets/js/SettingsModal.js"></script>
+    <script src="assets/js/AchievementManager.js"></script>
+    <script src="assets/js/AchievementsModal.js"></script>
 
     <script>
+        // User Data for Achievements (Guest Mode)
+        window.currentUser = {
+            isGuest: true
+        };
+
         // Initialize Audio Manager with elements
         const bgMusic = document.getElementById('bgMusic');
         const clickSound = document.getElementById('clickSound');
@@ -300,6 +311,15 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
                 settingsBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     window.settingsModal.show();
+                });
+            }
+
+            // Achievements Button Wrapper
+            const achievementsBtn = document.getElementById('achievementsBtn');
+            if (achievementsBtn) {
+                achievementsBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.achievementsModal.show();
                 });
             }
 
