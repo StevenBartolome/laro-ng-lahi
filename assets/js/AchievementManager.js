@@ -237,7 +237,15 @@ class AchievementManager {
     async loadUserData() {
         if (!this.userId || this.isGuest) return;
 
-        const userRef = database.ref(`achievements/${this.userId}`);
+        // Use window.database as fallback if database is not in scope
+        const db = typeof database !== 'undefined' ? database : window.database;
+
+        if (!db) {
+            console.error('Firebase database not initialized');
+            return;
+        }
+
+        const userRef = db.ref(`achievements/${this.userId}`);
         const snapshot = await userRef.once('value');
         const data = snapshot.val() || {};
 
@@ -503,7 +511,15 @@ class AchievementManager {
     async saveUserData() {
         if (!this.userId || this.isGuest) return;
 
-        const userRef = database.ref(`achievements/${this.userId}`);
+        // Use window.database as fallback if database is not in scope
+        const db = typeof database !== 'undefined' ? database : window.database;
+
+        if (!db) {
+            console.error('Firebase database not initialized');
+            return;
+        }
+
+        const userRef = db.ref(`achievements/${this.userId}`);
         await userRef.set({
             unlockedAchievements: this.unlockedAchievements,
             stats: this.userStats

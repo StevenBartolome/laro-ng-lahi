@@ -52,13 +52,13 @@ if ($isLoggedIn) {
         
         <!-- Game Cards -->
         <div class="game-cards-container">
-            <a href="patintero/index.html" class="game-card" title="Play Patintero">
+            <a href="patintero/index.php" class="game-card" title="Play Patintero">
                 <img src="assets/startmenu/patintero_gamecard.png" alt="Patintero">
             </a>
-            <a href="jolen/index.html" class="game-card" title="Play Jolen">
+            <a href="jolen/index.php" class="game-card" title="Play Jolen">
                 <img src="assets/startmenu/jolen_gamecard.png" alt="Luksong Tinik">
             </a>
-            <a href="luksong-baka/index.html" class="game-card" title="Play Luksong Baka">
+            <a href="luksong-baka/index.php" class="game-card" title="Play Luksong Baka">
                 <img src="assets/startmenu/luksong_baka_gamecard.png" alt="Luksong Baka">
             </a>
         </div>

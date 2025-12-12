@@ -18,6 +18,38 @@ import { checkBoostInput } from './input.js';
 // or just reset it inside startGame/startRound.
 let lastTime = 0;
 
+// --- Achievement Tracking ---
+let achievementStats = {
+    points: 0,          // Points scored as runner
+    tags: 0,            // Runners tagged as tagger
+    wasTagged: false,   // Was player tagged this game?
+    gameStartTime: null // Track game duration
+};
+
+// Initialize achievements on page load
+async function initAchievements() {
+    if (window.achievementManager && typeof userId !== 'undefined') {
+        await window.achievementManager.init(userId, isGuest);
+        console.log('Achievement system initialized for Patintero');
+    }
+}
+window.addEventListener('load', initAchievements);
+
+async function trackPatinteroAchievements() {
+    if (window.achievementManager && !isGuest) {
+        const duration = achievementStats.gameStartTime
+            ? Math.floor((Date.now() - achievementStats.gameStartTime) / 1000)
+            : 0;
+
+        await window.achievementManager.trackPatinteroGame({
+            points: achievementStats.points,
+            tags: achievementStats.tags,
+            flawless: !achievementStats.wasTagged,
+            duration: duration
+        });
+    }
+}
+
 /**
  * Start the game with selected difficulty
  */
@@ -40,6 +72,12 @@ export function startGame(difficulty) {
     document.getElementById('boostMeter').classList.remove('active');
 
     gameState.selectedDifficulty = difficulty || 'medium';
+
+    // Reset achievement tracking for new game
+    achievementStats.points = 0;
+    achievementStats.tags = 0;
+    achievementStats.wasTagged = false;
+    achievementStats.gameStartTime = Date.now();
 
     // Hide difficulty screen and show coin flip
     document.getElementById('difficultyScreen').classList.add('hidden');
@@ -268,24 +306,31 @@ export function endGame() {
     gameState.gameActive = false;
     clearInterval(gameState.timerInterval);
 
+    // Track achievement stats based on game results
+    achievementStats.points = gameState.playerTeamScore;
+    achievementStats.tags = 0; // Will be tracked separately if needed
+
+    // Call achievement tracker
+    trackPatinteroAchievements();
+
     const modal = document.getElementById('messageOverlay');
     const title = document.getElementById('modalTitle');
     const msg = document.getElementById('modalMessage');
     const scoreDisplay = document.getElementById('modalScore');
     const btn = document.getElementById('modalActionBtn');
     const menuBtn = document.getElementById('modalMenuBtn');
-    
+
     // Ensure backdrop mode
     modal.classList.add('game-complete-backdrop');
     menuBtn.style.display = 'flex'; // Ensure menu button is visible
 
     // Determine winner
     const winner = gameState.playerTeamScore > gameState.enemyTeamScore ? 'My Team' :
-                   gameState.playerTeamScore < gameState.enemyTeamScore ? 'Enemy Team' : 'Tie';
-    
+        gameState.playerTeamScore < gameState.enemyTeamScore ? 'Enemy Team' : 'Tie';
+
     // Set Title
     title.textContent = "GAME OVER";
-    
+
     if (winner === 'Enemy Team') {
         title.classList.add('fail');
         title.classList.remove('round');
@@ -295,8 +340,8 @@ export function endGame() {
     }
 
     // Winner Color for Text
-    const winnerColor = winner === 'My Team' ? '#4CAF50' : 
-                        winner === 'Enemy Team' ? '#ff4444' : '#FFA500';
+    const winnerColor = winner === 'My Team' ? '#4CAF50' :
+        winner === 'Enemy Team' ? '#ff4444' : '#FFA500';
 
     msg.innerHTML = `
         <div style="font-size: 1.1em; margin-bottom: 20px;">
@@ -310,12 +355,12 @@ export function endGame() {
             </div>
         </div>
         <div style="color: #90caf9; font-size: 0.9em; font-style: italic;">
-            ${winner === 'My Team' ? "Great job! Keep it up!" : 
-              winner === 'Enemy Team' ? "Better luck next time!" : 
-              "Close match!"}
+            ${winner === 'My Team' ? "Great job! Keep it up!" :
+            winner === 'Enemy Team' ? "Better luck next time!" :
+                "Close match!"}
         </div>
     `;
-    
+
     btn.textContent = "Play Again";
 
     // Override button click
