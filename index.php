@@ -17,6 +17,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <link rel="stylesheet" href="assets/css/start_menu.css">
     <link rel="stylesheet" href="assets/css/settings_modal.css">
     <link rel="stylesheet" href="assets/css/achievements_modal.css">
+    <link rel="stylesheet" href="assets/css/facts_modal.css">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -28,8 +29,6 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         .user-bar {
             display: none !important;
         }
-
-
 
         /* Start button styling (button element instead of link) */
         .start-btn {
@@ -96,7 +95,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 
             <!-- Secondary buttons - Horizontal layout -->
             <div class="secondary-buttons">
-                <a href="facts.php" class="menu-btn" title="Laro Fact Cards">
+                <a href="#" class="menu-btn" id="factsBtn" title="Laro Fact Cards">
                     <img src="assets/startmenu/fact_button.png" alt="Facts">
                 </a>
                 <a href="#" class="menu-btn achievements-btn" id="achievementsBtn" title="Achievements">
@@ -118,6 +117,9 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         <audio id="clickSound">
             <source src="assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
         </audio>
+        <audio id="factsMusic" loop>
+            <source src="assets/game_facts_assets/fact_cards_music.mp3" type="audio/mpeg">
+        </audio>
 
         <!-- Music Toggle Button -->
         <button id="musicToggle" class="music-toggle" title="Toggle Music">
@@ -125,7 +127,6 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
         </button>
     </div>
 
-    <!-- Login Modal -->
     <!-- Login Modal -->
     <div class="settings-modal-overlay hidden" id="loginModal">
         <div class="settings-modal-content">
@@ -146,6 +147,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     <script src="assets/js/SettingsModal.js"></script>
     <script src="assets/js/AchievementManager.js"></script>
     <script src="assets/js/AchievementsModal.js"></script>
+    <script src="assets/js/FactsModal.js"></script>
 
     <script>
         // User Data for Achievements (Guest Mode)
@@ -240,6 +242,15 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
                 achievementsBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     window.achievementsModal.show();
+                });
+            }
+
+            // Facts Button Wrapper
+            const factsBtn = document.getElementById('factsBtn');
+            if (factsBtn) {
+                factsBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.factsModal.show();
                 });
             }
 

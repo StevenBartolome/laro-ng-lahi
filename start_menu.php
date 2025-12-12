@@ -27,6 +27,7 @@ $email = $_SESSION['email'];
     <link rel="stylesheet" href="assets/css/start_menu.css">
     <link rel="stylesheet" href="assets/css/settings_modal.css">
     <link rel="stylesheet" href="assets/css/achievements_modal.css">
+    <link rel="stylesheet" href="assets/css/facts_modal.css">
     
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
@@ -70,7 +71,7 @@ $email = $_SESSION['email'];
             
             <!-- Secondary buttons - Horizontal layout -->
             <div class="secondary-buttons">
-                <a href="facts.php" class="menu-btn" title="Laro Fact Cards">
+                <a href="#" class="menu-btn" id="factsBtn" title="Laro Fact Cards">
                     <img src="assets/startmenu/fact_button.png" alt="Facts">
                 </a>
                 <a href="#" class="menu-btn achievements-btn" id="achievementsBtn" title="Achievements">
@@ -83,7 +84,7 @@ $email = $_SESSION['email'];
         </div>
         
         <!-- Version text -->
-        <div class="version-text">Version 1.0.0 | © 2024 Laro ng Lahi</div>
+        <div class="version-text">Version 1.0.0 | © 2025 Laro ng Lahi</div>
         
         <!-- Background Music -->
         <audio id="bgMusic" loop autoplay>
@@ -91,6 +92,9 @@ $email = $_SESSION['email'];
         </audio>
         <audio id="clickSound">
             <source src="assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="factsMusic" loop>
+            <source src="assets/game_facts_assets/fact_cards_music.mp3" type="audio/mpeg">
         </audio>
         
         <!-- Music Toggle Button -->
@@ -104,6 +108,7 @@ $email = $_SESSION['email'];
     <script src="assets/js/SettingsModal.js"></script>
     <script src="assets/js/AchievementManager.js"></script>
     <script src="assets/js/AchievementsModal.js"></script>
+    <script src="assets/js/FactsModal.js"></script>
 
     <script>
         // User Data for Achievements
@@ -170,6 +175,15 @@ $email = $_SESSION['email'];
                 achievementsBtn.addEventListener('click', (e) => {
                     e.preventDefault();
                     window.achievementsModal.show();
+                });
+            }
+
+            // Facts Button Wrapper
+            const factsBtn = document.getElementById('factsBtn');
+            if (factsBtn) {
+                factsBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.factsModal.show();
                 });
             }
 
