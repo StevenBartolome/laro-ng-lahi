@@ -10,7 +10,7 @@ function createWindow() {
         width: 1280,
         height: 720,
         backgroundColor: '#2e2c29',
-        icon: path.join(__dirname, 'public/assets/icons/icon.png'), // Ensure icon exists or remove
+        // icon: path.join(__dirname, 'public/assets/icons/icon.png'), // Ensure icon exists or remove
         webPreferences: {
             nodeIntegration: false,
             contextIsolation: true,
