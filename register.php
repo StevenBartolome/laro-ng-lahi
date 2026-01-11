@@ -60,7 +60,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             
             <button type="submit" class="btn" id="regBtn">
                 REGISTER
-                <div class="spinner" id="spinner"></div>
+                <div class="spinner" id="spinner" style="display: none;"></div>
             </button>
         </form>
         
@@ -110,7 +110,7 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
             const btn = document.getElementById('regBtn');
             const spinner = document.getElementById('spinner');
             btn.disabled = isLoading;
-            spinner.style.display = isLoading ? 'block' : 'none';
+            spinner.style.display = isLoading ? 'inline-block' : 'none';
         }
     </script>
 </body>

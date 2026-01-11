@@ -438,6 +438,54 @@ if ($isLoggedIn) {
                 });
             });
         });
+
+        // Responsive Scaling Logic
+        function resizeGame() {
+            const gameContainer = document.getElementById('gameArea');
+            if (!gameContainer) return;
+
+            // Base dimensions of the game content (approx field + controls height)
+            const baseWidth = 1200;
+            const baseHeight = 900; 
+
+            const windowWidth = window.innerWidth;
+            const windowHeight = window.innerHeight;
+
+            // Calculate scale
+            // Scale based on width (primary constraint)
+            let scale = windowWidth / (baseWidth + 40); // 40px padding safety
+            
+            // Check if height constraint needs more scaling
+            if ((baseHeight * scale) > (windowHeight - 20)) {
+                scale = (windowHeight - 20) / baseHeight;
+            }
+
+            // Cap at 1.0 to prevent upscaling blurriness on large screens (optional, but good for pixel art)
+            // Or cap at 1.2
+            if (scale > 1.2) scale = 1.2;
+            
+            // Apply scale
+            const gameUI = document.getElementById('gameUI');
+            
+            if (scale < 1) {
+                gameContainer.style.transform = `scale(${scale})`;
+                // Center vertically if needed or keep top aligned
+                // gameContainer.style.transformOrigin = 'top center'; // Already in CSS
+                
+                // Adjust margin to reduce gap
+                const heightDiff = baseHeight - (baseHeight * scale);
+                gameContainer.style.marginBottom = `-${heightDiff}px`;
+            } else {
+                gameContainer.style.transform = 'none';
+                gameContainer.style.marginBottom = '0';
+            }
+        }
+
+        window.addEventListener('resize', resizeGame);
+        window.addEventListener('load', resizeGame);
+        
+        // Initial call
+        resizeGame();
     </script>
 </body>
 
