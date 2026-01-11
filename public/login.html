@@ -144,6 +144,7 @@
             const result = await Auth.login(email, password);
 
             if (result.success) {
+                localStorage.removeItem('guestMode'); // Clear guest flag if previously set
                 window.location.replace('start_menu.html');
             } else {
                 errorMsg.textContent = result.message;
@@ -170,6 +171,7 @@
             });
 
             if (result.success) {
+                localStorage.setItem('guestMode', 'true');
                 window.location.replace('start_menu.html');
             }
         });

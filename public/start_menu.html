@@ -95,19 +95,36 @@
     <script src="assets/js/AuthSelectionModal.js"></script>
 
     <script>
-        // Update User UI when session is ready
-        window.addEventListener('user-ready', (e) => {
-            const user = e.detail;
-            document.getElementById('userName').textContent = user.displayname;
-            document.getElementById('userAvatar').textContent = user.displayname.charAt(0).toUpperCase();
+        // Update User UI
+        const updateUserUI = (user) => {
+            if (!user) return;
+            const userNameEl = document.getElementById('userName');
+            const userAvatarEl = document.getElementById('userAvatar');
 
-            // Set global user object for other scripts (like modals)
-            window.currentUser = {
-                id: user.username,
-                displayname: user.displayname,
-                isGuest: false // Simplified for now, can add check if needed
-            };
+            if (userNameEl) userNameEl.textContent = user.displayname;
+            if (userAvatarEl) userAvatarEl.textContent = user.displayname.charAt(0).toUpperCase();
+
+            // Set global user object for other scripts (like modals) if not already set
+            if (!window.currentUser) {
+                window.currentUser = {
+                    id: user.username,
+                    displayname: user.displayname,
+                    isGuest: user.isGuest || false
+                };
+            }
+        };
+
+        // Listen for event
+        window.addEventListener('user-ready', (e) => {
+            updateUserUI(e.detail);
         });
+
+        // Check if already ready (race condition fix)
+        if (window.currentUser) {
+            updateUserUI(window.currentUser);
+        } else if (window.userData) {
+            updateUserUI(window.userData);
+        }
 
         // Initialize Audio Manager with elements
         const bgMusic = document.getElementById('bgMusic');

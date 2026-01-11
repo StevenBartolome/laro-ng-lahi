@@ -67,7 +67,8 @@ class AchievementsModal {
 
     renderContent() {
         // Access global user state
-        const isGuest = window.currentUser ? window.currentUser.isGuest : true;
+        const user = window.currentUser || window.userData;
+        const isGuest = user ? user.isGuest : true;
 
         if (isGuest) {
             this.renderGuestMessage();
@@ -85,19 +86,20 @@ class AchievementsModal {
                     You are currently playing as a Guest. <br>
                     Log in to track your progress and unlock achievements!
                 </p>
-                <a href="login.php" class="modal-login-btn">Login Now</a>
+                <a href="login.html" class="modal-login-btn">Login Now</a>
             </div>
         `;
     }
 
     async renderAchievements() {
         const am = window.achievementManager;
+        const user = window.currentUser || window.userData;
 
         if (!am || !am.initialized) {
             this.body.innerHTML = '<div class="modal-guest-message"><p>Loading achievements...</p></div>';
             // Retry briefly if not initialized (though it should be by the time user clicks)
-            if (am && !am.initialized && window.currentUser && window.currentUser.id) {
-                await am.init(window.currentUser.id, false);
+            if (am && !am.initialized && user && user.id) {
+                await am.init(user.id, false);
             } else if (!am) {
                 this.body.innerHTML = '<div class="modal-guest-message"><p>Error loading Achievement Manager.</p></div>';
                 return;

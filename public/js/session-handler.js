@@ -20,6 +20,7 @@
             displayname: 'Guest Player',
             isGuest: true
         };
+        window.currentUser = window.userData;
         window.dispatchEvent(new CustomEvent('user-ready', { detail: window.userData }));
         return;
     }
@@ -35,6 +36,12 @@
             console.log('Logged in as:', data.user.displayname);
             // Dispatch event for other scripts to use user data
             window.userData = data.user;
+            // Also set currentUser for backward compatibility/ease of use
+            window.currentUser = {
+                id: data.user.username,
+                displayname: data.user.displayname,
+                isGuest: false
+            };
             window.dispatchEvent(new CustomEvent('user-ready', { detail: data.user }));
         }
     } catch (error) {
