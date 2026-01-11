@@ -1,0 +1,162 @@
+/* Jolen Overlays - Modularized */
+@import '../../assets/css/shared-overlays.css';
+
+/* Jolen Specific Overrides */
+
+/* Mode Buttons Grid - Ensure layout is preserved */
+.mode-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.mode-btn {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    height: 100%;
+}
+
+.card-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* 
+   Override Shared Overlay Background for Messages 
+   (So game remains visible behind the popup)
+*/
+#messageOverlay {
+    background: none !important;
+    background-image: none !important;
+    pointer-events: none; /* Let clicks pass through container */
+}
+
+/* Modal Styling for Game Over / Success */
+#messageOverlay .game-complete-box {
+    pointer-events: auto; /* Re-enable clicks */
+    background: rgba(62, 39, 35, 0.95);
+    border: 3px solid #C75C42;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    min-width: 400px;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.game-complete-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+    width: 100%;
+}
+
+.complete-header {
+    font-size: 3rem;
+    color: #ffd700;
+    text-shadow: 2px 2px 0 #000;
+    margin: 0;
+    line-height: 1;
+    font-family: var(--font-heading);
+}
+
+.complete-header.fail {
+    color: #ff4444;
+}
+
+.complete-sub {
+    font-size: 1.2rem;
+    color: #e0fbfc;
+    font-family: var(--font-body);
+}
+
+.complete-score {
+    font-size: 2rem;
+    color: #fff;
+    background: rgba(0,0,0,0.3);
+    padding: 10px 30px;
+    border-radius: 10px;
+    margin: 10px 0;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-family: var(--font-heading);
+}
+
+.complete-buttons {
+    display: flex;
+    gap: 20px;
+    width: 100%;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.restart-btn, .back-menu-btn {
+    padding: 15px 30px;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s;
+    text-decoration: none;
+    color: white;
+    text-transform: uppercase;
+    text-align: center;
+}
+
+.restart-btn {
+    background: #4CAF50;
+    box-shadow: 0 4px 0 #2E7D32;
+}
+
+.back-menu-btn {
+    background: #FF5722;
+    box-shadow: 0 4px 0 #bf360c;
+}
+
+.restart-btn:hover, .back-menu-btn:hover {
+    transform: translateY(-2px);
+}
+
+.restart-btn:active, .back-menu-btn:active {
+    transform: translateY(2px);
+    box-shadow: none;
+}
+
+@keyframes popIn {
+    from { transform: scale(0.5); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* In-game Messages (Toast style for "Miss!", "Level Up!") */
+#messageText.fail, #messageText.success {
+    background: rgba(0, 0, 0, 0.9);
+    padding: 20px 40px;
+    border-radius: 50px;
+    font-size: 1.5rem;
+    font-family: var(--font-heading);
+    box-shadow: 0 5px 20px rgba(0,0,0,0.5);
+    border: 4px solid #fff;
+    animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    text-transform: uppercase;
+    text-align: center;
+    color: #fff; /* Default text color */
+    pointer-events: none; /* Click through */
+}
+
+#messageText.fail {
+    color: #ff4444;
+    border-color: #ff4444;
+}
+
+#messageText.success {
+    color: #4CAF50;
+    border-color: #4CAF50;
+}

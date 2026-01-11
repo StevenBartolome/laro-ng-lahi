@@ -195,12 +195,12 @@ export function showDifficultyScreen(mode = 'both') {
         instructionsPanel.style.display = 'block';
         difficultyPanel.style.display = 'flex';
     } else if (mode === 'instructions') {
-        overlayContent.style.maxWidth = '500px';
+        overlayContent.style.maxWidth = '700px'; // Increased from 500px
         menuGrid.classList.add('single');
         instructionsPanel.style.display = 'block';
         difficultyPanel.style.display = 'none';
     } else if (mode === 'difficulty') {
-        overlayContent.style.maxWidth = '500px';
+        overlayContent.style.maxWidth = '700px'; // Increased from 500px
         menuGrid.classList.add('single');
         instructionsPanel.style.display = 'none';
         difficultyPanel.style.display = 'flex';

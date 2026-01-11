@@ -149,6 +149,21 @@ const Sound = {
         
         // Save to localStorage
         localStorage.setItem('luksongBakaSfxVolume', this.sfxVolume);
+    },
+    
+    pauseMusic() {
+        if (this.bgMusic) {
+            this.bgMusic.pause();
+        }
+        if (this.runSound) {
+            this.runSound.pause();
+        }
+    },
+
+    resumeMusic() {
+        if (this.bgMusic && this.bgmVolume > 0) {
+            this.bgMusic.play().catch(() => {});
+        }
     }
 };
 

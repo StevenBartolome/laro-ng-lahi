@@ -43,6 +43,15 @@ const Assets = {
             img.src = path + `taya_${i}.png`;
             this.bakaLevels.push(img);
         }
+
+        // Facts Boards (1-3)
+        for (let i = 1; i <= 3; i++) {
+            const img = new Image();
+            img.src = '../assets/game_facts_assets/luksong_baka_facts_board_' + i + '.png';
+            // We don't necessarily need to store them if we just want to prime the cache,
+            // but let's keep a reference just in case.
+            // But since UI uses direct src assignment, just creating the Image object is enough to trigger download.
+        }
     }
 };
 

@@ -38,6 +38,7 @@ const Game = {
         if (infoBtn) {
             infoBtn.addEventListener('click', () => {
                 Sound.playClick();
+                UI.hideFacts();
                 UI.showDifficultyScreen('instructions'); // Show instructions only
                 GameState.state = 'menu'; // Pause game logic
                 GameState.openedViaInfoButton = true; // Track how overlay was opened
@@ -56,9 +57,8 @@ const Game = {
                 GameState.state = 'menu';
 
                 // Facts Music Logic
-                const bgMusic = document.getElementById('bgMusic');
+                Sound.pauseMusic();
                 const factsMusic = document.getElementById('factsMusic');
-                if (bgMusic) bgMusic.pause();
                 if (factsMusic) {
                     factsMusic.volume = 0.5;
                     factsMusic.currentTime = 0;
@@ -98,13 +98,12 @@ const Game = {
                 }
 
                 // Facts Music Logic
-                const bgMusic = document.getElementById('bgMusic');
                 const factsMusic = document.getElementById('factsMusic');
                 if (factsMusic) {
                     factsMusic.pause();
                     factsMusic.currentTime = 0;
                 }
-                if (bgMusic) bgMusic.play().catch(()=>{});
+                Sound.resumeMusic();
             });
         }
         

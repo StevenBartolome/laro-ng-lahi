@@ -11,13 +11,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/core.css">
-    <link rel="stylesheet" href="css/overlays.css">
+    <link rel="stylesheet" href="css/patintero_overlays.css">
     <link rel="stylesheet" href="css/hud.css">
     <link rel="stylesheet" href="css/game.css">
 </head>
 
 <body>
-    <!-- Audio Elements -->
     <!-- Audio Elements -->
     <audio id="bgMusic" loop>
         <source src="../assets/patintero_assets/patintero_bgm.mp3" type="audio/mpeg">
@@ -40,6 +39,7 @@
     </audio>
 
     <!-- Sound Controls (Top Left) -->
+    <!-- Sound Controls (Restored Floating) -->
     <div class="sound-controls">
         <div class="volume-control">
             <span class="volume-label">🎵 BGM</span>
@@ -125,7 +125,7 @@
 
     <!-- Coin Flip Screen -->
     <div class="overlay hidden" id="coinFlipScreen">
-        <div class="overlay-content">
+        <div class="overlay-content coin-flip-layout">
             <h2>Determining Your Starting Role...</h2>
             <div class="coin-container">
                 <div class="coin" id="coin">
@@ -243,11 +243,12 @@
     </div>
 
     <!-- Facts Button (Above How to Play) -->
+    <!-- Facts Button (Restored Floating) -->
     <button id="factsBtn" class="info-fab facts-btn" title="Game Facts">
         <img src="../assets/game_facts_assets/fact_icon.png" alt="Facts">
     </button>
 
-    <!-- How to Play Button (Bottom Right) -->
+    <!-- How to Play Button (Restored Floating) -->
     <button id="infoBtn" class="info-fab" title="How to Play">
         ❓
     </button>
@@ -267,7 +268,7 @@
                     <span class="dot" data-index="3"></span>
                 </div>
             </div>
-            <p class="click-hint">Click board to read next page ➡️</p>
+            <p class="click-hint">Click board to read next page</p>
         </div>
     </div>
 
@@ -324,7 +325,18 @@
         });
 
         // Info button - show instructions only
+        // Info button - show instructions only
         document.getElementById('infoBtn')?.addEventListener('click', () => {
+            // Close facts overlay if open
+            const factsOverlay = document.getElementById('factsOverlay');
+            if (factsOverlay && !factsOverlay.classList.contains('hidden')) {
+                factsOverlay.classList.add('hidden');
+                const factsMusic = document.getElementById('factsMusic');
+                const bgMusic = document.getElementById('bgMusic');
+                if (factsMusic) { factsMusic.pause(); factsMusic.currentTime = 0; }
+                if (bgMusic) bgMusic.play().catch(() => { });
+            }
+
             if (window.showDifficultyScreen) {
                 window.showDifficultyScreen('instructions');
             }

@@ -1,18 +1,42 @@
-/* Luksong Baka - Overlay Styles */
+/* Luksong Baka - Overlay Styles (Login Theme) */
 
-/* Overlay Base */
+/* Overlay Base - The Vignette */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.85);
+    /* Warm Brown scanline/stripe background matching Login */
+    background: repeating-linear-gradient(
+        to bottom,
+        #4E342E,
+        #4E342E 2px,
+        #3E2723 2px,
+        #3E2723 4px
+    );
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 100;
     transition: opacity 0.5s ease;
+}
+
+/* Vignette Effect */
+.overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(
+        circle at center,
+        transparent 60%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+    z-index: -1;
 }
 
 .overlay.hidden {
@@ -21,10 +45,15 @@
 }
 
 .overlay-content {
+    /* Semi-transparent container for readability */
     text-align: center;
-    color: white;
+    color: #E0FBFC; /* Light Cyan */
     position: relative;
     animation: fadeIn 0.5s ease-out;
+    background: rgba(62, 39, 35, 0.6); /* Subtle backing */
+    padding: 2rem;
+    border-radius: 10px;
+    z-index: 10;
 }
 
 .close-btn {
@@ -33,20 +62,20 @@
     right: 15px;
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.95);
-    font-size: 40px;
+    color: #E0FBFC; /* Light Cyan */
+    font-size: 36px;
     cursor: pointer;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1;
     transition: all 0.3s ease;
     z-index: 1000;
-    text-shadow: 0 0 10px rgba(0, 0, 0, 0.8), 0 0 20px rgba(195, 155, 211, 0.6);
+    text-shadow: 1px 1px 2px black;
 }
 
 .close-btn:hover {
-    color: #ffffff;
-    transform: scale(1.2) rotate(90deg);
-    text-shadow: 0 0 15px rgba(195, 155, 211, 1);
+    color: #F4A261; /* Sandy Brown */
+    transform: scale(1.1) rotate(90deg);
+    text-shadow: 0 0 15px rgba(233, 196, 106, 0.5);
 }
 
 /* Enhanced Overlay (Difficulty/Menu) */
@@ -54,11 +83,9 @@
     max-width: 1100px;
     width: 90%;
     padding: 3rem;
-    background: rgba(46, 20, 60, 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(195, 155, 211, 0.2);
-    border-radius: 24px;
+    background: rgba(62, 39, 35, 0.85); /* Stronger backing for main menu */
+    border: 3px solid #E0FBFC; /* Cyan Border */
+    border-radius: 8px; /* Slightly sharper to match login theme */
     box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
     display: flex;
     flex-direction: column;
@@ -76,21 +103,24 @@
 .game-title {
     font-family: 'Fredoka One', cursive;
     font-size: 5rem;
-    background: linear-gradient(to right, #c39bd3, #8e44ad);
+    background: linear-gradient(to bottom, #E0FBFC, #98c1d9); /* Cyan Gradient */
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 15px rgba(142, 68, 173, 0.6);
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     margin-bottom: 0.5rem;
+    text-transform: uppercase;
 }
 
 .subtitle {
     font-size: 1.2rem;
-    opacity: 0.9;
+    opacity: 1;
     letter-spacing: 2px;
     text-transform: uppercase;
-    color: #d7ccc8;
+    color: #F4A261; /* Sandy Brown */
     margin-bottom: 1rem;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px black;
 }
 
 /* Menu Grid */
@@ -107,18 +137,22 @@
 
 /* Panels */
 .instructions-panel, .difficulty-panel {
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.3);
     padding: 2rem;
-    border-radius: 20px;
-    border: 1px solid rgba(155, 89, 182, 0.15);
+    border-radius: 8px;
+    border: 1px solid rgba(224, 251, 252, 0.2);
 }
 
 .instructions-panel h3, .difficulty-panel h3 {
-    color: #c39bd3;
-    font-size: 1.5rem;
+    color: #E0FBFC; /* Beige/Cyan */
+    font-size: 24px;
     margin-bottom: 1.5rem;
     font-family: 'Fredoka One', cursive;
     font-weight: 400;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    border-bottom: 2px solid #F4A261;
+    padding-bottom: 10px;
+    text-transform: uppercase;
 }
 
 /* Tutorial Steps */
@@ -131,17 +165,15 @@
     color: #fff;
     line-height: 1.5;
     padding: 0.8rem;
-    border-radius: 12px;
+    border-radius: 6px;
     transition: all 0.2s ease;
+    background: rgba(233, 196, 106, 0.1); /* Saffron tint */
+    border: 1px solid rgba(233, 196, 106, 0.2);
 }
 
 .instruction-item:hover {
-    background: rgba(155, 89, 182, 0.1);
-}
-
-.instruction-item.highlight {
-    background: rgba(195, 155, 211, 0.12);
-    border: 1px solid rgba(195, 155, 211, 0.25);
+    background: rgba(233, 196, 106, 0.2);
+    transform: translateY(-2px);
 }
 
 .key-icon {
@@ -151,10 +183,10 @@
     min-width: 40px;
     height: 32px;
     padding: 0 8px;
-    background: rgba(255, 255, 255, 0.9);
-    color: #333;
-    border-bottom: 3px solid rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
+    background: #E9C46A; /* Saffron */
+    color: #264653; /* Charcoal */
+    border-bottom: 3px solid #c8a34b;
+    border-radius: 4px;
     font-weight: 800;
     font-family: monospace;
     font-size: 14px;
@@ -179,16 +211,20 @@
     align-items: flex-start;
     padding: 1rem 1.5rem;
     border: none;
-    border-radius: 12px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.1s;
     text-align: left;
     width: 100%;
 }
 
 .diff-btn:hover {
     transform: translateY(-2px);
-    box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+}
+
+.diff-btn:active {
+    transform: translateY(2px);
+    margin-top: 2px;
 }
 
 .diff-name {
@@ -196,31 +232,33 @@
     font-size: 1.5rem;
     margin-bottom: 0.25rem;
     display: block;
+    text-shadow: none;
+    color: #264653; /* Charcoal */
+    text-transform: uppercase;
 }
 
 .diff-desc {
     font-size: 0.9rem;
     opacity: 0.9;
     font-family: 'Nunito', sans-serif;
-    font-weight: 600;
+    font-weight: 700;
+    color: #264653;
 }
 
+/* Theme Colors */
 .diff-btn.easy {
-    background: linear-gradient(135deg, #2ecc71, #27ae60);
-    color: white;
-    border: 2px solid #2ecc71;
+    background-color: #2ecc71;
+    border-bottom: 4px solid #27ae60;
 }
 
 .diff-btn.normal {
-    background: linear-gradient(135deg, #f39c12, #d35400);
-    color: white;
-    border: 2px solid #f39c12;
+    background-color: #E9C46A; /* Saffron */
+    border-bottom: 4px solid #c8a34b;
 }
 
 .diff-btn.hard {
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-    color: white;
-    border: 2px solid #e74c3c;
+    background-color: #e74c3c;
+    border-bottom: 4px solid #c0392b;
 }
 
 /* Facts Overlay */
@@ -242,11 +280,10 @@
     width: 100%;
     max-width: 750px;
     height: auto;
-    border-radius: 20px;
+    border-radius: 12px;
     cursor: pointer;
     transition: opacity 0.5s ease, transform 0.3s ease;
-    border: none;
-    border-radius: 12px;
+    border: 3px solid transparent;
     position: relative;
     z-index: 5;
     animation: boardFloat 4s ease-in-out infinite;
@@ -254,6 +291,7 @@
 
 .facts-board:hover {
     transform: scale(1.01);
+    border-color: #E9C46A;
 }
 
 .facts-nav {
@@ -266,21 +304,21 @@
 .dot {
     width: 15px;
     height: 15px;
-    background: rgba(255,255,255,0.3);
+    background: rgba(224, 251, 252, 0.3);
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .dot.active {
-    background: #ffd700;
+    background: #E9C46A;
     transform: scale(1.3);
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 10px rgba(233, 196, 106, 0.5);
 }
 
 .click-hint {
     margin-top: 15px;
-    color: #ccc;
+    color: #F4A261;
     font-size: 14px;
     font-style: italic;
     opacity: 0.8;
@@ -298,7 +336,7 @@
 
 .particle {
     position: absolute;
-    background: radial-gradient(circle, #fff, transparent);
+    background: radial-gradient(circle, #E9C46A, transparent);
     border-radius: 50%;
     pointer-events: none;
     opacity: 0;
@@ -328,25 +366,27 @@
 }
 
 #messageText {
-    background: rgba(0, 0, 0, 0.85);
-    color: white;
+    background: #3E2723;
+    color: #E0FBFC;
     padding: 30px 60px;
-    border-radius: 20px;
+    border-radius: 12px;
     font-size: 32px;
     font-weight: 700;
     text-align: center;
     font-family: 'Fredoka One', cursive;
     transform: scale(0.8);
     transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 4px solid #E9C46A;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.6);
 }
 
 #messageOverlay:not(.hidden) #messageText {
     transform: scale(1);
 }
 
-#messageText.success { color: #2ecc71; border: 3px solid #2ecc71; }
-#messageText.fail { color: #e74c3c; border: 3px solid #e74c3c; }
-#messageText.levelup { color: #D2691E; border: 3px solid #D2691E; }
+#messageText.success { color: #2ecc71; border-color: #2ecc71; }
+#messageText.fail { color: #e74c3c; border-color: #e74c3c; }
+#messageText.levelup { color: #E9C46A; border-color: #E9C46A; }
 
 /* Game Complete Backdrop */
 #messageOverlay.game-complete-backdrop {
@@ -355,7 +395,13 @@
     width: 100%;
     height: 100%;
     transform: none;
-    background: rgba(30, 15, 40, 0.9);
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(78, 52, 46, 0.95),
+        rgba(78, 52, 46, 0.95) 2px,
+        rgba(62, 39, 35, 0.95) 2px,
+        rgba(62, 39, 35, 0.95) 4px
+    );
     display: flex;
     justify-content: center;
     align-items: center;
@@ -363,11 +409,11 @@
 }
 
 .game-complete-box {
-    background: #2E143C !important;
+    background: #3E2723 !important;
     padding: 3rem 4rem !important;
-    border: 1px solid rgba(195, 155, 211, 0.3) !important;
-    border-radius: 24px !important;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5) !important;
+    border: 4px solid #E9C46A !important;
+    border-radius: 12px !important;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.6) !important;
     min-width: 500px;
 }
 
@@ -381,12 +427,13 @@
 .complete-header {
     font-size: 3.5rem;
     font-family: 'Fredoka One', cursive;
-    background: linear-gradient(to bottom, #ffd700, #ffb300);
+    background: linear-gradient(to right, #E0FBFC, #98c1d9);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
     filter: drop-shadow(0 4px 0 rgba(0,0,0,0.2));
     margin-bottom: 0.5rem;
+    text-transform: uppercase;
 }
 
 .complete-header.fail {
@@ -398,20 +445,20 @@
 
 .complete-sub {
     font-size: 1.5rem;
-    color: #dcdde1;
+    color: #F4A261; /* Sandy Brown */
     font-family: 'Nunito', sans-serif;
-    font-weight: 600;
+    font-weight: 700;
 }
 
 .complete-score {
     font-size: 2.5rem;
-    color: #fff;
+    color: #E0FBFC;
     font-family: 'Fredoka One', cursive;
     background: rgba(0,0,0,0.2);
     padding: 0.5rem 2rem;
-    border-radius: 50px;
+    border-radius: 8px;
     margin: 1rem 0 2rem 0;
-    border: 1px solid rgba(255,255,255,0.1);
+    border: 2px solid #3E2723;
 }
 
 .complete-buttons {
@@ -422,14 +469,14 @@
 }
 
 .restart-btn, .back-menu-btn {
-    padding: 16px 32px;
+    padding: 12px 32px;
     font-size: 1.2rem;
-    font-weight: 700;
+    font-weight: 800;
     font-family: 'Nunito', sans-serif;
     border: none;
-    border-radius: 12px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.1s ease;
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -440,32 +487,37 @@
 }
 
 .restart-btn {
-    background: #9b59b6;
-    color: white;
-    box-shadow: 0 4px 0 #8e44ad;
+    background-color: #E9C46A;
+    color: #264653;
+    border-bottom: 4px solid #c8a34b;
 }
 
 .restart-btn:hover {
-    transform: translateY(2px);
-    box-shadow: 0 2px 0 #8e44ad;
-    background: #a569bd;
+    background-color: #face7f;
+    border-bottom-color: #dcb355;
+    transform: translateY(-2px);
 }
 
 .restart-btn:active {
-    transform: translateY(4px);
-    box-shadow: none;
+    transform: translateY(2px);
+    border-bottom-width: 0;
+    margin-top: 4px;
 }
 
 .back-menu-btn {
-    background: transparent;
-    color: #bdc3c7;
-    border: 2px solid rgba(189, 195, 199, 0.3);
-    box-shadow: none;
+    background-color: #F4A261;
+    color: #3E2723;
+    border-bottom: 4px solid #d38c52;
 }
 
 .back-menu-btn:hover {
-    background: rgba(255,255,255,0.05);
-    color: white;
-    border-color: rgba(255,255,255,0.5);
+    background-color: #ffb57b;
+    border-bottom-color: #e59d60;
     transform: translateY(-2px);
+}
+
+.back-menu-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+    margin-top: 4px;
 }

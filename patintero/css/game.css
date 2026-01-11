@@ -196,3 +196,169 @@
     85% { transform: translate(-50%, 0); opacity: 1; }
     100% { transform: translate(-50%, -20px); opacity: 0; }
 }
+
+/* Message Overlay (Game Over / Round Complete) */
+.message-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000;
+    opacity: 1;
+    transition: opacity 0.3s ease;
+}
+
+.message-overlay.hidden {
+    opacity: 0;
+    pointer-events: none;
+    visibility: hidden; /* Ensure it doesn't block clicks */
+}
+
+/* Game Complete Box */
+.game-complete-box {
+    background: #3E2723; /* Dark Brown */
+    padding: 2.5rem;
+    border-radius: 20px;
+    border: 4px solid #8D6E63;
+    text-align: center;
+    color: white;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.6);
+    max-width: 500px;
+    width: 90%;
+    animation: zoomIn 0.3s ease-out;
+}
+
+.complete-header {
+    font-family: var(--font-heading);
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    color: #e74c3c; /* Red for Game Over default */
+    text-shadow: 2px 2px 0 #000;
+    -webkit-text-stroke: 1px #8D6E63;
+}
+
+.complete-header.round {
+    color: #FFD700; /* Gold for Round/Win */
+}
+
+.complete-sub {
+    font-size: 1.2rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+    color: #E0FBFC;
+}
+
+.complete-score {
+    font-size: 2rem;
+    color: #FFD700;
+    font-family: var(--font-heading);
+    margin-bottom: 2rem;
+}
+
+.complete-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.restart-btn, .back-menu-btn {
+    padding: 12px 24px;
+    border-radius: 50px;
+    font-family: var(--font-heading);
+    font-size: 1.2rem;
+    cursor: pointer;
+    border: none;
+    transition: transform 0.2s;
+    text-transform: uppercase;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.restart-btn {
+    background: #FFD700;
+    color: #3E2723;
+    box-shadow: 0 4px 0 #c8a34b;
+}
+
+.restart-btn:hover {
+    background: #ffecb3;
+    transform: translateY(-2px);
+}
+
+.back-menu-btn {
+    background: transparent;
+    color: #E0FBFC;
+    border: 2px solid #E0FBFC;
+}
+
+.back-menu-btn:hover {
+    background: rgba(224, 251, 252, 0.1);
+    transform: translateY(-2px);
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}
+
+/* Jolen-style HUD Standardization */
+.stat-box {
+    background: rgba(62, 39, 35, 0.85);
+    backdrop-filter: blur(5px);
+    padding: 10px 25px;
+    border-radius: 50px;
+    border: 2px solid #8d6e63;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    color: #d7ccc8;
+    font-family: var(--font-body);
+}
+
+.stat-value {
+    font-family: var(--font-heading);
+    font-size: 1.5rem;
+    color: #ffecb3;
+}
+
+.ui-icon-btn {
+    background: rgba(62, 39, 35, 0.85);
+    border: 2px solid #8d6e63;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    padding: 8px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ui-icon-btn svg, .ui-icon-btn img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.ui-icon-btn:hover {
+    transform: scale(1.1) rotate(20deg);
+    background: #FFD700;
+}
