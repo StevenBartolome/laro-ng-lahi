@@ -45,13 +45,15 @@ class AuthSelectionModal {
 
         // Login Button
         document.getElementById('loginBtn').addEventListener('click', () => {
-            window.audioManager.playClick();
+            const clickSound = document.getElementById('clickSound');
+            if (clickSound && window.audioManager) window.audioManager.playSFX(clickSound);
             window.location.href = 'login.html';
         });
 
         // Guest Button
         document.getElementById('guestBtn').addEventListener('click', () => {
-            window.audioManager.playClick();
+            const clickSound = document.getElementById('clickSound');
+            if (clickSound && window.audioManager) window.audioManager.playSFX(clickSound);
             // Set guest mode flag
             localStorage.setItem('guestMode', 'true');
             // Redirect to game select

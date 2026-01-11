@@ -78,7 +78,7 @@ app.post('/api/auth/logout', (req, res) => {
 // Fallback for SPA or unknown routes (Redirect to login if not found, or serve index)
 // For now, let's just 404 or redirect to login.html if root is accessed without index.html
 app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/login.html'));
+    res.sendFile(path.join(__dirname, '../public/landing.html'));
 });
 
 // Start Server
