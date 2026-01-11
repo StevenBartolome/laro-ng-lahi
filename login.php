@@ -4,6 +4,17 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
     header("Location: start_menu.php");
     exit();
 }
+
+// Handle Guest Login
+if (isset($_GET['guest']) && $_GET['guest'] === 'true') {
+    $_SESSION['logged_in'] = true;
+    $_SESSION['username'] = 'guest_' . uniqid();
+    $_SESSION['displayname'] = 'Guest Player';
+    $_SESSION['email'] = 'guest@local';
+    
+    header("Location: start_menu.php");
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -71,9 +82,9 @@ if (isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true) {
 
             <div class="divider">or</div>
 
-                <a href="guest_session.php" class="btn btn-guest">
-                    PLAY AS GUEST
-                </a>
+            <a href="login.php?guest=true" class="btn btn-guest" style="text-decoration:none; display:flex; justify-content:center; align-items:center;">
+                PLAY AS GUEST
+            </a>
         </form>
     </div>
 

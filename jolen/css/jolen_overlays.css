@@ -1,0 +1,31 @@
+/* Jolen Overlays - Modularized */
+@import '../../assets/css/shared-overlays.css';
+
+/* Jolen Specific Overrides */
+
+/* Mode Buttons Grid - Ensure layout is preserved */
+.mode-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.mode-btn {
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    padding: 15px;
+    height: 100%;
+}
+
+.card-icon {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+/* 
+   Shared Overlay Overrides (Transparency, Modals, Toasts) 
+   are now inherited from shared-overlays.css 
+*/

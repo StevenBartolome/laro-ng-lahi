@@ -22,7 +22,7 @@ if ($isLoggedIn) {
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/core.css">
-    <link rel="stylesheet" href="css/overlays.css">
+    <link rel="stylesheet" href="css/luksong_baka_overlays.css">
     <link rel="stylesheet" href="css/hud.css">
     <link rel="stylesheet" href="../assets/css/achievement-notifications.css">
     
@@ -61,6 +61,7 @@ if ($isLoggedIn) {
     </audio>
 
     <!-- Sound Controls (Top Left) -->
+    <!-- Sound Controls (Restored Floating) -->
     <div class="sound-controls">
         <div class="volume-control">
             <span class="volume-label">🎵 BGM</span>
@@ -74,15 +75,14 @@ if ($isLoggedIn) {
         </div>
     </div>
 
-    <!-- Difficulty Selection Screen -->
+    <!-- Difficulty Selection Overlay -->
     <div id="difficultyScreen" class="overlay">
         <div class="overlay-content enhanced-overlay">
             <button id="closeOverlayBtn" class="close-btn" title="Close">×</button>
 
-            <div class="header-area">
-                <h1 class="game-title">Luksong Baka</h1>
-                <p class="subtitle">Jump Over the Cow!</p>
-            </div>
+            <!-- Toolbar removed -->
+            <h1 class="game-title">Luksong Baka</h1>
+            <p class="subtitle">Traditional Filipino Game Jump Over the Cow</p>
 
             <div class="menu-grid">
                 <!-- Left Column: Instructions -->
@@ -93,15 +93,15 @@ if ($isLoggedIn) {
                         <span><strong>Press Space</strong> or <strong>Click</strong> to start running</span>
                     </div>
                     <div class="instruction-item">
-                        <span class="icon">📐</span>
+                        <span class="step-icon">📐</span>
                         <span><strong>Hold</strong> to aim your jump angle</span>
                     </div>
                     <div class="instruction-item">
-                        <span class="icon">🚀</span>
+                        <span class="step-icon">🚀</span>
                         <span><strong>Release</strong> to jump over the baka</span>
                     </div>
                     <div class="instruction-item highlight">
-                        <span class="icon">✨</span>
+                        <span class="step-icon">✨</span>
                         <span><strong>Press AGAIN</strong> on top to <strong>BOUNCE!</strong></span>
                     </div>
                 </div>
@@ -159,18 +159,18 @@ if ($isLoggedIn) {
         <div class="level-display">Baka Level: <span id="levelText">1</span></div>
     </div>
 
-    <!-- Facts Button (Above How to Play) -->
+    <!-- Facts Button (Restored Floating) -->
     <button id="factsBtn" class="info-fab facts-btn" title="Game Facts">
         <img src="../assets/game_facts_assets/fact_icon.png" alt="Facts">
     </button>
 
-    <!-- How to Play Button (Bottom Right) -->
+    <!-- How to Play Button (Restored Floating) -->
     <button id="infoBtn" class="info-fab" title="How to Play">
         ❓
     </button>
 
     <!-- Message Overlay -->
-    <div id="messageOverlay" class="hidden">
+    <div id="messageOverlay" class="overlay hidden">
         <div id="messageText"></div>
     </div>
 
@@ -189,7 +189,7 @@ if ($isLoggedIn) {
                     <span class="dot" data-index="3"></span>
                 </div>
             </div>
-            <p class="click-hint">Click board to read next page ➡️</p>
+            <p class="click-hint">Click board to read next page</p>
         </div>
     </div>
 

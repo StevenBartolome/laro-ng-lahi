@@ -25,7 +25,7 @@ if ($isLoggedIn) {
     <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap"
         rel="stylesheet">
     <link rel="stylesheet" href="css/core.css">
-    <link rel="stylesheet" href="css/overlays.css">
+    <link rel="stylesheet" href="css/patintero_overlays.css">
     <link rel="stylesheet" href="css/hud.css">
     <link rel="stylesheet" href="css/game.css">
     <link rel="stylesheet" href="../assets/css/achievement-notifications.css">
@@ -44,7 +44,6 @@ if ($isLoggedIn) {
 </head>
 
 <body>
-    <!-- Audio Elements -->
     <!-- Audio Elements -->
     <audio id="bgMusic" loop>
         <source src="../assets/patintero_assets/patintero_bgm.mp3" type="audio/mpeg">
@@ -67,6 +66,7 @@ if ($isLoggedIn) {
     </audio>
 
     <!-- Sound Controls (Top Left) -->
+    <!-- Sound Controls (Restored Floating) -->
     <div class="sound-controls">
         <div class="volume-control">
             <span class="volume-label">🎵 BGM</span>
@@ -152,7 +152,7 @@ if ($isLoggedIn) {
 
     <!-- Coin Flip Screen -->
     <div class="overlay hidden" id="coinFlipScreen">
-        <div class="overlay-content">
+        <div class="overlay-content coin-flip-layout">
             <h2>Determining Your Starting Role...</h2>
             <div class="coin-container">
                 <div class="coin" id="coin">
@@ -253,7 +253,7 @@ if ($isLoggedIn) {
     </div>
 
     <!-- Game Over / Round Complete Modal -->
-    <div id="messageOverlay" class="message-overlay hidden">
+    <div id="messageOverlay" class="overlay message-overlay hidden">
         <div class="game-complete-box" id="messageBox">
             <div class="game-complete-content">
                 <div class="complete-header" id="modalTitle">GAME OVER</div>
@@ -270,11 +270,12 @@ if ($isLoggedIn) {
     </div>
 
     <!-- Facts Button (Above How to Play) -->
+    <!-- Facts Button (Restored Floating) -->
     <button id="factsBtn" class="info-fab facts-btn" title="Game Facts">
         <img src="../assets/game_facts_assets/fact_icon.png" alt="Facts">
     </button>
 
-    <!-- How to Play Button (Bottom Right) -->
+    <!-- How to Play Button (Restored Floating) -->
     <button id="infoBtn" class="info-fab" title="How to Play">
         ❓
     </button>
@@ -294,7 +295,7 @@ if ($isLoggedIn) {
                     <span class="dot" data-index="3"></span>
                 </div>
             </div>
-            <p class="click-hint">Click board to read next page ➡️</p>
+            <p class="click-hint">Click board to read next page</p>
         </div>
     </div>
 
@@ -351,7 +352,18 @@ if ($isLoggedIn) {
         });
 
         // Info button - show instructions only
+        // Info button - show instructions only
         document.getElementById('infoBtn')?.addEventListener('click', () => {
+            // Close facts overlay if open
+            const factsOverlay = document.getElementById('factsOverlay');
+            if (factsOverlay && !factsOverlay.classList.contains('hidden')) {
+                factsOverlay.classList.add('hidden');
+                const factsMusic = document.getElementById('factsMusic');
+                const bgMusic = document.getElementById('bgMusic');
+                if (factsMusic) { factsMusic.pause(); factsMusic.currentTime = 0; }
+                if (bgMusic) bgMusic.play().catch(() => { });
+            }
+
             if (window.showDifficultyScreen) {
                 window.showDifficultyScreen('instructions');
             }

@@ -1,0 +1,98 @@
+/* Shared HUD Styles (Standardized based on Jolen) */
+
+/* Stat Box (Pill Shape, Glassmorphism, Brown Theme) */
+.stat-box, .lives-display, .level-display {
+    background: rgba(62, 39, 35, 0.85); /* Dark Brown */
+    backdrop-filter: blur(5px);
+    padding: 10px 25px;
+    border-radius: 50px;
+    border: 2px solid #8d6e63; /* Lighter Brown Border */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 120px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    color: #ffecb3;
+    font-family: var(--font-heading, 'Fredoka One', cursive);
+}
+
+.lives-display {
+    flex-direction: row; /* Hearts are horizontal */
+    gap: 8px;
+    padding: 8px 15px;
+    min-width: auto;
+}
+
+.stat-label {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    opacity: 0.8;
+    color: #d7ccc8;
+    font-family: var(--font-body, 'Nunito', sans-serif);
+    font-weight: 700;
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    color: #ffecb3; /* Gold-ish text */
+    line-height: 1;
+}
+
+/* Heart Icons for Lives */
+.heart {
+    width: 30px;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+    transition: transform 0.2s;
+}
+
+.heart.lost {
+    filter: grayscale(100%) opacity(0.5);
+    transform: scale(0.8);
+}
+
+/* Icon Buttons (Menu/Settings) */
+.ui-icon-btn {
+    background: rgba(62, 39, 35, 0.85); 
+    border: 2px solid #8d6e63;
+    cursor: pointer;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.3s ease;
+    padding: 8px;
+    backdrop-filter: blur(5px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+}
+
+.ui-icon-btn svg, .ui-icon-btn img {
+    width: 100%;
+    height: auto;
+    filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5));
+}
+
+.ui-icon-btn:hover {
+    transform: scale(1.1) rotate(20deg);
+    background: #FFD700; /* Gold Highlight */
+}
+
+/* Back Button (Bottom Center usually) */
+.back-btn {
+    cursor: pointer;
+    transition: all 0.3s ease;
+    filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
+    display: inline-block;
+}
+
+.back-btn img {
+    width: 220px;
+    height: auto;
+}
+
+.back-btn:hover {
+    transform: scale(1.1);
+}

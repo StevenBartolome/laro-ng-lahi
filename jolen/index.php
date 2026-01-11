@@ -25,7 +25,7 @@ if ($isLoggedIn) {
   <link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600;800&display=swap"
     rel="stylesheet" />
   <link rel="stylesheet" href="css/core.css">
-  <link rel="stylesheet" href="css/overlays.css">
+  <link rel="stylesheet" href="css/jolen_overlays.css">
   <link rel="stylesheet" href="css/hud.css">
   <link rel="stylesheet" href="../assets/css/achievement-notifications.css">
   
@@ -58,6 +58,7 @@ if ($isLoggedIn) {
   </audio>
 
   <!-- Sound Controls -->
+  <!-- Sound Controls (Restored Floating) -->
   <div class="sound-controls">
     <div class="volume-control">
       <span class="volume-label">🎵 BGM</span>
@@ -71,18 +72,18 @@ if ($isLoggedIn) {
 
   <div class="app-container">
     <!-- Mode/Difficulty Overlay (Unified) -->
-    <div id="menuOverlay" class="screen-panel overlay">
-      <div class="panel-content overlay-content">
+    <div id="menuOverlay" class="overlay">
+      <div class="overlay-content enhanced-overlay">
         <button id="closeOverlayBtn" class="close-btn" title="Close">
           ×
         </button>
 
         <div class="header-area">
-          <h1>JOLEN</h1>
-          <p class="subtitle">Classic Filipino Marble Game</p>
+          <h1 class="game-title">JOLEN</h1>
+          <p class="subtitle">Traditional Filipino Marble Game</p>
         </div>
 
-        <div class="menu-grid">
+        <div class="menu-grid" style="grid-template-columns: 1fr 1.2fr;">
           <!-- Left: How to Play -->
           <div class="instructions-panel">
             <h3>How to Play</h3>
@@ -113,7 +114,8 @@ if ($isLoggedIn) {
           <div class="difficulty-panel">
             <h3>Select Mode</h3>
             <div class="mode-options">
-              <button id="mode-target" class="game-card mode-btn">
+              <button id="mode-target" class="game-card mode-btn"
+                style="border-color: rgb(255, 215, 0); background: rgba(141, 110, 99, 0.8);">
                 <span class="card-icon">🎯</span> Target
               </button>
               <button id="mode-circle" class="game-card mode-btn">
@@ -144,6 +146,8 @@ if ($isLoggedIn) {
             </div>
           </div>
         </div>
+
+        <!-- Toolbar removed -->
       </div>
     </div>
 
@@ -182,7 +186,7 @@ if ($isLoggedIn) {
       </div>
 
       <!-- Message Overlay -->
-      <div id="messageOverlay" class="message-overlay hidden">
+      <div id="messageOverlay" class="overlay hidden">
         <div id="messageText"></div>
       </div>
 
@@ -193,12 +197,12 @@ if ($isLoggedIn) {
     </div>
   </div>
 
-  <!-- Facts Button (Above How to Play) -->
+  <!-- Facts Button (Restored Floating) -->
   <button id="factsBtn" class="info-fab facts-btn" title="Game Facts">
     <img src="../assets/game_facts_assets/fact_icon.png" alt="Facts" />
   </button>
 
-  <!-- Help Button -->
+  <!-- Help Button (Restored Floating) -->
   <button id="infoBtn" class="info-fab" title="How to Play">❓</button>
 
   <!-- Facts Overlay -->
@@ -216,7 +220,7 @@ if ($isLoggedIn) {
           <span class="dot" data-index="3"></span>
         </div>
       </div>
-      <p class="click-hint">Click board to read next page ➡️</p>
+      <p class="click-hint">Click board to read next page</p>
     </div>
   </div>
 

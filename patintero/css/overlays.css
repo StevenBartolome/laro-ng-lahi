@@ -1,18 +1,42 @@
-/* Patintero - Overlay Styles */
+/* Patintero - Overlay Styles (Login Theme) */
 
-/* Overlay Base */
+/* Overlay Base - The Vignette */
 .overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(5, 20, 35, 0.95); /* Dark Blue overlay */
+    /* Warm Brown scanline/stripe background matching Login */
+    background: repeating-linear-gradient(
+        to bottom,
+        #4E342E,
+        #4E342E 2px,
+        #3E2723 2px,
+        #3E2723 4px
+    );
     display: flex;
     justify-content: center;
     align-items: center;
     z-index: 2000;
     transition: opacity 0.5s ease;
+}
+
+/* Vignette Effect */
+.overlay::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(
+        circle at center,
+        transparent 60%,
+        rgba(0, 0, 0, 0.4) 100%
+    );
+    z-index: -1;
 }
 
 .overlay.hidden {
@@ -21,10 +45,15 @@
 }
 
 .overlay-content {
+    /* Semi-transparent container for readability */
     text-align: center;
-    color: white;
+    color: #E0FBFC; /* Light Cyan */
     position: relative;
     animation: fadeIn 0.5s ease-out;
+    background: rgba(62, 39, 35, 0.6); /* Subtle backing */
+    padding: 2rem;
+    border-radius: 10px;
+    z-index: 10;
 }
 
 .close-btn {
@@ -33,17 +62,18 @@
     right: 15px;
     background: none;
     border: none;
-    color: rgba(255, 255, 255, 0.6);
+    color: #E0FBFC; /* Light Cyan */
     font-size: 36px;
     cursor: pointer;
-    font-weight: 700;
+    font-weight: 800;
     line-height: 1;
     transition: all 0.3s ease;
     z-index: 10;
+    text-shadow: 1px 1px 2px black;
 }
 
 .close-btn:hover {
-    color: #ff4444;
+    color: #F4A261; /* Sandy Brown */
     transform: scale(1.1) rotate(90deg);
 }
 
@@ -52,32 +82,35 @@
     max-width: 900px !important;
     width: 90%;
     padding: 40px !important;
-    background: linear-gradient(135deg, #020a12 0%, #051625 100%); /* Much Darker Blue Gradient */
-    border-radius: 25px;
-    border: 3px solid var(--primary-color);
-    box-shadow: 0 0 30px rgba(41, 128, 185, 0.2);
+    background: rgba(62, 39, 35, 0.85); /* Stronger backing for main menu */
+    border-radius: 8px; /* Slightly sharper to match login theme */
+    border: 3px solid #E0FBFC; /* Cyan Border */
+    box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
     animation: fadeIn 0.5s ease-out;
 }
 
 .game-title {
-    font-family: var(--font-heading);
+    font-family: var(--font-heading, 'Fredoka One', cursive);
     font-size: 5rem;
-    background: linear-gradient(to right, #00ffff, #0099ff);
+    background: linear-gradient(to bottom, #E0FBFC, #98c1d9); /* Cyan Gradient */
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    text-shadow: 0 4px 15px rgba(0, 153, 255, 0.6); /* Bright Blue Glow */
+    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
     margin-bottom: 0.5rem;
+    text-transform: uppercase;
 }
 
 .subtitle {
-    font-family: var(--font-body);
+    font-family: var(--font-body, 'Nunito', sans-serif);
     font-size: 24px;
-    color: var(--accent-gold);
+    color: #F4A261; /* Sandy Brown */
     margin-bottom: 30px;
     text-transform: uppercase;
     letter-spacing: 2px;
-    opacity: 0.9;
+    opacity: 1;
+    font-weight: 700;
+    text-shadow: 1px 1px 2px black;
 }
 
 /* Menu Grid */
@@ -96,19 +129,20 @@
 .difficulty-panel {
     background: rgba(0, 0, 0, 0.3);
     padding: 25px;
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(224, 251, 252, 0.2);
 }
 
 .instructions-panel h3,
 .difficulty-panel h3 {
-    color: var(--accent-gold);
+    color: #E0FBFC; /* Light Cyan */
     font-size: 24px;
     margin-bottom: 20px;
-    font-family: var(--font-heading);
-    text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.5);
-    border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+    font-family: var(--font-heading, 'Fredoka One', cursive);
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.5);
+    border-bottom: 2px solid #F4A261;
     padding-bottom: 10px;
+    text-transform: uppercase;
 }
 
 /* Tutorial Steps */
@@ -117,39 +151,41 @@
     align-items: center;
     gap: 1.5rem;
     margin-bottom: 1.5rem;
-    background: rgba(41, 128, 185, 0.08);
+    background: rgba(233, 196, 106, 0.1); /* Saffron tint */
     padding: 1rem;
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    border: 1px solid rgba(233, 196, 106, 0.2);
 }
 
 .step-icon {
     font-size: 2rem;
-    background: rgba(41, 128, 185, 0.2); /* Blue tint */
+    background: #E9C46A; /* Saffron */
     width: 50px;
     height: 50px;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(41, 128, 185, 0.3);
+    box-shadow: 0 4px 0 #c8a34b;
+    color: #264653;
 }
 
 .step-text h4 {
-    color: var(--accent-gold);
+    color: #E0FBFC;
     margin-bottom: 0.2rem;
     font-size: 1.1rem;
-    font-family: var(--font-heading);
+    font-family: var(--font-heading, 'Fredoka One', cursive);
     text-align: left;
+    text-transform: uppercase;
 }
 
 .step-text p {
     font-size: 0.9rem;
     margin: 0;
     opacity: 0.9;
-    color: #e0e0e0;
+    color: #fff;
     text-align: left;
-    font-family: var(--font-body);
+    font-family: var(--font-body, 'Nunito', sans-serif);
 }
 
 /* Difficulty Buttons */
@@ -168,42 +204,58 @@
     align-items: flex-start;
     padding: 15px 25px;
     border: none;
-    border-radius: 15px;
+    border-radius: 6px; /* Login style */
     cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.1s;
     text-align: left;
     width: 100%;
 }
 
 .diff-btn:hover {
-    transform: scale(1.02) translateX(5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    transform: translateY(-2px);
+}
+
+.diff-btn:active {
+    transform: translateY(2px);
+    margin-top: 2px;
 }
 
 .diff-name {
-    font-family: var(--font-heading);
+    font-family: var(--font-heading, 'Fredoka One', cursive);
     font-size: 24px;
     margin-bottom: 4px;
     display: block;
-    color: #fff;
+    color: #264653; /* Dark Charcoal Text */
+    text-shadow: none;
+    text-transform: uppercase;
 }
 
 .diff-desc {
     font-size: 14px;
     opacity: 0.9;
-    font-family: var(--font-body);
-    font-weight: 600;
-    color: #fff;
+    font-family: var(--font-body, 'Nunito', sans-serif);
+    font-weight: 700;
+    color: #264653;
 }
 
-.diff-btn.easy { background: linear-gradient(135deg, #2ecc71, #27ae60); border: 2px solid #2ecc71; }
-.diff-btn.normal { background: linear-gradient(135deg, #f39c12, #d35400); border: 2px solid #f39c12; }
-.diff-btn.hard { background: linear-gradient(135deg, #e74c3c, #c0392b); border: 2px solid #e74c3c; }
+/* Theme Colors for Diff Buttons - kept broadly compatible but styled like Login btns */
+.diff-btn.easy {
+    background-color: #2ecc71;
+    border-bottom: 4px solid #27ae60;
+}
+.diff-btn.normal {
+    background-color: #E9C46A; /* Saffron (Login Primary) */
+    border-bottom: 4px solid #c8a34b;
+}
+.diff-btn.hard {
+    background-color: #e74c3c;
+    border-bottom: 4px solid #c0392b;
+}
 
 /* Coin Flip Screen */
 #coinFlipScreen .overlay-content {
-    background: transparent; /* Removed background */
-    border: none; /* Removed border */
+    background: transparent;
+    border: none;
     box-shadow: none;
     padding: 0;
     display: flex;
@@ -214,29 +266,30 @@
 
 #coinFlipScreen h2 {
     font-size: 2rem;
-    color: #e0e0e0;
+    color: #E0FBFC;
     margin-bottom: 20px;
-    text-shadow: 0 2px 4px rgba(0,0,0,0.5);
-    font-family: var(--font-heading);
+    text-shadow: 2px 2px 0 #264653;
+    font-family: var(--font-heading, 'Fredoka One', cursive);
 }
 
 .coin-result {
     margin-top: 30px;
-    font-size: 3.5rem; /* Made dominant */
+    font-size: 3.5rem; 
     font-weight: 800;
-    font-family: var(--font-heading);
+    font-family: var(--font-heading, 'Fredoka One', cursive);
     text-transform: uppercase;
-    text-shadow: 0 0 20px rgba(0,0,0,0.8);
-    opacity: 0; /* Hidden initially, JS fades it in/sets text */
+    text-shadow: 2px 2px 0 #264653;
+    opacity: 0;
     transition: opacity 0.5s ease;
     letter-spacing: 2px;
+    color: #E9C46A; /* Saffron */
 }
 
 /* Coin Animation Container */
 .coin-container {
     perspective: 1000px;
     margin: 30px auto;
-    width: 180px; /* Slightly larger */
+    width: 180px;
     height: 180px;
 }
 
@@ -261,42 +314,41 @@
     font-size: 28px;
     border: 8px solid rgba(255, 255, 255, 0.3);
     box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
-    font-family: var(--font-heading);
+    font-family: var(--font-heading, 'Fredoka One', cursive);
 }
 
 .coin-heads {
-    background: radial-gradient(circle at 30% 30%, #ffd700, #daa520);
-    color: #3e2723;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.4);
+    background: radial-gradient(circle at 30% 30%, #E9C46A, #c8a34b);
+    color: #264653;
+    text-shadow: none;
 }
 
 .coin-tails {
-    background: radial-gradient(circle at 30% 30%, #ff4444, #c62828);
-    color: white;
+    background: radial-gradient(circle at 30% 30%, #E76F51, #3E2723);
+    color: #E0FBFC;
     transform: rotateY(180deg);
-    text-shadow: 0 2px 0 rgba(0,0,0,0.2);
 }
 
 /* Character Selection Panel */
 .character-selection-panel {
     position: relative;
-    background: rgba(0, 0, 0, 0.9);
+    background: rgba(62, 39, 35, 0.95);
     padding: 10px 15px;
-    border-radius: 20px;
+    border-radius: 8px;
     display: none;
-    border: 3px solid #3498db; /* Blue border */
+    border: 3px solid #E0FBFC;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
 }
 
 .character-selection-panel h3 {
-    color: #3498db; /* Blue text */
+    color: #E0FBFC;
     font-size: 18px;
-    font-family: var(--font-heading);
+    font-family: var(--font-heading, 'Fredoka One', cursive);
     margin-bottom: 15px;
     text-align: center;
     border: none;
     padding: 0;
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+    text-shadow: 1px 1px 2px black;
 }
 
 .character-buttons {
@@ -308,81 +360,34 @@
 
 .character-btn {
     padding: 12px 22px;
-    background: linear-gradient(135deg, #2c3e50, #34495e);
-    color: white;
-    border: 3px solid transparent;
-    border-radius: 15px;
+    background-color: #3E2723;
+    color: #E0FBFC;
+    border: none;
+    border-bottom: 4px solid #291a15;
+    border-radius: 6px;
     cursor: pointer;
     font-weight: bold;
     font-size: 18px;
-    font-family: var(--font-heading);
-    transition: all 0.3s;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+    font-family: var(--font-heading, 'Fredoka One', cursive);
+    transition: all 0.1s;
 }
 
 .character-btn:hover {
-    transform: scale(1.1) translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
-    background: linear-gradient(135deg, #34495e, #2c3e50);
+    background-color: #4E342E;
+    transform: translateY(-2px);
+}
+
+.character-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+    margin-top: 4px;
 }
 
 .character-btn.active {
-    background: linear-gradient(135deg, #3498db, #2980b9); /* Blue active */
-    color: #fff;
-    border-color: #fff;
-    box-shadow: 0 0 20px rgba(52, 152, 219, 0.6), 0 4px 10px rgba(0, 0, 0, 0.3);
-    animation: activeCharPulse 1.5s ease-in-out infinite;
-}
-
-@keyframes activeCharPulse {
-    0%, 100% { box-shadow: 0 0 20px rgba(52, 152, 219, 0.6); }
-    50% { box-shadow: 0 0 35px rgba(52, 152, 219, 0.9); }
-}
-
-/* Game Over Modal (Legacy - likely unused now but updated just in case) */
-.game-over-modal {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(0, 0, 0, 0.9);
-    padding: 40px 60px;
-    border-radius: 20px;
-    text-align: center;
-    display: none;
-    z-index: 2000;
-    border: 4px solid #3498db;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.8);
-}
-
-.game-over-modal h2 {
-    color: #3498db;
-    font-family: var(--font-heading);
-    font-size: 48px;
-    margin-bottom: 20px;
-}
-
-.game-over-modal p {
-    color: white;
-    font-size: 24px;
-    margin-bottom: 30px;
-}
-
-.game-over-modal .btn {
-    padding: 15px 40px;
-    font-size: 24px;
-    background: #3498db;
-    color: white;
-    border: none;
-    border-radius: 50px;
-    cursor: pointer;
-    font-family: var(--font-heading);
-    transition: transform 0.2s;
-}
-
-.game-over-modal .btn:hover {
-    transform: scale(1.1);
-    background: #2980b9;
+    background-color: #E9C46A; /* Saffron */
+    color: #264653;
+    border-bottom-color: #c8a34b;
+    box-shadow: 0 0 15px rgba(233, 196, 106, 0.4);
 }
 
 /* Facts Overlay */
@@ -427,22 +432,22 @@
 .dot {
     width: 15px;
     height: 15px;
-    background: rgba(255,255,255,0.3);
+    background: rgba(224, 251, 252, 0.3);
     border-radius: 50%;
     cursor: pointer;
     transition: all 0.3s ease;
 }
 
 .dot.active {
-    background: #ffd700;
+    background: #E9C46A;
     transform: scale(1.3);
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    box-shadow: 0 0 10px rgba(233, 196, 106, 0.5);
 }
 
 .click-hint {
     text-align: center;
     margin-top: 1rem;
-    color: #ffecb3;
+    color: #F4A261;
     font-style: italic;
     font-size: 0.9rem;
 }
@@ -459,7 +464,7 @@
 
 .particle {
     position: absolute;
-    background: radial-gradient(circle, #fff, transparent);
+    background: radial-gradient(circle, #E9C46A, transparent);
     border-radius: 50%;
     pointer-events: none;
     opacity: 0;
@@ -467,15 +472,21 @@
     animation: particleFloat 3s linear infinite;
 }
 
+@keyframes particleFloat {
+    0% { transform: translateY(0) scale(0); opacity: 0; }
+    50% { opacity: 0.8; }
+    100% { transform: translateY(-100px) scale(1.5); opacity: 0; }
+}
 
-/* Generic Message Overlay */
+
+/* Generic Message Overlay (Game Over, etc) */
 .message-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(5, 20, 35, 0.6);
+    background: rgba(40, 20, 10, 0.6);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -491,23 +502,29 @@
 
 /* Backdrop for Game Complete/Round End */
 .message-overlay.game-complete-backdrop {
-    background: rgba(5, 20, 35, 0.95); /* Dark Blue Dim */
-    backdrop-filter: blur(10px);
+    background: repeating-linear-gradient(
+        to bottom,
+        rgba(78, 52, 46, 0.95),
+        rgba(78, 52, 46, 0.95) 2px,
+        rgba(62, 39, 35, 0.95) 2px,
+        rgba(62, 39, 35, 0.95) 4px
+    );
+    backdrop-filter: blur(5px);
     pointer-events: all;
 }
 
 /* Content Box */
 .game-complete-box {
-    background: linear-gradient(135deg, #020a12 0%, #051625 100%) !important;
+    background: #3E2723 !important;
     padding: 3rem 4rem !important;
-    border: 2px solid #3498db !important; /* Blue Border */
-    border-radius: 24px !important;
-    box-shadow: 0 0 50px rgba(0, 153, 255, 0.3) !important;
+    border: 4px solid #E9C46A !important;
+    border-radius: 12px !important;
+    box-shadow: 0 0 50px rgba(0, 0, 0, 0.6) !important;
     min-width: 500px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    text-align: center; /* Ensure centering */
+    text-align: center;
     gap: 1.5rem;
     animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     transform: scale(1);
@@ -517,12 +534,12 @@
 /* Header Text */
 .complete-header {
     font-size: 3.5rem;
-    font-family: var(--font-heading);
-    background: linear-gradient(to right, #00ffff, #0099ff); /* Cyan to Blue */
+    font-family: var(--font-heading, 'Fredoka One', cursive);
+    background: linear-gradient(to right, #E0FBFC, #98c1d9);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(0, 153, 255, 0.5));
+    filter: drop-shadow(0 4px 0 rgba(0,0,0,0.5));
     margin-bottom: 0.5rem;
     line-height: 1.2;
     text-transform: uppercase;
@@ -533,35 +550,33 @@
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(255, 0, 0, 0.4));
 }
 
 .complete-header.round {
-    background: linear-gradient(to right, #ffd700, #ffaa00); /* Gold */
+    background: linear-gradient(to right, #E9C46A, #F4A261);
     -webkit-background-clip: text;
     background-clip: text;
     -webkit-text-fill-color: transparent;
-    filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5));
 }
 
 /* Subtitle/Message */
 .complete-sub {
     font-size: 1.3rem;
-    color: #b3e5fc; /* Light Blue Text */
-    font-family: var(--font-body);
-    font-weight: 600;
+    color: #F4A261;
+    font-family: var(--font-body, 'Nunito', sans-serif);
+    font-weight: 700;
     line-height: 1.6;
 }
 
 /* Score Display */
 .complete-score {
     font-size: 2rem;
-    color: #fff;
-    font-family: var(--font-heading);
-    background: rgba(0, 153, 255, 0.1);
+    color: #E0FBFC;
+    font-family: var(--font-heading, 'Fredoka One', cursive);
+    background: rgba(0, 0, 0, 0.2);
     padding: 0.8rem 2rem;
-    border-radius: 50px;
-    border: 1px solid rgba(0, 153, 255, 0.3);
+    border-radius: 8px;
+    border: 2px solid #3E2723;
     margin: 0.5rem 0;
 }
 
@@ -576,14 +591,14 @@
 
 /* Buttons */
 .restart-btn, .back-menu-btn {
-    padding: 16px 32px;
+    padding: 12px 32px;
     font-size: 1.2rem;
-    font-weight: 700;
-    font-family: var(--font-body);
+    font-weight: 800;
+    font-family: var(--font-body, 'Nunito', sans-serif);
     border: none;
-    border-radius: 12px;
+    border-radius: 6px;
     cursor: pointer;
-    transition: all 0.2s ease;
+    transition: all 0.1s ease;
     text-decoration: none;
     display: flex;
     align-items: center;
@@ -593,36 +608,40 @@
     letter-spacing: 1px;
 }
 
-/* Restart/Next Button - Blue Theme */
+/* Restart/Next Button - Saffron */
 .restart-btn {
-    background: linear-gradient(135deg, #2980b9, #3498db);
-    color: white;
-    box-shadow: 0 4px 0 #1a5276;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background-color: #E9C46A;
+    color: #264653;
+    border-bottom: 4px solid #c8a34b;
 }
 
 .restart-btn:hover {
+    background-color: #face7f;
+    border-bottom-color: #dcb355;
     transform: translateY(-2px);
-    box-shadow: 0 6px 0 #1a5276;
-    background: linear-gradient(135deg, #3498db, #5dade2);
 }
 
 .restart-btn:active {
     transform: translateY(2px);
-    box-shadow: 0 0 0 #1a5276;
+    border-bottom-width: 0;
+    margin-top: 4px;
 }
 
-/* Back Button - Dark Theme */
+/* Back Button - Sandy Brown */
 .back-menu-btn {
-    background: transparent;
-    color: #90caf9;
-    border: 2px solid rgba(144, 202, 249, 0.3);
-    box-shadow: none;
+    background-color: #F4A261;
+    color: #3E2723;
+    border-bottom: 4px solid #d38c52;
 }
 
 .back-menu-btn:hover {
-    background: rgba(144, 202, 249, 0.1);
-    color: white;
-    border-color: rgba(144, 202, 249, 0.8);
+    background-color: #ffb57b;
+    border-bottom-color: #e59d60;
     transform: translateY(-2px);
+}
+
+.back-menu-btn:active {
+    transform: translateY(2px);
+    border-bottom-width: 0;
+    margin-top: 4px;
 }

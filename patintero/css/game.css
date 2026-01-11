@@ -196,3 +196,10 @@
     85% { transform: translate(-50%, 0); opacity: 1; }
     100% { transform: translate(-50%, -20px); opacity: 0; }
 }
+
+/* Message Overlay styles now inherited from shared-overlays.css */
+
+@keyframes zoomIn {
+    from { transform: scale(0.8); opacity: 0; }
+    to { transform: scale(1); opacity: 1; }
+}

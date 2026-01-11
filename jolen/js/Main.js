@@ -494,11 +494,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const menuBtn = document.getElementById('menuBtn');
   if (menuBtn) menuBtn.addEventListener('click', () => {
+    Facts.hide();
     UI.showMenu('both', true);
   });
 
   const infoBtn = document.getElementById('infoBtn');
   if (infoBtn) infoBtn.addEventListener('click', () => {
+    Facts.hide();
     UI.showMenu('instructions', true);
   });
 });
