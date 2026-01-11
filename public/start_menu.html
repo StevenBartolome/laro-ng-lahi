@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Laro ng Lahi - Main Menu</title>
+    <link rel="stylesheet" href="assets/css/start_menu.css">
+    <link rel="stylesheet" href="assets/css/settings_modal.css">
+    <link rel="stylesheet" href="assets/css/achievements_modal.css">
+    <link rel="stylesheet" href="assets/css/facts_modal.css">
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <script src="assets/js/firebase-config.js"></script>
+    <script src="js/session-handler.js"></script>
+</head>
+
+<body>
+    <div class="game-container">
+        <!-- Decorative glow -->
+        <div class="glow-effect"></div>
+
+        <!-- Floating particles -->
+        <div class="particles">
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+            <div class="particle"></div>
+        </div>
+
+        <!-- User info bar -->
+        <div class="user-bar">
+            <div class="user-avatar" id="userAvatar">?</div>
+            <span class="user-name" id="userName">Loading...</span>
+            <a href="#" onclick="logout(); return false;" class="logout-btn">Logout</a>
+        </div>
+
+        <!-- Game Title -->
+        <div class="game-title">
+            <img src="assets/startmenu/screen_title.png" alt="Laro ng Lahi">
+        </div>
+
+        <!-- Menu Buttons -->
+        <div class="menu-container">
+            <!-- Start Button - Centered and prominent -->
+            <a href="#" class="start-btn" id="startBtn" title="Start Game">
+                <img src="assets/startmenu/start_button.png" alt="Start">
+            </a>
+
+            <!-- Secondary buttons - Horizontal layout -->
+            <div class="secondary-buttons">
+                <a href="#" class="menu-btn" id="factsBtn" title="Laro Fact Cards">
+                    <img src="assets/startmenu/fact_button.png" alt="Facts">
+                </a>
+                <a href="#" class="menu-btn achievements-btn" id="achievementsBtn" title="Achievements">
+                    <img src="assets/startmenu/achievements_button.png" alt="Achievements">
+                </a>
+                <a href="#" class="menu-btn" id="settingsBtn" title="Settings">
+                    <img src="assets/startmenu/settings_button.png" alt="Settings">
+                </a>
+            </div>
+        </div>
+
+        <!-- Version text -->
+        <div class="version-text">Version 1.0.0 | © 2025 Laro ng Lahi</div>
+
+        <!-- Background Music -->
+        <audio id="bgMusic" loop autoplay>
+            <source src="assets/bgmusic/startmenuMusic.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="clickSound">
+            <source src="assets/game_sfx/button_click_sound.mp3" type="audio/mpeg">
+        </audio>
+        <audio id="factsMusic" loop>
+            <source src="assets/game_facts_assets/fact_cards_music.mp3" type="audio/mpeg">
+        </audio>
+
+        <!-- Music Toggle Button -->
+        <button id="musicToggle" class="music-toggle" title="Toggle Music">
+            <img src="assets/startmenu/volume.png" alt="Toggle Music">
+        </button>
+    </div>
+
+    <!-- Global Audio System -->
+    <script src="assets/js/AudioManager.js"></script>
+    <script src="assets/js/SettingsModal.js"></script>
+    <script src="assets/js/AchievementManager.js"></script>
+    <script src="assets/js/AchievementsModal.js"></script>
+    <script src="assets/js/FactsModal.js"></script>
+    <script src="assets/js/AuthSelectionModal.js"></script>
+
+    <script>
+        // Update User UI when session is ready
+        window.addEventListener('user-ready', (e) => {
+            const user = e.detail;
+            document.getElementById('userName').textContent = user.displayname;
+            document.getElementById('userAvatar').textContent = user.displayname.charAt(0).toUpperCase();
+
+            // Set global user object for other scripts (like modals)
+            window.currentUser = {
+                id: user.username,
+                displayname: user.displayname,
+                isGuest: false // Simplified for now, can add check if needed
+            };
+        });
+
+        // Initialize Audio Manager with elements
+        const bgMusic = document.getElementById('bgMusic');
+        const clickSound = document.getElementById('clickSound');
+
+        // Wait for manager to load
+        window.addEventListener('load', () => {
+            const audioMgr = window.audioManager;
+
+            // Register Elements
+            audioMgr.registerMusic(bgMusic);
+            audioMgr.registerSFX(clickSound);
+
+            // Auto-play music (with interaction fallback)
+            bgMusic.play().catch(() => {
+                document.addEventListener('click', () => {
+                    bgMusic.play().catch(() => { });
+                }, { once: true });
+            });
+
+            // Music Toggle Button
+            const musicToggle = document.getElementById('musicToggle');
+            const toggleIcon = musicToggle.querySelector('img');
+
+            const updateToggleButton = () => {
+                const isMuted = audioMgr.settings.isMuted;
+                toggleIcon.src = isMuted ? 'assets/startmenu/mute.png' : 'assets/startmenu/volume.png';
+            };
+
+            updateToggleButton();
+
+            musicToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                audioMgr.toggleMute();
+                updateToggleButton();
+            });
+
+            window.addEventListener('audioSettingsChanged', () => {
+                updateToggleButton();
+            });
+
+            // Settings Button Wrapper
+            const settingsBtn = document.getElementById('settingsBtn');
+            if (settingsBtn) {
+                settingsBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.settingsModal.show();
+                });
+            }
+
+            // Achievements Button Wrapper
+            const achievementsBtn = document.getElementById('achievementsBtn');
+            if (achievementsBtn) {
+                achievementsBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.achievementsModal.show();
+                });
+            }
+
+            // Facts Button Wrapper
+            const factsBtn = document.getElementById('factsBtn');
+            if (factsBtn) {
+                factsBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.factsModal.show();
+                });
+            }
+
+            // Universal button click sound
+            const allButtons = document.querySelectorAll('.menu-btn, .start-btn, button, a');
+            allButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    if (clickSound) audioMgr.playSFX(clickSound);
+
+                    // Add animation
+                    if (btn.classList.contains('menu-btn') || btn.classList.contains('start-btn')) {
+                        btn.style.transform = 'scale(0.9)';
+                        setTimeout(() => {
+                            btn.style.transform = '';
+                        }, 100);
+                    }
+                });
+            });
+
+            // Start Button Wrapper
+            const startBtn = document.getElementById('startBtn');
+            if (startBtn) {
+                startBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    // Check directly for userData (set by session-handler) or localStorage guest flag
+                    if (window.userData || localStorage.getItem('guestMode') === 'true') {
+                        console.log('User authenticated, redirecting to game select');
+                        window.location.href = 'game_select.html';
+                    } else {
+                        console.log('No active session, showing auth modal');
+                        window.authSelectionModal.show();
+                    }
+                });
+            }
+
+            // Parallax Effect
+            document.addEventListener('mousemove', (e) => {
+                const title = document.querySelector('.game-title');
+                const glow = document.querySelector('.glow-effect');
+
+                if (title && glow) {
+                    const centerX = window.innerWidth / 2;
+                    const centerY = window.innerHeight / 2;
+
+                    const moveX = (e.clientX - centerX) / 50;
+                    const moveY = (e.clientY - centerY) / 50;
+
+                    title.style.transform = `translate(${moveX}px, ${moveY}px)`;
+                    glow.style.transform = `translate(calc(-50% + ${moveX * 2}px), ${moveY * 2}px)`;
+                }
+            });
+        });
+    </script>
+</body>
+
+</html>
