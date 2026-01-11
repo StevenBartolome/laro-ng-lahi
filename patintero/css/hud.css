@@ -1,6 +1,7 @@
 /* Patintero - HUD Styles */
+@import '../../assets/css/shared-hud.css';
 
-/* Game UI (Top Right) */
+/* Game UI (Top Right) - Layout Only */
 #gameUI {
     position: fixed;
     top: 20px;
@@ -11,34 +12,7 @@
     align-items: center;
 }
 
-.stat-box {
-    background: rgba(0, 0, 0, 0.85);
-    padding: 12px 20px;
-    border-radius: 20px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    min-width: 90px;
-    border: 3px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-}
-
-.stat-label {
-    font-size: 12px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    color: #fff;
-    margin-bottom: 4px;
-}
-
-.stat-value {
-    font-family: var(--font-heading);
-    font-size: 26px;
-    color: var(--accent-gold);
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
-}
-
+/* Specific Stat Colors (Patintero only) */
 .score-green {
     color: #2ecc71 !important;
     text-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
@@ -56,26 +30,6 @@
 .role-box .stat-value {
     color: #00e5ff;
     text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-}
-
-/* Icon Buttons */
-.ui-icon-btn {
-    background: rgba(0, 0, 0, 0.7);
-    border: none;
-    cursor: pointer;
-    width: 45px;
-    height: 45px;
-    border-radius: 50%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: transform 0.2s;
-    padding: 8px;
-}
-
-.ui-icon-btn:hover {
-    transform: scale(1.1);
-    background: rgba(0, 0, 0, 0.9);
 }
 
 /* Bottom Controls Row */

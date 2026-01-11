@@ -1,4 +1,5 @@
 /* Jolen - HUD Styles */
+@import '../../assets/css/shared-hud.css';
 
 /* Game InterfaceContainer */
 #game-container {
@@ -21,58 +22,6 @@
   align-items: center;
 }
 
-.stat-box {
-  background: rgba(62, 39, 35, 0.85);
-  backdrop-filter: blur(5px);
-  padding: 10px 25px;
-  border-radius: 50px;
-  border: 2px solid #8d6e63;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 120px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.stat-label {
-  font-size: 0.75rem;
-  text-transform: uppercase;
-  letter-spacing: 1px;
-  opacity: 0.8;
-  color: #d7ccc8;
-}
-
-.stat-value {
-  font-family: var(--font-heading);
-  font-size: 1.5rem;
-  color: #ffecb3;
-}
-
-/* Icon Buttons */
-.ui-icon-btn {
-  background: rgba(62, 39, 35, 0.85);
-  /* Dark brown to match stat-box */
-  border: 2px solid #8d6e63;
-  cursor: pointer;
-  width: 45px;
-  height: 45px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  transition: all 0.3s ease;
-  padding: 8px;
-  color: #ffecb3;
-  backdrop-filter: blur(5px);
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.ui-icon-btn:hover {
-  transform: scale(1.1) rotate(20deg);
-  background: var(--accent-color);
-  color: #fff;
-}
-
 /* Canvas Wrapper */
 .canvas-wrapper {
   width: 100%;
@@ -89,28 +38,19 @@ canvas {
   border: 2px solid #5d4037;
 }
 
-/* Back Button */
+/* Back Button Positioning */
 .back-btn {
   position: absolute;
   bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
-  cursor: pointer;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.4));
   z-index: 100;
 }
 
-.back-btn img {
-  width: 220px;
-  height: auto;
-}
-
 .back-btn:hover {
-  transform: translateX(-50%) scale(1.1);
+  transform: translateX(-50%) scale(1.1) !important;
 }
 
-/* Floating Action Buttons (FABs) */
 /* Floating Action Buttons moved to shared-overlays.css */
 
 /* Floating Instructions */
@@ -135,7 +75,7 @@ canvas {
   font-size: 1.5rem;
 }
 
-/* Tips Box (used in tutorials sometimes?) */
+/* Tips Box */
 .tips-box {
   background: rgba(255, 167, 38, 0.1);
   border-left: 4px solid #ffa726;
@@ -154,31 +94,6 @@ canvas {
 .tips-box p {
   font-size: 0.85rem;
   line-height: 1.4;
-}
-
-/* Lives Display with Hearts */
-.lives-display {
-  display: flex;
-  gap: 8px;
-  background: rgba(62, 39, 35, 0.85);
-  backdrop-filter: blur(5px);
-  padding: 8px 15px;
-  border-radius: 25px;
-  border: 2px solid #8d6e63;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-}
-
-.heart {
-  width: 35px;
-  height: auto;
-  transition: all 0.3s ease;
-  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-}
-
-.heart.lost {
-  opacity: 0.3;
-  filter: grayscale(100%) drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
-  transform: scale(0.9);
 }
 
 /* Instruction Prompt */
@@ -202,14 +117,7 @@ canvas {
 }
 
 @keyframes float {
-
-  0%,
-  100% {
-    transform: translateX(-50%) translateY(0);
-  }
-
-  50% {
-    transform: translateX(-50%) translateY(-10px);
-  }
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-10px); }
 }
 
