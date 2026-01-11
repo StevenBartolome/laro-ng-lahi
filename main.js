@@ -1,38 +1,64 @@
 const { app, BrowserWindow } = require('electron');
-const http = require('http');
 const path = require('path');
+const { fork } = require('child_process');
 
 let mainWindow;
+let serverProcess;
 
 function createWindow() {
     mainWindow = new BrowserWindow({
         width: 1280,
         height: 720,
+        backgroundColor: '#2e2c29',
+        icon: path.join(__dirname, 'public/assets/app_icon/laro_ng_lahi_app_icon.png'),
         webPreferences: {
             nodeIntegration: false,
-            contextIsolation: true
+            contextIsolation: true,
         },
         autoHideMenuBar: true
     });
 
-    const appUrl = 'http://localhost/laro_ng_lahi/index.php';
+    const SERVER_PORT = 3000;
+    const appUrl = `http://localhost:${SERVER_PORT}`;
 
-    // Function to check if server is running
+    // Start the Express server
+    startServer();
+
+    // Check if server is ready
     const checkServer = () => {
-        const req = http.get(appUrl, (res) => {
-            // If we get a response, the server is up
-            mainWindow.loadURL(appUrl);
-        }).on('error', (e) => {
-            // If error, load the local error page
-            mainWindow.loadFile(path.join(__dirname, 'server_error.html'));
+        const http = require('http');
+        http.get(appUrl, (res) => {
+            if (res.statusCode === 200 || res.statusCode === 302 || res.statusCode === 404) {
+                mainWindow.loadURL(appUrl);
+            } else {
+                setTimeout(checkServer, 1000);
+            }
+        }).on('error', (err) => {
+            setTimeout(checkServer, 1000);
         });
     };
 
     checkServer();
 
-    // Recheck on reload if we are on error page
     mainWindow.webContents.on('did-fail-load', () => {
-        mainWindow.loadFile(path.join(__dirname, 'server_error.html'));
+        // Retry logic or show error
+        setTimeout(checkServer, 1000);
+    });
+}
+
+function startServer() {
+    if (serverProcess) return;
+
+    const serverPath = path.join(__dirname, 'src/server.js');
+
+    // Spawn server process
+    serverProcess = fork(serverPath, [], {
+        env: { ...process.env, PORT: 3000 },
+        stdio: 'inherit'
+    });
+
+    serverProcess.on('error', (err) => {
+        console.error('Failed to start server:', err);
     });
 }
 
@@ -49,5 +75,13 @@ app.whenReady().then(() => {
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
         app.quit();
+    }
+});
+
+app.on('will-quit', () => {
+    // Kill the server process when app quits
+    if (serverProcess) {
+        serverProcess.kill();
+        serverProcess = null;
     }
 });
