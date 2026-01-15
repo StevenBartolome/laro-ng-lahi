@@ -445,11 +445,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Difficulty Selection ---
+  // --- Difficulty Selection ---
   function startGame(difficulty) {
+    document.getElementById("game-container").style.display = "block"; // Show game container FIRST
     UI.setGameStarted(true);
     UI.hideMenu();
-    document.getElementById("game-container").style.display = "block";
-
+    
     // Reset achievement tracking for new game
     currentStreak = 0;
     maxStreak = 0;

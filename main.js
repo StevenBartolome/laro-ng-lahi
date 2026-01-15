@@ -81,7 +81,17 @@ app.on('window-all-closed', () => {
 app.on('will-quit', () => {
     // Kill the server process when app quits
     if (serverProcess) {
-        serverProcess.kill();
+        if (process.platform === 'win32') {
+            try {
+                const { execSync } = require('child_process');
+                execSync(`taskkill /pid ${serverProcess.pid} /f /t`);
+            } catch (e) {
+                console.error('Failed to kill server process via taskkill:', e);
+                serverProcess.kill(); 
+            }
+        } else {
+            serverProcess.kill();
+        }
         serverProcess = null;
     }
 });

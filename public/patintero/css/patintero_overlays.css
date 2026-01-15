@@ -80,3 +80,8 @@
     color: #F6C260; /* Gold for title */
     -webkit-text-stroke: 1px #A4753A;
 }
+
+/* Fix for difficulty buttons: Ensure text doesn't block clicks */
+.diff-btn > * {
+    pointer-events: none;
+}
