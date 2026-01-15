@@ -99,7 +99,7 @@ class AchievementsModal {
             this.body.innerHTML = '<div class="modal-guest-message"><p>Loading achievements...</p></div>';
             // Retry briefly if not initialized (though it should be by the time user clicks)
             if (am && !am.initialized && user && user.id) {
-                await am.init(user.id, false);
+                await am.init(user.id, user.isGuest || false);
             } else if (!am) {
                 this.body.innerHTML = '<div class="modal-guest-message"><p>Error loading Achievement Manager.</p></div>';
                 return;

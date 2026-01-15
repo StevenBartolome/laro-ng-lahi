@@ -197,6 +197,13 @@ class AchievementManager {
      */
     async init(userId, isGuest = false) {
         this.userId = userId;
+        
+        // Defensive check: If userId indicates a guest, force isGuest to true
+        // This handles cases where callers might incorrectly pass isGuest=false
+        if (userId === 'guest' || (typeof userId === 'string' && userId.startsWith('guest_'))) {
+            isGuest = true;
+        }
+        
         this.isGuest = isGuest;
 
         if (this.isGuest) {
@@ -485,6 +492,7 @@ class AchievementManager {
     }
 
     processNotificationQueue() {
+        if (this.isGuest) return;
         if (this.isShowingNotification) {
             console.log('Notification queue busy. Waiting...');
             return;
