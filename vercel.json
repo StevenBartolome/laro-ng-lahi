@@ -1,0 +1,57 @@
+{
+    "version": 2,
+    "builds": [
+        {
+            "src": "api/**/*.js",
+            "use": "@vercel/node"
+        },
+        {
+            "src": "public/**",
+            "use": "@vercel/static"
+        }
+    ],
+    "routes": [
+        {
+            "src": "/api/(.*)",
+            "dest": "/api/$1"
+        },
+        {
+            "src": "/assets/(.*)",
+            "dest": "/public/assets/$1"
+        },
+        {
+            "src": "/js/(.*)",
+            "dest": "/public/js/$1"
+        },
+        {
+            "src": "/(jolen|luksong-baka|patintero)/(.*)",
+            "dest": "/public/$1/$2"
+        },
+        {
+            "src": "/(.*\\.(html|css|js|png|jpg|jpeg|gif|svg|ico|mp3|wav|ogg))",
+            "dest": "/public/$1"
+        },
+        {
+            "src": "/",
+            "dest": "/public/landing.html"
+        },
+        {
+            "src": "/(.*)",
+            "dest": "/public/$1"
+        }
+    ],
+    "rewrites": [
+        {
+            "source": "/api/auth/user",
+            "destination": "/api/auth/user.js"
+        },
+        {
+            "source": "/api/auth/session",
+            "destination": "/api/auth/session.js"
+        },
+        {
+            "source": "/api/auth/logout",
+            "destination": "/api/auth/logout.js"
+        }
+    ]
+}
