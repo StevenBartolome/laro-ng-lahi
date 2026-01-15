@@ -92,10 +92,16 @@ const Auth = {
     logout: async function () {
         try {
             await firebase.auth().signOut();
-            // Call PHP logout to clear session
-            window.location.href = 'logout.php';
+            // Call Node API to clear session
+            const response = await fetch('/api/auth/logout', { method: 'POST' });
+            if (response.ok) {
+                // Force reload to login page
+                window.location.replace('login.html');
+            }
         } catch (error) {
             console.error("Logout Error:", error);
+            // Fallback redirect even if API fails
+            window.location.replace('login.html');
         }
     },
 

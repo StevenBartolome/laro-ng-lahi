@@ -8,13 +8,14 @@
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     /* Warm Brown scanline/stripe background */
-    background: repeating-linear-gradient(
+    /* Warm Brown scanline/stripe background */
+    background-color: #4E342E;
+    background-image: linear-gradient(
         to bottom,
-        #4E342E,
-        #4E342E 2px,
-        #3E2723 2px,
-        #3E2723 4px
+        #4E342E 50%,
+        #3E2723 50%
     );
+    background-size: 100% 4px; /* 4px repeating pattern (2px + 2px) */
     min-height: 100vh;
     display: flex;
     justify-content: center;
