@@ -25,7 +25,131 @@
     margin-bottom: 5px;
 }
 
-/* 
-   Shared Overlay Overrides (Transparency, Modals, Toasts) 
+/* Shared Overlay Overrides (Transparency, Modals, Toasts) 
    are now inherited from shared-overlays.css 
 */
+
+/* 
+   FIX: Compact Layout for Jolen Modal 
+   Adjusts dimensions to fit on screen WITHOUT scrolling, 
+   matching the clean style of Luksong Baka/Patintero.
+*/
+
+/* 1. Base Overlay Compact */
+.overlay-content.enhanced-overlay {
+    padding: 2rem;
+    /* Reduced from 3rem */
+    gap: 1.5rem;
+    /* Reduced from 2rem */
+    width: 95%;
+    /* Wider to fit content horizontally */
+    max-width: 1000px;
+    /* No max-height or overflow - allow natural fit */
+}
+
+/* 2. Compact Title */
+.overlay-content .game-title {
+    /* Revert to shared font-size (clamp) or slightly smaller relative to it */
+    font-size: clamp(3rem, 8vw, 4.5rem);
+    margin-bottom: 0.5rem;
+    margin-top: -1rem;
+    /* Pull it higher as requested */
+    line-height: 1;
+}
+
+.overlay-content .subtitle {
+    margin-bottom: 1rem;
+    font-size: 1.1rem;
+}
+
+/* 3. Compact Panels */
+.instructions-panel,
+.difficulty-panel {
+    padding: 1.2rem;
+    /* Reduced from 2rem */
+    gap: 0.5rem;
+}
+
+.instructions-panel h3,
+.difficulty-panel h3 {
+    margin-bottom: 1rem;
+    font-size: 1.2rem;
+    /* Smaller headers */
+}
+
+/* 4. Compact Instructions */
+.tutorial-step {
+    padding: 0.5rem;
+    margin-bottom: 0.8rem;
+}
+
+.step-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 16px;
+}
+
+.step-text h4 {
+    font-size: 1rem;
+}
+
+.step-text p {
+    font-size: 0.85rem;
+}
+
+/* 5. Compact Mode Buttons */
+.mode-options {
+    gap: 10px;
+    /* Reduced gap */
+    margin-bottom: 15px;
+}
+
+.mode-btn {
+    padding: 0.8rem;
+    font-size: 1rem;
+}
+
+.card-icon {
+    font-size: 1.5rem;
+}
+
+/* 6. Compact Difficulty Buttons */
+.difficulty-options {
+    display: flex;
+    gap: 10px;
+}
+
+.diff-btn {
+    padding: 0.8rem;
+    flex: 1;
+    /* Distribute evenly */
+    margin-bottom: 0;
+}
+
+.diff-name {
+    font-size: 1.2rem;
+}
+
+.diff-desc {
+    font-size: 0.8rem;
+    display: block;
+    /* Show descriptions */
+    opacity: 0.9;
+}
+
+/* Responsive Extreme: Laptop/Tablet scale down */
+@media (max-height: 800px) {
+    .overlay-content.enhanced-overlay {
+        padding: 1.5rem;
+        gap: 1rem;
+    }
+
+    .overlay-content .game-title {
+        font-size: 2.5rem;
+    }
+
+    /* 
+       .diff-desc display:none removed to show descriptions 
+       as per user request. 
+    */
+}
