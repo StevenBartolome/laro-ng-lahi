@@ -17,14 +17,24 @@ const Game = {
         Sound.init();
 
         // Initialize Achievements
-        if (window.achievementManager && typeof userId !== 'undefined') {
-            window.achievementManager.init(userId, isGuest);
-            console.log('Achievement system initialized for Luksong Baka');
+        const initAchievements = async () => {
+            const user = window.currentUser;
+            if (window.achievementManager && user) {
+                await window.achievementManager.init(user.id, user.isGuest);
+                console.log('Achievement system initialized for Luksong Baka', user.isGuest ? '(Guest)' : '(User)');
+            }
+        };
+
+        if (window.currentUser) {
+            initAchievements();
+        } else {
+            window.addEventListener('user-ready', initAchievements);
         }
 
         // Global tracker function
         window.trackLuksongAchievements = async () => {
-            if (window.achievementManager && !isGuest) {
+            const user = window.currentUser;
+            if (window.achievementManager && user && !user.isGuest) {
                 console.log('Tracking Luksong Baka game:', GameState.achievementStats);
                 await window.achievementManager.trackLuksongGame(GameState.achievementStats);
             }

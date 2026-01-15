@@ -86,16 +86,31 @@ document.addEventListener("DOMContentLoaded", () => {
   let gameStartTime = null;
 
   // Initialize achievements on page load
+  // Initialize achievements on page load
   async function initAchievements() {
-    if (window.achievementManager && typeof userId !== 'undefined') {
-      await window.achievementManager.init(userId, isGuest);
-      console.log('Achievement system initialized for Jolen');
+    // Wait for user-ready event if currentUser is not set yet
+    if (!window.currentUser) {
+       window.addEventListener('user-ready', () => initAchievements());
+       return;
+    }
+
+    const user = window.currentUser;
+    if (window.achievementManager) {
+      await window.achievementManager.init(user.id, user.isGuest);
+      console.log('Achievement system initialized for Jolen', user.isGuest ? '(Guest)' : '(User)');
     }
   }
-  window.addEventListener('load', initAchievements);
+  // Call immediately in case already loaded, otherwise listener above handles it
+  if (document.readyState === 'complete') {
+      initAchievements();
+  } else {
+      window.addEventListener('load', initAchievements);
+  }
 
   async function trackJolenAchievements(won) {
-    if (window.achievementManager && !isGuest) {
+    const user = window.currentUser;
+    // user.isGuest is true for guests. We only track if NOT guest.
+    if (window.achievementManager && user && !user.isGuest) {
       await window.achievementManager.trackJolenGame({
         won: won,
         streak: maxStreak,
@@ -430,11 +445,12 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // --- Difficulty Selection ---
+  // --- Difficulty Selection ---
   function startGame(difficulty) {
+    document.getElementById("game-container").style.display = "block"; // Show game container FIRST
     UI.setGameStarted(true);
     UI.hideMenu();
-    document.getElementById("game-container").style.display = "block";
-
+    
     // Reset achievement tracking for new game
     currentStreak = 0;
     maxStreak = 0;

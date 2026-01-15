@@ -31,7 +31,7 @@
         window.addEventListener('user-ready', (e) => {
             const user = e.detail;
             userId = user.username;
-            isGuest = false; // logic for guest if needed
+            isGuest = user.isGuest || false;
             console.log('Game initialized for user:', userId);
 
             // Trigger any game init logic if it was waiting
