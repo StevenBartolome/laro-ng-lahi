@@ -58,6 +58,11 @@
                 <input type="password" id="password" required>
             </div>
 
+            <div style="margin-top: -15px; margin-bottom: 20px; text-align: right;">
+                <a href="forgot_password.html" style="color: #E0FBFC; font-size: 12px; text-decoration: none;">Forgot
+                    Password?</a>
+            </div>
+
             <div class="button-row">
                 <button type="submit" class="btn btn-login" id="loginBtn">
                     LOGIN
@@ -176,21 +181,7 @@
             }
         });
 
-        function handleResetPassword() {
-            const email = document.getElementById('email').value;
-            if (!email) {
-                alert('Please enter your email address first to reset password.');
-                return;
-            }
 
-            firebase.auth().sendPasswordResetEmail(email)
-                .then(() => {
-                    alert('Password reset email sent! Check your inbox.');
-                })
-                .catch((error) => {
-                    alert('Error: ' + error.message);
-                });
-        }
     </script>
 </body>
 

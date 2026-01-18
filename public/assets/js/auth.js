@@ -105,6 +105,48 @@ const Auth = {
         }
     },
 
+    resetPassword: async function (email) {
+        try {
+            // Check if user exists in Firestore first (to give specific error)
+            const db = firebase.firestore();
+            const snapshot = await db.collection('users').where('email', '==', email).get();
+
+            if (snapshot.empty) {
+                return { success: false, message: "Email does not exist." };
+            }
+
+            await firebase.auth().sendPasswordResetEmail(email);
+            return { success: true, message: "Password reset email sent! Check your inbox." };
+        } catch (error) {
+            console.error("Reset Password Error:", error);
+            // Handle specific Firebase error if protection is off/on
+            if (error.code === 'auth/user-not-found') {
+                return { success: false, message: "Email does not exist." };
+            }
+            return { success: false, message: error.message };
+        }
+    },
+
+    verifyPasswordResetCode: async function (code) {
+        try {
+            const email = await firebase.auth().verifyPasswordResetCode(code);
+            return { success: true, email: email };
+        } catch (error) {
+            console.error("Verify Code Error:", error);
+            return { success: false, message: error.message };
+        }
+    },
+
+    confirmPasswordReset: async function (code, newPassword) {
+        try {
+            await firebase.auth().confirmPasswordReset(code, newPassword);
+            return { success: true, message: "Password has been reset successfully! You can now login." };
+        } catch (error) {
+            console.error("Confirm Reset Error:", error);
+            return { success: false, message: error.message };
+        }
+    },
+
     // Helper to call Node.js API
     syncSession: async function (data) {
         const response = await fetch('/api/auth/session', {

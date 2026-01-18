@@ -17,7 +17,20 @@
         "win": {
             "icon": "public/assets/app_icon/laro_ng_lahi_app_icon.ico",
             "target": "nsis"
-        }
+        },
+        "nsis": {
+            "oneClick": false,
+            "perMachine": false,
+            "allowToChangeInstallationDirectory": true
+        },
+        "protocols": [
+            {
+                "name": "Laro ng Lahi URL",
+                "schemes": [
+                    "laronglahi"
+                ]
+            }
+        ]
     },
     "devDependencies": {
         "electron": "^33.2.1",

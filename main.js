@@ -62,15 +62,59 @@ function startServer() {
     });
 }
 
-app.whenReady().then(() => {
-    createWindow();
+app.setAsDefaultProtocolClient('laronglahi');
 
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow();
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+    app.quit();
+} else {
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        // Someone tried to run a second instance, we should focus our window.
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) mainWindow.restore();
+            mainWindow.focus();
+
+            // Handle deep link
+            const url = commandLine.find(arg => arg.startsWith('laronglahi://'));
+            if (url) handleDeepLink(url);
         }
     });
-});
+
+    app.whenReady().then(() => {
+        createWindow();
+
+        // Handle deep link on cold start (Windows)
+        const url = process.argv.find(arg => arg.startsWith('laronglahi://'));
+        if (url) {
+            // Delay slightly to ensure window/server is ready
+            setTimeout(() => handleDeepLink(url), 3000);
+        }
+
+        app.on('activate', () => {
+            if (BrowserWindow.getAllWindows().length === 0) {
+                createWindow();
+            }
+        });
+    });
+}
+
+function handleDeepLink(url) {
+    console.log("Deep link received:", url);
+    try {
+        // Expected format: laronglahi://reset-password?oobCode=XYZ
+        const urlObj = new URL(url);
+        const oobCode = urlObj.searchParams.get('oobCode');
+
+        if (oobCode) {
+            // Navigate the window to the reset page with the code
+            const resetUrl = `http://localhost:3000/reset_new_password.html?oobCode=${oobCode}`;
+            mainWindow.loadURL(resetUrl);
+        }
+    } catch (e) {
+        console.error("Failed to parse deep link:", e);
+    }
+}
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
@@ -87,7 +131,7 @@ app.on('will-quit', () => {
                 execSync(`taskkill /pid ${serverProcess.pid} /f /t`);
             } catch (e) {
                 console.error('Failed to kill server process via taskkill:', e);
-                serverProcess.kill(); 
+                serverProcess.kill();
             }
         } else {
             serverProcess.kill();
